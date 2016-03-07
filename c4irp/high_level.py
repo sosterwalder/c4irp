@@ -18,7 +18,7 @@ typedef struct {
     int32_t  port;
     char     identity[16];
     char     serial[16];
-    char     host_order;
+    int8_t   host_order;
     char*    actor;
     char*    data;
 }

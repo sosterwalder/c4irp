@@ -17,7 +17,9 @@ OBJS=$(SRCS:.c=.o)
 
 include home/Makefile
 
-all: libc4irp $(HL) $(LL)
+all: libc4irp
+
+test-all: sublibs all pymods test
 
 sublibs:
 	make CFLAGS="$(PCFLAGS)" libuv mbedtls
@@ -29,6 +31,8 @@ genhtml:
 	mkdir -p lcov_tmp
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
+
+pymods: c4irp/_high_level.so
 
 c4irp/_high_level.so: libc4irp.a c4irp/high_level.py
 	cd c4irp && python high_level.py
@@ -71,10 +75,12 @@ clean:
 	cd libuv && git clean -xdf
 	cd mbedtls && git clean -xdf
 
-test_ext: array_test
+test_ext: array_test coverage
 	make CFLAGS="$(DCFLAGS)"
 	make -C mbedtls check
 	./array_test 2>&1 | grep Bufferoverflow
+
+coverage:
 	geninfo --config-file lcovrc c4irpc \
 		-o c4irpc.info --derive-func-data
 	lcov --config-file lcovrc \
