@@ -19,10 +19,7 @@ include home/Makefile
 
 all: libc4irp
 
-test-all: sublibs all pymods test
-
-sublibs:
-	make CFLAGS="$(PCFLAGS)" libuv mbedtls
+test-all: all pymods test
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -65,9 +62,10 @@ mbedtls: mbedtls/library/libmbedtls.a
 array_test: c4irpc/array_test.o
 	$(CC) -std=c99 -o $@ $< $(CFLAGS)
 
-libc4irp: sublibs libc4irp.a
+libc4irp: libc4irp.a
 
 libc4irp.a: $(OBJS)
+	@make CFLAGS="$(PCFLAGS)" libuv mbedtls
 	ar $(ARFLAGS) $@ $^
 
 clean:
