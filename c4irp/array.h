@@ -30,6 +30,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #ifndef NDEBUG
 #define CA(type, array, index)                     \
@@ -85,14 +86,15 @@ ca_##type##_p(                                     \
     int line                                       \
 ) {                                                \
     if(!(index < array.len)) {                     \
-		printf(                                    \
-			"Bufferoverflow at %s:%d\n"            \
-			"\ttype:  %s\n"                        \
-			"\tlen:   %zu\n"                       \
-			"\tindex: %zu\n",                      \
-			file, line, #type, array.len, index    \
-		);                                         \
-		assert(0);                                 \
+        fprintf(                                   \
+            stderr,                                \
+            "Bufferoverflow at %s:%d\n"            \
+            "\ttype:  %s\n"                        \
+            "\tlen:   %zu\n"                       \
+            "\tindex: %zu\n",                      \
+            file, line, #type, array.len, index    \
+        );                                         \
+        assert(0);                                 \
     }                                              \
     return &(array.data[index]);                   \
 }
