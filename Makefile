@@ -35,10 +35,12 @@ pymods: c4irp/_high_level.so
 c4irp/_high_level.so: libc4irp.a cffi/high_level.py
 	cd c4irp && python ../cffi/high_level.py
 	$(CC) -std=c99 -shared -o $@ c4irp/_high_level.c $(CFLAGS) $(PYINC) $(LDFLAGS)
+	rm _high_level.gc*
 
 # c4irp/_low_level.so: libc4irp.a cffi/low_level.py
 #	cd c4irp && python ../cffi/low_level.py
-# 	$(CC) -std=c99 -shared -o $@ c4irp/_low_level.c $(CFLAGS) $(PYINC) $(LDFLAGS)
+#	$(CC) -std=c99 -shared -o $@ c4irp/_low_level.c $(CFLAGS) $(PYINC) $(LDFLAGS)
+#	rm _low_level.gc*
 
 libuv/configure:
 	cd libuv && ./autogen.sh
