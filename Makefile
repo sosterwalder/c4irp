@@ -1,7 +1,7 @@
 .PHONY: clean libc4irp sublibs libuv mbedtls test_ext
 
-PROJECT   := c4irp
-export CC := clang
+PROJECT     := c4irp
+export CC   := clang
 
 COMMON    := config.h c4irpc/common.h
 CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude
@@ -14,6 +14,7 @@ PYLD      := $(shell python-config --ldflags)
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
+COVOUT=$(SRCS:.c=.gcov)
 
 include home/Makefile
 
@@ -32,11 +33,11 @@ genhtml:
 pymods: c4irp/_high_level.so
 
 c4irp/_high_level.so: libc4irp.a cffi/high_level.py
-	cd c4irp && python high_level.py && mv cffi/_high_level.ch c4irp/
+	cd c4irp && python ../cffi/high_level.py
 	$(CC) -std=c99 -shared -o $@ c4irp/_high_level.c $(CFLAGS) $(PYINC) $(LDFLAGS)
 
 # c4irp/_low_level.so: libc4irp.a cffi/low_level.py
-# 	cd c4irp && python low_level.py && mv cffi/_low_level.ch c4irp/
+#	cd c4irp && python ../cffi/low_level.py
 # 	$(CC) -std=c99 -shared -o $@ c4irp/_low_level.c $(CFLAGS) $(PYINC) $(LDFLAGS)
 
 libuv/configure:
@@ -77,18 +78,11 @@ clean:
 test_ext: array_test
 	make CFLAGS="$(DCFLAGS)"
 	make -C mbedtls check
-	./array_test 2>&1 | grep Bufferoverflow
+	./array_test 1 2>&1
+	./array_test 3 2>&1 | grep Bufferoverflow
+	make coverage
 
-coverage:
-	geninfo --config-file lcovrc c4irpc \
-		-o c4irpc.info --derive-func-data
-	lcov --config-file lcovrc \
-		-a c4irpc.info \
-		-o app_total.info \
-		| grep -v -E \
-'(Summary coverage rate|\
-.: no data found|\
-Combining tracefiles.|\
-Reading tracefile)' \
-		| grep -v "app_.*.info" \
-		| grep -v '.: 100.0%' 2>&1 | ( ! grep . )
+coverage: $(COVOUT)
+
+%.gcov: %.c
+	llvm-cov -n $< | grep "Lines executed:100.00%"
