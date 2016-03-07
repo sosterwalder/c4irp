@@ -1,4 +1,8 @@
 /.deps
 *.o
+*.gcda
+*.gcno
+/c4irp.info
+/app_total.info
 /array_test
 /config.h

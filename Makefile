@@ -4,7 +4,9 @@ PROJECT   := c4irp
 export CC := clang
 
 COMMON    := config.h c4irp/common.h libuv mbedtls
-# CFLAGS    := -O3 -DNDEBUG
+DCFLAGS   := -Wall -Werror -Wno-unused-function -g --coverage
+CFLAGS    := $(DCFLAGS)
+#CFLAGS    := -Wall -Werror -Wno-unused-function -O3 -DNDEBUG
 
 
 include home/Makefile
@@ -15,8 +17,25 @@ config.h: config.defs.h
 	cp config.defs.h config.h
 
 test_ext:
-	make CFLAGS="-g -DDEBUG"
+	make CFLAGS="$(DCFLAGS)"
 	./array_test 2>&1 | grep Bufferoverflow
+	geninfo --config-file lcovrc c4irp \
+		-o c4irp.info --derive-func-data
+	lcov --config-file lcovrc \
+		-a c4irp.info \
+		-o app_total.info \
+		| grep -v -E \
+'(Summary coverage rate|\
+.: no data found|\
+Combining tracefiles.|\
+Reading tracefile)' \
+		| grep -v "app_.*.info" \
+		| grep -v '.: 100.0%' 2>&1 | ( ! grep . )
+
+genhtml:
+	mkdir -p lcov_tmp
+	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
+	cd lcov_tmp && open index.html
 
 libuv/configure:
 	cd libuv && ./autogen.sh
