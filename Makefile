@@ -3,11 +3,11 @@
 PROJECT     := c4irp
 export CC   := clang
 
-PYPY      := $(shell python --version | grep pypy)
-ifeq ($(PYPY),)
-	COVERAGE  := --coverage
-else
+PYPY      := $(shell python --version 2>&1 | grep PyPy > /dev/null 2> /dev/null; echo $$?)
+ifeq ($(PYPY),0)
 	COVERAGE  :=
+else
+	COVERAGE  := --coverage
 endif
 
 COMMON    := config.h c4irpc/common.h
@@ -89,7 +89,13 @@ test_ext: array_test
 	./array_test 3 2>&1 | grep Bufferoverflow
 	make coverage
 
+
+ifeq ($(PYPY),0)
+coverage:
+else
 coverage: $(COVOUT)
+endif
+
 
 %.gcov: %.c
 	llvm-cov -n $< | grep "Lines executed:100.00%"
