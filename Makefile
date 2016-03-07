@@ -4,23 +4,15 @@ PROJECT   := c4irp
 export CC := clang
 
 COMMON    := config.h c4irpc/common.h
-CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function 
+CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude
 DCFLAGS   := $(CCFLAGS)-g --coverage
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
 CFLAGS    := $(DCFLAGS)
+PYINC     := $(shell  python-config --includes)
+PYLD      := $(shell  python-config --ldflags)
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
-HL=$(wildcard c4irp/_high_level*.so)
-# LL=$(wildcard c4irp/_low_level*.so)
-
-ifeq ($(HL),)
-	HL=undefhl
-endif
-
-# ifeq ($(LL),)
-# 	LL=undefll
-# endif
 
 include home/Makefile
 
@@ -37,10 +29,11 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-$(HL): libc4irp c4irp/high_level.py
+c4irp/_high_level.so: libc4irp c4irp/high_level.py
 	cd c4irp && python high_level.py
+	$(CC) -std=c99 -shared -o c4irp/_high_level.so c4irp/_high_level.c $(PCFLAGS) $(PYINC)
 
-# $(LL): libc4irp c4irp/low_level.py
+#_low_level.c: libc4irp c4irp/low_level.py
 #	cd c4irp && python low_level.py
 
 libuv/configure:

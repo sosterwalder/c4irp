@@ -11,6 +11,8 @@ ffi.set_source(
     include_dirs=["../include"],
 )
 
+ffi.emit_c_code("_high_level.c")
+
 ffi.cdef("""
 typedef struct {
     char     address[16];
