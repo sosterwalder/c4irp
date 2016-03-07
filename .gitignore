@@ -7,3 +7,8 @@
 /array_test
 /config.h
 /libchirp.a
+/.cache
+/.coverage
+/.cache
+/.coverage
+/c4irp.egg-info/
