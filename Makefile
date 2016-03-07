@@ -27,7 +27,7 @@ COVOUT=$(SRCS:.c=.c.gcov)
 
 include home/Makefile
 
-all: libc4irp
+all: libc4irp c4irp/_high_level.o
 
 test-all: all pymods test coverage
 
