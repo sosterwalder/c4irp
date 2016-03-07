@@ -4,7 +4,7 @@
  *
  * If you call CA_PROTOTYPE(int) you get the type:
  *
- * ca_int_type
+ * ca_int_t
  *
  * and the functions:
  *
@@ -46,13 +46,13 @@ typedef struct {                                   \
     type* data;                                    \
     size_t len;                                    \
 }                                                  \
-ca_##type##_type;                                  \
+ca_##type##_t;                                     \
                                                    \
-static inline ca_##type##_type                     \
+static inline ca_##type##_t                        \
 ca_new_##type(                                     \
     size_t size                                    \
 ) {                                                \
-    ca_##type##_type array;                        \
+    ca_##type##_t array;                           \
     array.data = (type*) malloc(                   \
         size * sizeof(type)                        \
     );                                             \
@@ -60,12 +60,12 @@ ca_new_##type(                                     \
     return array;                                  \
 }                                                  \
                                                    \
-static inline ca_##type##_type                     \
+static inline ca_##type##_t                        \
 ca_from_pointer_##type(                            \
     type* data,                                    \
     size_t size                                    \
 ) {                                                \
-    ca_##type##_type array;                        \
+    ca_##type##_t array;                           \
     array.data = data;                             \
     array.len = size;                              \
     return array;                                  \
@@ -73,14 +73,14 @@ ca_from_pointer_##type(                            \
                                                    \
 static inline void                                 \
 ca_free_##type(                                    \
-    ca_##type##_type array                         \
+    ca_##type##_t array                            \
 ) {                                                \
     free(array.data);                              \
 }                                                  \
                                                    \
 static inline type*                                \
 ca_##type##_p(                                     \
-    ca_##type##_type array,                        \
+    ca_##type##_t array,                           \
     size_t index,                                  \
     const char file[],                             \
     int line                                       \
@@ -103,7 +103,7 @@ ca_##type##_p(                                     \
 (array[index])
 
 #define CA_PROTOTYPE(type)                         \
-typedef type* ca_##type##_type;                    \
+typedef type* ca_##type##_t;                       \
                                                    \
 static inline type*                                \
 ca_new_##type(                                     \
@@ -119,7 +119,7 @@ ca_free_##type(                                    \
     free(array);                                   \
 }                                                  \
                                                    \
-static inline ca_##type##_type                     \
+static inline ca_##type##_t                        \
 ca_from_pointer_##type(                            \
     type* data,                                    \
     size_t size                                    \
@@ -130,7 +130,7 @@ ca_from_pointer_##type(                            \
                                                    \
 static inline type*                                \
 ca_##type##_p(                                     \
-    ca_##type##_type array,                        \
+    ca_##type##_t array,                           \
     size_t index,                                  \
     const char file[],                             \
     int line                                       \

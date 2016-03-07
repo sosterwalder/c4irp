@@ -8,6 +8,8 @@ DCFLAGS   := -Wall -Werror -Wno-unused-function -g --coverage
 CFLAGS    := $(DCFLAGS)
 #CFLAGS    := -Wall -Werror -Wno-unused-function -O3 -DNDEBUG
 
+SRCS=$(wildcard c4irp/*.c)
+OBJS=$(SRCS:.c=.o)
 
 include home/Makefile
 
@@ -15,22 +17,6 @@ all: array_test
 
 config.h: config.defs.h
 	cp config.defs.h config.h
-
-test_ext:
-	make CFLAGS="$(DCFLAGS)"
-	./array_test 2>&1 | grep Bufferoverflow
-	geninfo --config-file lcovrc c4irp \
-		-o c4irp.info --derive-func-data
-	lcov --config-file lcovrc \
-		-a c4irp.info \
-		-o app_total.info \
-		| grep -v -E \
-'(Summary coverage rate|\
-.: no data found|\
-Combining tracefiles.|\
-Reading tracefile)' \
-		| grep -v "app_.*.info" \
-		| grep -v '.: 100.0%' 2>&1 | ( ! grep . )
 
 genhtml:
 	mkdir -p lcov_tmp
@@ -61,8 +47,26 @@ mbedtls: mbedtls/library/libmbedtls.a
 array_test: c4irp/array_test.o
 	$(CC) -std=c99 -o $@ $< $(CFLAGS)
 
+libchirp.a: $(OBJS)
+	ar $(ARFLAGS) $@ $^
+
 clean:
 	git clean -xdf
 	cd libuv && git clean -xdf
 	cd mbedtls && git clean -xdf
 
+test_ext:
+	make CFLAGS="$(DCFLAGS)"
+	./array_test 2>&1 | grep Bufferoverflow
+	geninfo --config-file lcovrc c4irp \
+		-o c4irp.info --derive-func-data
+	lcov --config-file lcovrc \
+		-a c4irp.info \
+		-o app_total.info \
+		| grep -v -E \
+'(Summary coverage rate|\
+.: no data found|\
+Combining tracefiles.|\
+Reading tracefile)' \
+		| grep -v "app_.*.info" \
+		| grep -v '.: 100.0%' 2>&1 | ( ! grep . )
