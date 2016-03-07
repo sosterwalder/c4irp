@@ -11,15 +11,15 @@ CFLAGS    := $(DCFLAGS)
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
 HL=$(wildcard c4irp/_high_level*.so)
-LL=$(wildcard c4irp/_low_level*.so)
+# LL=$(wildcard c4irp/_low_level*.so)
 
-ifndef HL
-	HL=undef
+ifeq ($(HL),)
+	HL=undefhl
 endif
 
-ifndef LL
-	LL=undef
-endif
+# ifeq ($(LL),)
+# 	LL=undefll
+# endif
 
 include home/Makefile
 
@@ -34,10 +34,10 @@ genhtml:
 	cd lcov_tmp && open index.html
 
 $(HL): libchirp.a
-	python setup.py build
+	python -m c4irp.high_level
 
-$(LL): libchirp.a
-	python setup.py build
+# $(LL): libchirp.a
+#	python -m c4irp.low_level
 
 libuv/configure:
 	cd libuv && ./autogen.sh

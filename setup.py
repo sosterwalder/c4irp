@@ -3,7 +3,6 @@
 # pylint: disable=exec-used
 from setuptools import setup
 from setuptools import find_packages
-from setuptools.command.build_py import build_py
 import sys
 import os
 
@@ -20,30 +19,6 @@ version_file = "c4irp/version.py"
 with open(version_file) as f:
     code = compile(f.read(), version_file, 'exec')
     exec(code)
-
-cffi_files = {'c4irp': ['high_level.py']}
-
-
-class CustomBuildCommand(build_py):
-    """CustomBuildCommand"""
-    def run(self):
-        for cffi_dir in cffi_files.keys():
-            try:
-                os.chdir(cffi_dir)
-                if cffi_dir not in self.package_data:
-                    self.package_data[cffi_dir] = []
-                for cffi_file in cffi_files[cffi_dir]:
-                    with open(cffi_file) as f:
-                        code = compile(f.read(), cffi_file, 'exec')
-                        ffi = {}
-                        exec(code, ffi)
-                        self.package_data[cffi_dir].append(
-                            os.path.basename(ffi['ffi'].compile())
-                        )
-
-            finally:
-                os.chdir(base_dir)
-        build_py.run(self)
 
 
 def find_data(packages, extensions):
@@ -77,7 +52,7 @@ setup(
     version = __version__,
     packages = find_packages(),
     package_data=find_data(
-        find_packages(), ["json", "json.gz", "so"]
+        find_packages(), ["so"]
     ),
     entry_points = {
         'console_scripts': [
@@ -89,9 +64,6 @@ setup(
     setup_requires = [
         "cffi",
     ],
-    cmdclass = {
-        'build_py': CustomBuildCommand,
-    },
     author = "Jean-Louis Fuchs",
     author_email = "ganwell@fangorn.ch",
     description = "Message-passing and actor-based programming for everyone",

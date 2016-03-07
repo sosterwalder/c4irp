@@ -28,4 +28,4 @@ ch_msg_init(ch_message_t* message);
 """)
 
 if __name__ == "__main__":
-    outfile = ffi.compile()
+    ffi.compile()
