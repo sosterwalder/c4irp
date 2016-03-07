@@ -3,7 +3,7 @@
 PROJECT   := c4irp
 export CC := clang
 
-COMMON    := config.h c4chirp/common.h
+COMMON    := config.h c4irp/common.h
 # CFLAGS    := -O3 -DNDEBUG
 
 
@@ -31,7 +31,9 @@ mbedtls/library/libmbedtls.a:
 
 mbedtls: mbedtls/library/libmbedtls.a
 
-%.o: %.c %.h $(COMMON)
+%.c: %.h
+
+%.o: %.c $(COMMON)
 	$(CC) -std=c99 -c -o $@ $< $(CFLAGS)
 
 array_test: c4irp/array_test.o
