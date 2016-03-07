@@ -3,15 +3,21 @@
 PROJECT     := c4irp
 export CC   := clang
 
+PYPY      := $(shell python --version | grep pypy)
+ifeq ($(PYPY),)
+	COVERAGE  := --coverage
+else
+	COVERAGE  :=
+endif
+
 COMMON    := config.h c4irpc/common.h
 CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude
-DCFLAGS   := $(CCFLAGS) -g --coverage
+DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
 CFFIF     := $(shell pwd)/home/cffi_fix:$(PATH)
 PY        := python
 
 export CFLAGS   := $(DCFLAGS)
-export CFFILIBS := libc4irp.a
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
@@ -34,11 +40,11 @@ genhtml:
 pymods: c4irp/_high_level.o
 
 c4irp/_high_level.o: libc4irp.a cffi/high_level.py
-	PATH=$(CFFIF) $(PY) cffi/high_level.py --linker_exe=$(CC)
+	PATH=$(CFFIF) $(PY) cffi/high_level.py
 	mv _high_level* c4irp/
 
 # c4irp/_low_level.so: libc4irp.a cffi/low_level.py
-#	PATH=$(CFFIF) $(PY) cffi/low_level.py --linker_exe=$(CC)
+#	PATH=$(CFFIF) CFFILIBS=libc4irp.a $(PY) cffi/low_level.py
 #	mv _low_level* c4irp/
 
 libuv/configure:

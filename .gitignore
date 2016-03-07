@@ -1,7 +1,9 @@
 /.deps
+/.python-version
 /build
 __pycache__
 *.o
+*.pyc
 *.so
 *.gcda
 *.gcno
