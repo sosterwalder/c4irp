@@ -11,7 +11,6 @@ ffi.set_source(
     include_dirs=["../include"],
 )
 
-ffi.emit_c_code("_high_level.c")
 
 ffi.cdef("""
 typedef struct {
@@ -31,4 +30,4 @@ ch_msg_init(ch_message_t* message);
 """)
 
 if __name__ == "__main__":
-    ffi.compile()
+    ffi.emit_c_code("_high_level.c")

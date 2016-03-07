@@ -5,11 +5,12 @@ export CC := clang
 
 COMMON    := config.h c4irpc/common.h
 CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude
-DCFLAGS   := $(CCFLAGS)-g --coverage
+DCFLAGS   := $(CCFLAGS) -g --coverage
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
 CFLAGS    := $(DCFLAGS)
-PYINC     := $(shell  python-config --includes)
-PYLD      := $(shell  python-config --ldflags)
+LDFLAGS   := libc4irp.a
+PYINC     := $(shell python-config --includes)
+PYLD      := $(shell python-config --ldflags)
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
@@ -29,9 +30,9 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-c4irp/_high_level.so: libc4irp c4irp/high_level.py
+c4irp/_high_level.so: libc4irp.a c4irp/high_level.py
 	cd c4irp && python high_level.py
-	$(CC) -std=c99 -shared -o c4irp/_high_level.so c4irp/_high_level.c $(PCFLAGS) $(PYINC)
+	$(CC) -std=c99 -shared -o $@ c4irp/_high_level.c $(CFLAGS) $(PYINC) $(LDFLAGS)
 
 #_low_level.c: libc4irp c4irp/low_level.py
 #	cd c4irp && python low_level.py
