@@ -1,13 +1,13 @@
-.PHONY: clean libuv mbedtls test_ext
+.PHONY: clean libc4irp sublibs libuv mbedtls test_ext
 
 PROJECT   := c4irp
 export CC := clang
 
-COMMON    := config.h c4irpc/common.h libuv/.libs/libuv.a mbedtls/library/libmbedtls.a
+COMMON    := config.h c4irpc/common.h
 CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function 
 DCFLAGS   := $(CCFLAGS)-g --coverage
+PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
 CFLAGS    := $(DCFLAGS)
-#CFLAGS    := $(CCFLAGS) -O3 -DNDEBUG
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
@@ -24,7 +24,10 @@ endif
 
 include home/Makefile
 
-all: libc4irp.a array_test $(HL) $(LL)
+all: libc4irp $(HL) $(LL)
+
+sublibs:
+	make CFLAGS="$(PCFLAGS)" libuv mbedtls
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -34,10 +37,10 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-$(HL): libc4irp.a c4irp/high_level.py
+$(HL): libc4irp c4irp/high_level.py
 	cd c4irp && python high_level.py
 
-# $(LL): libc4irp.a c4irp/low_level.py
+# $(LL): libc4irp c4irp/low_level.py
 #	cd c4irp && python low_level.py
 
 libuv/configure:
@@ -64,6 +67,8 @@ mbedtls: mbedtls/library/libmbedtls.a
 array_test: c4irpc/array_test.o
 	$(CC) -std=c99 -o $@ $< $(CFLAGS)
 
+libc4irp: sublibs libc4irp.a
+
 libc4irp.a: $(OBJS)
 	ar $(ARFLAGS) $@ $^
 
@@ -72,8 +77,9 @@ clean:
 	cd libuv && git clean -xdf
 	cd mbedtls && git clean -xdf
 
-test_ext:
+test_ext: array_test
 	make CFLAGS="$(DCFLAGS)"
+	make -C mbedtls check
 	./array_test 2>&1 | grep Bufferoverflow
 	geninfo --config-file lcovrc c4irpc \
 		-o c4irpc.info --derive-func-data
