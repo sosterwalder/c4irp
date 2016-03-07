@@ -3,16 +3,19 @@
 PROJECT   := c4irp
 export CC := clang
 
-COMMON    := config.h c4irp/common.h
+COMMON    := config.h c4irp/common.h libuv mbedtls
 # CFLAGS    := -O3 -DNDEBUG
 
 
 include home/Makefile
 
+all: array_test
+
 config.h: config.defs.h
 	cp config.defs.h config.h
 
-test_ext: array_test
+test_ext:
+	make CFLAGS="-g -DDEBUG"
 	./array_test 2>&1 | grep Bufferoverflow
 
 libuv/configure:
