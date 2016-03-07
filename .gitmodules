@@ -1,0 +1,6 @@
+[submodule "home"]
+	path = home
+	url = git@github.com:concretecloud/home.git
+[submodule "libuv"]
+	path = libuv
+	url = git@github.com:libuv/libuv.git
