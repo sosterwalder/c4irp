@@ -1,14 +1,12 @@
+.PHONY: clean libuv mbedtls
+
 PROJECT   := c4irp
 export CC := clang
 
 include home/Makefile
 
-
-clean:
-	rm -f libuv/configure
-	rm -f libuv/Makefile
-	rm -f libuv/.libs/libuv.a
-	cd libuv && git clean -xdf
+test_ext:
+	make -C mbedtls check
 
 libuv/configure:
 	cd libuv && ./autogen.sh
@@ -20,3 +18,14 @@ libuv/.libs/libuv.a: libuv/Makefile
 	make -C libuv
 
 libuv: libuv/.libs/libuv.a
+
+mbedtls/library/libmbedtls.a:
+	make -C mbedtls
+
+mbedtls: mbedtls/library/libmbedtls.a
+
+clean:
+	git clean -xdf
+	cd libuv && git clean -xdf
+	cd mbedtls && git clean -xdf
+

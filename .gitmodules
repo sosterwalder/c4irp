@@ -4,3 +4,6 @@
 [submodule "libuv"]
 	path = libuv
 	url = git@github.com:libuv/libuv.git
+[submodule "mbedtls"]
+	path = mbedtls
+	url = git@github.com:ARMmbed/mbedtls.git
