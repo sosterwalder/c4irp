@@ -16,3 +16,4 @@ __pycache__
 /.coverage
 /c4irp.egg-info/
 /c4irp/*.c
+/*.info

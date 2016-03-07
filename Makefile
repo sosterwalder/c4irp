@@ -3,19 +3,27 @@
 PROJECT   := c4irp
 export CC := clang
 
-COMMON    := config.h c4irpc/common.h libuv mbedtls
+COMMON    := config.h c4irpc/common.h libuv/.libs/libuv.a mbedtls/library/libmbedtls.a
 DCFLAGS   := -Wall -Werror -Wno-unused-function -g --coverage
 CFLAGS    := $(DCFLAGS)
 #CFLAGS    := -Wall -Werror -Wno-unused-function -O3 -DNDEBUG
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
-HL=$(wildcard c4irpc/_high_level*.so)
-LL=$(wildcard c4irpc/_low_level*.so)
+HL=$(wildcard c4irp/_high_level*.so)
+LL=$(wildcard c4irp/_low_level*.so)
+
+ifndef HL
+	HL=undef
+endif
+
+ifndef LL
+	LL=undef
+endif
 
 include home/Makefile
 
-all: array_test
+all: array_test $(HL) $(LL)
 
 config.h: config.defs.h
 	cp config.defs.h config.h
