@@ -19,7 +19,7 @@ include home/Makefile
 
 all: libc4irp
 
-test-all: all pymods test
+test-all: all pymods test coverage
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -31,12 +31,13 @@ genhtml:
 
 pymods: c4irp/_high_level.so
 
-c4irp/_high_level.so: libc4irp.a c4irp/high_level.py
-	cd c4irp && python high_level.py
+c4irp/_high_level.so: libc4irp.a cffi/high_level.py
+	cd c4irp && python high_level.py && mv cffi/_high_level.ch c4irp/
 	$(CC) -std=c99 -shared -o $@ c4irp/_high_level.c $(CFLAGS) $(PYINC) $(LDFLAGS)
 
-#_low_level.c: libc4irp c4irp/low_level.py
-#	cd c4irp && python low_level.py
+# c4irp/_low_level.so: libc4irp.a cffi/low_level.py
+# 	cd c4irp && python low_level.py && mv cffi/_low_level.ch c4irp/
+# 	$(CC) -std=c99 -shared -o $@ c4irp/_low_level.c $(CFLAGS) $(PYINC) $(LDFLAGS)
 
 libuv/configure:
 	cd libuv && ./autogen.sh
@@ -73,7 +74,7 @@ clean:
 	cd libuv && git clean -xdf
 	cd mbedtls && git clean -xdf
 
-test_ext: array_test coverage
+test_ext: array_test
 	make CFLAGS="$(DCFLAGS)"
 	make -C mbedtls check
 	./array_test 2>&1 | grep Bufferoverflow
