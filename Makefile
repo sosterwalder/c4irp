@@ -4,9 +4,10 @@ PROJECT   := c4irp
 export CC := clang
 
 COMMON    := config.h c4irpc/common.h libuv/.libs/libuv.a mbedtls/library/libmbedtls.a
-DCFLAGS   := -Wall -Werror -Wno-unused-function -g --coverage
+CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function 
+DCFLAGS   := $(CCFLAGS)-g --coverage
 CFLAGS    := $(DCFLAGS)
-#CFLAGS    := -Wall -Werror -Wno-unused-function -O3 -DNDEBUG
+#CFLAGS    := $(CCFLAGS) -O3 -DNDEBUG
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
@@ -23,7 +24,7 @@ endif
 
 include home/Makefile
 
-all: array_test $(HL) $(LL)
+all: libc4irp.a array_test $(HL) $(LL)
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -33,11 +34,11 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-$(HL): libchirp.a
-	python -m c4irp.high_level
+$(HL): libc4irp.a c4irp/high_level.py
+	cd c4irp && python high_level.py
 
-# $(LL): libchirp.a
-#	python -m c4irp.low_level
+# $(LL): libc4irp.a c4irp/low_level.py
+#	cd c4irp && python low_level.py
 
 libuv/configure:
 	cd libuv && ./autogen.sh
@@ -63,7 +64,7 @@ mbedtls: mbedtls/library/libmbedtls.a
 array_test: c4irpc/array_test.o
 	$(CC) -std=c99 -o $@ $< $(CFLAGS)
 
-libchirp.a: $(OBJS)
+libc4irp.a: $(OBJS)
 	ar $(ARFLAGS) $@ $^
 
 clean:

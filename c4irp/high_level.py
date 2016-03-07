@@ -6,7 +6,8 @@ ffi.set_source(
     """
     #include <c4irp.h>
     """,
-    libraries=[],
+    libraries=["c4irp"],
+    library_dirs=[".."],
     include_dirs=["../include"],
 )
 
