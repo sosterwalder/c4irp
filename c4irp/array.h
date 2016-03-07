@@ -27,8 +27,9 @@
 #ifndef ca_check_array_h
 #define ca_check_array_h
 
+#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #ifndef NDEBUG
 #define CA(type, array, index)                     \
@@ -84,12 +85,11 @@ ca_##type##_p(                                     \
     int line                                       \
 ) {                                                \
     if(!(index < array.len)) {                     \
-        char buffer[ARRAYBUFSIZ];                  \
-		printf(                                    \ 
+		printf(                                    \
 			"Bufferoverflow at %s:%d\n"            \
 			"\ttype:  %s\n"                        \
-			"\tlen:   %d\n"                        \
-			"\tindex: %d\n",                       \
+			"\tlen:   %zu\n"                       \
+			"\tindex: %zu\n",                      \
 			file, line, #type, array.len, index    \
 		);                                         \
 		assert(0);                                 \
@@ -142,7 +142,7 @@ ca_##type##_p(                                     \
 #endif //ca_check_array_h
 
 // Testcode
-/*
+
 CA_PROTOTYPE(int)
 
 int
@@ -155,6 +155,4 @@ main(
     CA(int, a, 3) = 2;
     return CA(int, a, 3);
 }
-*/
-
 
