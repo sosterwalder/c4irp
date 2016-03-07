@@ -4,6 +4,8 @@ PROJECT     := c4irp
 export CC   := clang
 
 PYPY      := $(shell python --version 2>&1 | grep PyPy > /dev/null 2> /dev/null; echo $$?)
+NEWCOV    := $(shell llvm-cov --help 2>&1 | grep -E "USAGE:.*SOURCEFILE" > /dev/null 2> /dev/null; echo $$?)
+
 ifeq ($(PYPY),0)
 	COVERAGE  :=
 else
@@ -97,6 +99,12 @@ coverage: $(COVOUT)
 endif
 
 
+ifeq ($(NEWCOV),0)
 %.c.gcov: %.c
 	llvm-cov $< | grep "Lines executed:100.00%"
 	mv *.c.gcov c4irpc/
+else
+%.c.gcov: %.c
+	llvm-cov -gcda=$<.gcda -gcno=$<.gcno
+	mv *.c.gcov c4irpc/
+endif
