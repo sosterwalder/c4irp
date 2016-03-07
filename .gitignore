@@ -1,3 +1,4 @@
 /.deps
 *.o
 /array_test
+/config.h

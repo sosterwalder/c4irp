@@ -9,7 +9,7 @@ COMMON    := config.h c4chirp/common.h
 
 include home/Makefile
 
-config.h:
+config.h: config.defs.h
 	cp config.defs.h config.h
 
 test_ext: array_test
@@ -31,8 +31,7 @@ mbedtls/library/libmbedtls.a:
 
 mbedtls: mbedtls/library/libmbedtls.a
 
-
-%.o: %.h %.c $(COMMON)
+%.o: %.c %.h $(COMMON)
 	$(CC) -std=c99 -c -o $@ $< $(CFLAGS)
 
 array_test: c4irp/array_test.o
