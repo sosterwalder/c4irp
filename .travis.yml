@@ -1,5 +1,4 @@
 language: python
-sudo: required
 python:
   - "2.7"
   - "3.4"
@@ -16,4 +15,3 @@ git:
 before_install:
     - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
     - git submodule update --init --recursive
-    - sudo apt-get install llvm

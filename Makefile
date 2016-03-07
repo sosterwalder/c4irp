@@ -21,7 +21,7 @@ export CFLAGS   := $(DCFLAGS)
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
-COVOUT=$(SRCS:.c=.gcov)
+COVOUT=$(SRCS:.c=.c.gcov)
 
 include home/Makefile
 
@@ -97,5 +97,6 @@ coverage: $(COVOUT)
 endif
 
 
-%.gcov: %.c
-	llvm-cov -n $< | grep "Lines executed:100.00%"
+%.c.gcov: %.c
+	llvm-cov $< | grep "Lines executed:100.00%"
+	mv *.c.gcov c4irpc/
