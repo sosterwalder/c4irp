@@ -3,12 +3,12 @@
 PROJECT   := c4irp
 export CC := clang
 
-COMMON    := config.h c4irp/common.h libuv mbedtls
+COMMON    := config.h c4irpc/common.h libuv mbedtls
 DCFLAGS   := -Wall -Werror -Wno-unused-function -g --coverage
 CFLAGS    := $(DCFLAGS)
 #CFLAGS    := -Wall -Werror -Wno-unused-function -O3 -DNDEBUG
 
-SRCS=$(wildcard c4irp/*.c)
+SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
 
 include home/Makefile
@@ -44,7 +44,7 @@ mbedtls: mbedtls/library/libmbedtls.a
 %.o: %.c $(COMMON)
 	$(CC) -std=c99 -c -o $@ $< $(CFLAGS)
 
-array_test: c4irp/array_test.o
+array_test: c4irpc/array_test.o
 	$(CC) -std=c99 -o $@ $< $(CFLAGS)
 
 libchirp.a: $(OBJS)
@@ -58,10 +58,10 @@ clean:
 test_ext:
 	make CFLAGS="$(DCFLAGS)"
 	./array_test 2>&1 | grep Bufferoverflow
-	geninfo --config-file lcovrc c4irp \
-		-o c4irp.info --derive-func-data
+	geninfo --config-file lcovrc c4irpc \
+		-o c4irpc.info --derive-func-data
 	lcov --config-file lcovrc \
-		-a c4irp.info \
+		-a c4irpc.info \
 		-o app_total.info \
 		| grep -v -E \
 '(Summary coverage rate|\
