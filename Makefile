@@ -105,6 +105,6 @@ ifeq ($(NEWCOV),0)
 	mv *.c.gcov c4irpc/
 else
 %.c.gcov: %.c
-	llvm-cov -gcda=$<.gcda -gcno=$<.gcno
+	llvm-cov-3.4 -gcda=$(basename $<).gcda -gcno=$(basename $<).gcno
 	mv *.c.gcov c4irpc/
 endif
