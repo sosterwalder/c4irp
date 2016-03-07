@@ -7,10 +7,11 @@ COMMON    := config.h c4irpc/common.h
 CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude
 DCFLAGS   := $(CCFLAGS) -g --coverage
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
-CFLAGS    := $(DCFLAGS)
-LDFLAGS   := libc4irp.a
-PYINC     := $(shell python-config --includes)
-PYLD      := $(shell python-config --ldflags)
+CFFIF     := $(shell pwd)/home/cffi_fix:$(PATH)
+PY        := python
+
+export CFLAGS   := $(DCFLAGS)
+export CFFILIBS := libc4irp.a
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
@@ -30,17 +31,15 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-pymods: c4irp/_high_level.so
+pymods: c4irp/_high_level.o
 
-c4irp/_high_level.so: libc4irp.a cffi/high_level.py
-	cd c4irp && python ../cffi/high_level.py
-	$(CC) -std=c99 -shared -o $@ c4irp/_high_level.c $(CFLAGS) $(PYINC) $(LDFLAGS)
-	rm _high_level.gc*
+c4irp/_high_level.o: libc4irp.a cffi/high_level.py
+	PATH=$(CFFIF) $(PY) cffi/high_level.py --linker_exe=$(CC)
+	mv _high_level* c4irp/
 
 # c4irp/_low_level.so: libc4irp.a cffi/low_level.py
-#	cd c4irp && python ../cffi/low_level.py
-#	$(CC) -std=c99 -shared -o $@ c4irp/_low_level.c $(CFLAGS) $(PYINC) $(LDFLAGS)
-#	rm _low_level.gc*
+#	PATH=$(CFFIF) $(PY) cffi/low_level.py --linker_exe=$(CC)
+#	mv _low_level* c4irp/
 
 libuv/configure:
 	cd libuv && ./autogen.sh

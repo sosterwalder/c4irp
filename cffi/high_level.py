@@ -6,8 +6,6 @@ ffi.set_source(
     """
     #include <c4irp.h>
     """,
-    libraries=["c4irp"],
-    library_dirs=[".."],
     include_dirs=["../include"],
 )
 
@@ -30,4 +28,4 @@ ch_msg_init(ch_message_t* message);
 """)
 
 if __name__ == "__main__":
-    ffi.emit_c_code("_high_level.c")
+    ffi.compile(verbose=True)
