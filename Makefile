@@ -10,6 +10,8 @@ CFLAGS    := $(DCFLAGS)
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
+HL=$(wildcard c4irpc/_high_level*.so)
+LL=$(wildcard c4irpc/_low_level*.so)
 
 include home/Makefile
 
@@ -22,6 +24,12 @@ genhtml:
 	mkdir -p lcov_tmp
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
+
+$(HL): libchirp.a
+	python setup.py build
+
+$(LL): libchirp.a
+	python setup.py build
 
 libuv/configure:
 	cd libuv && ./autogen.sh
