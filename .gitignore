@@ -7,6 +7,7 @@ __pycache__
 *.so
 *.gcda
 *.gcno
+*.gcov
 /c4irp.info
 /app_total.info
 /array_test
