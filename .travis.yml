@@ -7,6 +7,9 @@ python:
   - "3.5"
   - "pypy"
   - "pypy3"
+branches:
+  except:
+    - wip
 # command to install dependencies
 install: "pip install -r .requirements.txt"
 # command to run tests
