@@ -105,4 +105,5 @@ ifeq ($(NEWCOV),0)
 	mv *.c.gcov c4irpc/
 else
 %.c.gcov: %.c
+	echo not suppored
 endif
