@@ -2,22 +2,30 @@
 Concrete Clouds C Chirp (C4irp)
 ===============================
 
-Public API
-==========
+Public C API
+============
 
 .. toctree::
    :maxdepth: 2
 
    inc/c4irp.h.rst
 
-Internal API
-============
+Internal C API
+==============
 
 .. toctree::
    :maxdepth: 2
 
    c4irpc/array.h.rst
    c4irpc/message.c.rst
+
+Public Python API
+=================
+
+.. toctree::
+   :maxdepth: 2
+
+   c4irp.rst
 
 Indices and tables
 ==================
