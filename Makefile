@@ -41,11 +41,11 @@ genhtml:
 
 pymods: c4irp/_high_level.o
 
-c4irp/_high_level.o: libc4irp.a cffi/high_level.py
+c4irp/_high_level.o: libc4irp.a cffi/high_level.py .deps/$(PROJECT)
 	PATH=$(CFFIF) $(PY) cffi/high_level.py
 	mv _high_level* c4irp/
 
-# c4irp/_low_level.so: libc4irp.a cffi/low_level.py
+# c4irp/_low_level.so: libc4irp.a cffi/low_level.py .deps/$(PROJECT)
 #	PATH=$(CFFIF) CFFILIBS=libc4irp.a $(PY) cffi/low_level.py
 #	mv _low_level* c4irp/
 
