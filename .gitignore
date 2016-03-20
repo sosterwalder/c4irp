@@ -21,3 +21,5 @@ __pycache__
 /c4irp/*.c
 /*.info
 /doc/_build
+/c4irpc/*.rst
+/include/*.rst

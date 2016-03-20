@@ -15,7 +15,6 @@
 
 import sys
 import os
-import shlex
 import sphinx_rtd_theme
 
 version_file = "../c4irp/version.py"

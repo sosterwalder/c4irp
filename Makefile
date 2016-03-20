@@ -21,6 +21,9 @@ PY        := python
 
 export CFLAGS   := $(DCFLAGS)
 
+DOCC=$(wildcard c4irpc/*.c)
+DOCH=$(wildcard c4irpc/*.h) $(wildcard include/*.h)
+DOCRST=$(DOCC:.c=.c.rst) $(DOCH:.h=.h.rst)
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
 COVOUT=$(SRCS:.c=.c.gcov)
@@ -28,6 +31,8 @@ COVOUT=$(SRCS:.c=.c.gcov)
 include home/Makefile
 
 all: libc4irp c4irp/_high_level.o
+
+doc-all: $(DOCRST) doc
 
 test-all: all pymods test coverage
 
@@ -64,6 +69,12 @@ mbedtls/library/libmbedtls.a:
 	make -C mbedtls
 
 mbedtls: mbedtls/library/libmbedtls.a
+
+%.c.rst: %.c
+	home/c2rst $<
+
+%.h.rst: %.h
+	home/c2rst $<
 
 %.c: %.h
 
