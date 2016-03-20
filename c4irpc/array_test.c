@@ -1,7 +1,7 @@
 // ===============
 // Testing array.h
 // ===============
-// 
+//
 // .. code-block:: cpp
 
 #include "array.h"
@@ -35,4 +35,3 @@ main(
     CA(int, a, index) = 0;
     return CA(int, a, index);
 }
-

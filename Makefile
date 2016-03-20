@@ -1,4 +1,4 @@
-.PHONY: clean libc4irp sublibs libuv mbedtls test_ext
+.PHONY: clean libc4irp sublibs libuv mbedtls test_ext doc c4irp
 
 PROJECT     := c4irp
 export CC   := clang
