@@ -17,6 +17,7 @@ Internal C API
    :maxdepth: 2
 
    c4irpc/array.h.rst
+   c4irpc/array_test.c.rst
    c4irpc/message.c.rst
 
 Public Python API
