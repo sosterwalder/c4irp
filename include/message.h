@@ -13,10 +13,10 @@
 //
 //    Represents a message.
 //  
-// .. c:member:: ch_message_t address
+//    .. c:member:: char[16] address
 //
-//    IPv4/6 address of the sender if the message was received.
-//    IPv4/6 address of the recipient if the message is going to be sent.
+//       IPv4/6 address of the sender if the message was received.  IPv4/6
+//       address of the recipient if the message is going to be sent.
 //
 // .. code-block:: cpp
 
