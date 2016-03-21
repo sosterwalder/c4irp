@@ -100,6 +100,7 @@ test_ext: array_test
 	make -C libuv CFLAGS="$(PCFLAGS)" check
 	./array_test 1 2>&1
 	./array_test 3 2>&1 | grep Bufferoverflow
+	./array_test -1 2>&1 | grep Bufferoverflow
 	make coverage
 
 
