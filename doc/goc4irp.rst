@@ -57,7 +57,7 @@ schreiben zu können?
 * Enums verstehen
 * Static verstehen
 
-   - Wissen wann es sinnvoll ist
+  - Wissen wann es sinnvoll ist
 
 * Out Parameter (**) verstehen
 * Opaque pointer verstehen (kann ich erklären wenn man obiges versteht)
