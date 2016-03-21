@@ -52,6 +52,7 @@ Anfangs wäre ich froh einen der C schreiben kann zu kriegen. Was heisst C
 schreiben zu können?
 
 * Pointer verstehen
+* Stack und Heap verstehen
 * Structs verstehen
 * Enums verstehen
 * Static verstehen
