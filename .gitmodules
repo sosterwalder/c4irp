@@ -1,10 +1,10 @@
 [submodule "home"]
 	path = home
-	url = git@github.com:concretecloud/home.git
+	url = https://github.com/concretecloud/home.git
 [submodule "libuv"]
 	path = libuv
-	url = git@github.com:libuv/libuv.git
+	url = https://github.com/libuv/libuv.git
 [submodule "mbedtls"]
 	path = mbedtls
-	url = git@github.com:ARMmbed/mbedtls.git
+	url = https://github.com/ARMmbed/mbedtls.git
 
