@@ -7,6 +7,8 @@
 #ifndef ch_message_h
 #define ch_message_h
 
+#include "error.h"
+
 #include <stdint.h>
 
 // .. c:type:: ch_message_t
@@ -26,14 +28,15 @@ typedef struct {
     char     identity[16];
     char     serial[16];
     int8_t   host_order;
+    int16_t  actor_len;
+    int32_t  data_len;
     char*    actor;
     char*    data;
-}
-ch_message_t;
+} ch_message_t;
 
 // .. c:function::
 extern
-void
+ch_error_t
 ch_msg_init(ch_message_t* message);
 //
 //    Intialiaze a message.

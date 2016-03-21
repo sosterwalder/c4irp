@@ -9,7 +9,7 @@
 #include <string.h>
 
 // .. c:function::
-void
+ch_error_t
 ch_msg_init(ch_message_t* message)
 //    :noindex:
 //
@@ -20,4 +20,5 @@ ch_msg_init(ch_message_t* message)
 {
     memset(message, 0, sizeof(ch_message_t));
     message->host_order = 1;
+    return CH_SUCCESS;
 }
