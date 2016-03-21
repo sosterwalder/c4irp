@@ -9,5 +9,6 @@
 
 #include "error.h"
 #include "message.h"
+#include "c4irp_obj.h"
 
 #endif //ch_inc_c4irp_h
