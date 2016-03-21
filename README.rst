@@ -14,7 +14,7 @@ Message-passing and actor-based programming for everyone
 
 `Read the Docs`_
 
-.. _`Read the Docs`: http://checkmemaster.ignorelist.com/chirp
+.. _`Read the Docs`: http://checkmemaster.ignorelist.com/c4irp
 
 .. [1] Coverage enforced by tests (on travis)
 
