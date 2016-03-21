@@ -4,8 +4,8 @@
 // 
 // .. code-block:: cpp
 
-#ifndef ch_message_h
-#define ch_message_h
+#ifndef ch_inc_message_h
+#define ch_inc_message_h
 
 #include "error.h"
 
@@ -39,10 +39,10 @@ extern
 ch_error_t
 ch_msg_init(ch_message_t* message);
 //
-//    Intialiaze a message.
+//    Intialiaze a message. Memory provided by caller (for performance).
 //
 //    :param ch_message_t* message: Pointer to the message
 //
 // .. code-block:: cpp
 
-#endif //ch_message_h
+#endif //ch_inc_message_h

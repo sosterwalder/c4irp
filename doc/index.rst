@@ -10,6 +10,8 @@ Public C API
 
    inc/c4irp.h.rst
    inc/message.h.rst
+   inc/error.h.rst
+   inc/c4irp_obj.h.rst
 
 Internal C API
 ==============
@@ -23,6 +25,8 @@ Internal C API
    c4irpc/common.h.rst
    c4irpc/message.h.rst
    c4irpc/message.c.rst
+   c4irpc/c4irp.h.rst
+   c4irpc/c4irp.c.rst
 
 Public Python API
 =================

@@ -13,6 +13,11 @@ ffi.set_source(
 
 
 ffi.cdef("""
+typedef enum {
+    CH_SUCCESS     = 0,
+    CH_VALUE_ERROR = 1
+} ch_error_t;
+
 typedef struct {
     char     address[16];
     int32_t  port;

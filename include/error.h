@@ -9,7 +9,7 @@
 
 typedef enum {
     CH_SUCCESS     = 0,
-    CH_VALUE_ERROR = 1 
+    CH_VALUE_ERROR = 1
 } ch_error_t;
 
 #endif //ch_error_h

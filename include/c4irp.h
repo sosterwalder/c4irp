@@ -4,10 +4,10 @@
 // 
 // .. code-block:: cpp
 
-#ifndef ch_c4irp_h
-#define ch_c4irp_h
+#ifndef ch_inc_c4irp_h
+#define ch_inc_c4irp_h
 
 #include "error.h"
 #include "message.h"
 
-#endif
+#endif //ch_inc_c4irp_h
