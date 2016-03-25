@@ -20,3 +20,13 @@ Message-passing and actor-based programming for everyone
 
 WORK IN PROGRESS
 ================
+
+Development
+===========
+
+Start:
+
+.. code-block:: bash
+
+   apt-get install build-essential automake autoconf cmake clang llvm
+   make test-all

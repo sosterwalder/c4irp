@@ -13,7 +13,7 @@ else
 endif
 
 COMMON    := config.h c4irpc/common.h
-CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude
+CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude -Ilibuv/include -std=c99 -pthread -D_XOPEN_SOURCE=700
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
 CFFIF     := $(shell pwd)/home/cffi_fix:$(PATH)
@@ -34,7 +34,7 @@ all: libc4irp c4irp/_high_level.o
 
 doc-all: $(DOCRST) doc
 
-test-all: all pymods test coverage
+test-all: all pymods test coverage test-lib
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -79,10 +79,10 @@ mbedtls: mbedtls/library/libmbedtls.a
 %.c: %.h
 
 %.o: %.c $(COMMON)
-	$(CC) -std=c99 -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 array_test: c4irpc/array_test.o
-	$(CC) -std=c99 -o $@ $< $(CFLAGS)
+	$(CC) -o $@ $< $(CFLAGS)
 
 libc4irp: libc4irp.a
 
@@ -101,13 +101,14 @@ clean-sub:
 	cd libuv && git clean -xdf
 	cd mbedtls && git clean -xdf
 
-test_ext: array_test
-	make -C mbedtls check
-	make -C libuv CFLAGS="$(PCFLAGS)" check
+test-array: array_test
 	./array_test 1 2>&1
 	./array_test 3 2>&1 | grep Bufferoverflow
 	./array_test -1 2>&1 | grep Bufferoverflow
-	make coverage
+
+test-lib:
+	make -C mbedtls check
+	make -C libuv CFLAGS="$(PCFLAGS)" check
 
 
 ifeq ($(PYPY),0)
@@ -119,8 +120,9 @@ endif
 
 ifeq ($(NEWCOV),0)
 %.c.gcov: %.c
-	llvm-cov $< | grep "Lines executed:100.00%"
+	llvm-cov $<
 	mv *.c.gcov c4irpc/
+	!(grep -v "// NOCOV" $@ | grep -E "\s+#####:")
 else
 %.c.gcov: %.c
 	echo not suppored
