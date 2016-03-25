@@ -12,12 +12,4 @@ branches:
 # command to install dependencies
 install: "pip install -r .requirements.txt"
 # command to run tests
-script: make test-all
-# Handle git submodules yourself
-git:
-    submodules: false
-# Use sed to replace the SSH URL with the public URL, then initialize submodules
-before_install:
-  - apt-cache search llvm
-  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-  - git submodule update --init --recursive
+script: .test.sh
