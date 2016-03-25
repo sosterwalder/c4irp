@@ -13,13 +13,14 @@ else
 endif
 
 COMMON    := config.h c4irpc/common.h
-CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude -Ilibuv/include -std=c99 -pthread -D_XOPEN_SOURCE=700
+CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude -Ilibuv/include
+MYFLAGS   := -std=c99 -pthread -D_XOPEN_SOURCE=700
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
 CFFIF     := $(shell pwd)/home/cffi_fix:$(PATH)
 PY        := python
 
-export CFLAGS   := $(DCFLAGS)
+export CFLAGS   := $(DCFLAGS) $(MYFLAGS)
 
 DOCC=$(wildcard c4irpc/*.c)
 DOCH=$(wildcard c4irpc/*.h) $(wildcard include/*.h)
@@ -34,7 +35,7 @@ all: libc4irp c4irp/_high_level.o
 
 doc-all: $(DOCRST) doc
 
-test-all: all pymods test coverage test-lib
+test-all: all pymods test test-array coverage test-lib
 
 config.h: config.defs.h
 	cp config.defs.h config.h
