@@ -2,5 +2,6 @@
 
 set -e
 make libc4irp-depends
-scan-build make libc4irp.a
+scan-build --status-bugs make libc4irp.a
+make clean
 make test-all

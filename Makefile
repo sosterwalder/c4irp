@@ -86,14 +86,18 @@ array_test: c4irpc/array_test.o
 
 libc4irp: libc4irp.a
 
-libc4irp.a: libc4irp-depends $(OBJS)
+libc4irp.a: $(OBJS) | libc4irp-depends
 	ar $(ARFLAGS) $@ $^
 
 libc4irp-depends:
 	@make CFLAGS="$(PCFLAGS)" libuv mbedtls
 
+clean-all: clean clean-sub
+
 clean:
 	git clean -xdf
+
+clean-sub:
 	cd libuv && git clean -xdf
 	cd mbedtls && git clean -xdf
 
