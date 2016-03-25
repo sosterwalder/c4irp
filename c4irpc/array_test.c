@@ -30,8 +30,11 @@ main(
 
 {
     int index = strtol(argv[1], NULL, 10);
+    int ret;
     ca_int_t a;
     a = ca_new_int(3);
     CA(int, a, index) = 0;
-    return CA(int, a, index);
+    ret = CA(int, a, index);
+    ca_free_int(a);
+    return ret;
 }
