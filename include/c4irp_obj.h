@@ -9,6 +9,8 @@
 
 #include "error.h"
 
+#include <uv.h>
+
 // .. c:type:: ch_config_t
 //
 //    Chirp configuration.
@@ -41,7 +43,7 @@ typedef struct {
     int TIMEOUT;
     int PORT;
     char BIND_V6[16];
-    char BIND_V4[16];
+    char BIND_V4[4];
 } ch_config_t;
 
 //
@@ -55,27 +57,30 @@ extern ch_config_t ch_config_defaults;
 
 // .. c:type:: ch_chirp_t
 //
-//    Opaque pointer to chirp object.
+//    Chirp object.
 //  
 // .. code-block:: cpp
 
-struct ch_chirp_s;
-typedef struct ch_chirp_s* ch_chirp_t;
+typedef struct {
+    char identity[16];
+    uv_loop_t loop;
+} ch_chirp_t;
 
 // .. c:function::
 extern
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp);
+ch_chirp_init(ch_chirp_t* chirp, ch_config_t config);
 //
-//    Intialiaze a chirp object. Memory is allocated by function. You must call
-//    :c:func:`ch_chirp_free` to cleanup the object.
+//    Intialiaze a chirp object. Memory is provided by caller. You must call
+//    :c:func:`ch_chirp_close` to cleanup the object.
 //
 //    :param ch_chirp_t* chirp: Out: Chirp object
+//    :param ch_config_t config: Chirp config
 //
 // .. c:function::
 extern
 ch_error_t
-ch_chirp_free(ch_chirp_t chirp);
+ch_chirp_close(ch_chirp_t* chirp);
 //
 //    Cleanup chirp object. Will remove all callbacks. Pending outs will be
 //    ignored after calling free.

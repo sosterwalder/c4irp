@@ -7,3 +7,137 @@ def test_low_level_new():
     lib.ch_msg_init(message)
     assert message.port == 0
     assert message.host_order == 1
+
+
+def test_low_level_set_get_address4():
+    """Test if cffi low level set and get of address works"""
+    message = ffi.new("ch_message_t*")
+    lib.ch_msg_init(message)
+    ip = "49.32.12.1".encode("UTF-8")
+    assert message.port == 0
+    assert message.host_order == 1
+    assert lib.ch_msg_set_address(
+        message,
+        lib.CH_IPV4,
+        ip,
+        3432,
+    ) == lib.CH_SUCCESS
+    assert message.port == 3432
+    address = ffi.new("ch_text_address_t*")
+    assert lib.ch_msg_get_address(
+        message,
+        address
+    ) == lib.CH_SUCCESS
+    assert ffi.string(address.data) == ip
+
+
+def test_low_level_set_get_address4_error():
+    """Test if cffi low level set and get of address errors are correct"""
+    message = ffi.new("ch_message_t*")
+    lib.ch_msg_init(message)
+    ip = "349.32.12.1".encode("UTF-8")
+    assert message.port == 0
+    assert message.host_order == 1
+    assert lib.ch_msg_set_address(
+        message,
+        lib.CH_IPV4,
+        ip,
+        3432,
+    ) == lib.CH_VALUE_ERROR
+
+
+def test_low_level_set_get_address4_bad_proto():
+    """Test if cffi low level set and get of address errors are correct"""
+    message = ffi.new("ch_message_t*")
+    lib.ch_msg_init(message)
+    ip = "49.32.12.1".encode("UTF-8")
+    assert message.port == 0
+    assert message.host_order == 1
+    assert lib.ch_msg_set_address(
+        message,
+        100,
+        ip,
+        3432,
+    ) == lib.CH_VALUE_ERROR
+
+
+def test_low_level_set_get_address4_error_back():
+    """Test if cffi low level set and get of address errors are correct"""
+    message = ffi.new("ch_message_t*")
+    lib.ch_msg_init(message)
+    ip = "49.32.12.1".encode("UTF-8")
+    assert message.port == 0
+    assert message.host_order == 1
+    assert lib.ch_msg_set_address(
+        message,
+        lib.CH_IPV4,
+        ip,
+        3432,
+    ) == lib.CH_SUCCESS
+    assert message.port == 3432
+    address = ffi.new("ch_text_address_t*")
+    message.ip_protocol = 3
+    assert lib.ch_msg_get_address(
+        message,
+        address
+    ) == lib.CH_PROTOCOL_ERROR
+
+
+def test_low_level_set_get_address6():
+    """Test if cffi low level set and get of address works"""
+    message = ffi.new("ch_message_t*")
+    lib.ch_msg_init(message)
+    ip = "2001:db8:85a3:0:0:8a2e:370:7334".encode("UTF-8")
+    res = "2001:db8:85a3::8a2e:370:7334".encode("UTF-8")
+    assert message.port == 0
+    assert message.host_order == 1
+    assert lib.ch_msg_set_address(
+        message,
+        lib.CH_IPV6,
+        ip,
+        3432,
+    ) == lib.CH_SUCCESS
+    assert message.port == 3432
+    address = ffi.new("ch_text_address_t*")
+    assert lib.ch_msg_get_address(
+        message,
+        address
+    ) == lib.CH_SUCCESS
+    assert ffi.string(address.data) == res
+
+
+def test_low_level_set_get_address6_error():
+    """Test if cffi low level set and get of address errors are correct"""
+    message = ffi.new("ch_message_t*")
+    lib.ch_msg_init(message)
+    ip = "200x:db8:85a3:0:0:8a2e:370:7334".encode("UTF-8")
+    assert message.port == 0
+    assert message.host_order == 1
+    assert lib.ch_msg_set_address(
+        message,
+        lib.CH_IPV6,
+        ip,
+        3432,
+    ) == lib.CH_VALUE_ERROR
+
+
+def test_low_level_set_get_address6_error_back():
+    """Test if cffi low level set and get of address errors are correct"""
+    message = ffi.new("ch_message_t*")
+    lib.ch_msg_init(message)
+    ip = "2001:db8:85a3:0:0:8a2e:370:7334".encode("UTF-8")
+    assert message.port == 0
+    assert message.host_order == 1
+    assert lib.ch_msg_set_address(
+        message,
+        lib.CH_IPV6,
+        ip,
+        3432,
+    ) == lib.CH_SUCCESS
+    assert message.port == 3432
+    address = ffi.new("ch_text_address_t*")
+    message.ip_protocol = 3
+    assert lib.ch_msg_get_address(
+        message,
+        address
+    ) == lib.CH_PROTOCOL_ERROR

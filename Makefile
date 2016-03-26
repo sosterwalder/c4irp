@@ -33,9 +33,14 @@ include home/Makefile
 
 all: test-all
 
+vi:
+	vi c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h
+
 doc-all: $(DOCRST) doc
 
 test-all: pymods test test-array coverage test-lib
+
+test-cov: clean pymods pytest test-array coverage
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -79,7 +84,7 @@ mbedtls: mbedtls/library/libmbedtls.a
 
 %.c: %.h
 
-%.o: %.c $(COMMON)
+%.o: %.c $(COMMON) $(DOCH)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 array_test: c4irpc/array_test.o
