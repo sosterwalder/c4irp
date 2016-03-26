@@ -35,7 +35,7 @@ all: test-all
 
 doc-all: $(DOCRST) doc
 
-test-all: all pymods test test-array coverage test-lib
+test-all: pymods test test-array coverage test-lib
 
 config.h: config.defs.h
 	cp config.defs.h config.h

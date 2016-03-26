@@ -7,6 +7,6 @@ def test_init_free():
     lib.ch_chirp_init(chirp)
     lib.ch_chirp_free(chirp[0])
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     test_init_free()
     print("Minimal test: ok")
