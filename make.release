@@ -1,0 +1,52 @@
+.PHONY: clean libc4irp libuv mbedtls
+
+COMMON        := config.h c4irpc/common.h
+export CFLAGS := -fPIC -Wall -Werror -Wno-unused-function -Iinclude -Ilibuv/include
+
+SRCS=$(wildcard c4irpc/*.c)
+OBJS=$(SRCS:.c=.o)
+
+all: libc4irp
+
+config.h: config.defs.h
+	cp config.defs.h config.h
+
+libuv/configure:
+	cd libuv && ./autogen.sh
+
+libuv/Makefile: libuv/configure
+	cd libuv && ./configure
+
+libuv/.libs/libuv.a: libuv/Makefile
+	make -C libuv
+
+libuv: libuv/.libs/libuv.a
+
+mbedtls/library/libmbedtls.a:
+	make -C mbedtls
+
+mbedtls: mbedtls/library/libmbedtls.a
+
+libc4irp: libc4irp.a
+
+libc4irp.a: $(OBJS) | libc4irp-depends
+	ar $(ARFLAGS) $@ $^
+
+libc4irp-depends: libuv mbedtls
+
+clean:
+	git clean -xdf
+	cd libuv && git clean -xdf
+	cd mbedtls && git clean -xdf
+
+%.c.rst: %.c
+	home/c2rst $<
+
+%.h.rst: %.h
+	home/c2rst $<
+
+%.c: %.h
+
+%.o: %.c $(COMMON)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
