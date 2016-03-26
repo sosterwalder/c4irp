@@ -47,11 +47,11 @@ genhtml:
 
 pymods: _c4irp_cffi.so
 
-_c4irp_cffi.so: libc4irp.a cffi/high_level.py .deps/$(PROJECT)
+_c4irp_cffi.so: libc4irp.a cffi/high_level.py
 	PATH=$(CFFIF) $(PY) cffi/high_level.py
 	rm _c4irp_cffi.c
 
-# _c4irp_low_level.so: libc4irp.a cffi/low_level.py .deps/$(PROJECT)
+# _c4irp_low_level.so: libc4irp.a cffi/low_level.py
 #	PATH=$(CFFIF) $(PY) cffi/low_level.py
 #	rm _c4irp_low_level.c
 

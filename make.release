@@ -32,7 +32,7 @@ libc4irp: libc4irp.a
 libc4irp.a: $(OBJS) | libc4irp-depends
 	ar $(ARFLAGS) $@ $^
 
-libc4irp-depends: libuv mbedtls
+libc4irp-depends: | libuv mbedtls
 
 clean:
 	git clean -xdf
