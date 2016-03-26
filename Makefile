@@ -31,7 +31,7 @@ COVOUT=$(SRCS:.c=.c.gcov)
 
 include home/Makefile
 
-all: libc4irp c4irp/_high_level.o
+all: test-all
 
 doc-all: $(DOCRST) doc
 
@@ -45,15 +45,15 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-pymods: c4irp/_high_level.o
+pymods: _c4irp_cffi.so
 
-c4irp/_high_level.o: libc4irp.a cffi/high_level.py .deps/$(PROJECT)
+_c4irp_cffi.so: libc4irp.a cffi/high_level.py .deps/$(PROJECT)
 	PATH=$(CFFIF) $(PY) cffi/high_level.py
-	mv _high_level* c4irp/
+	rm _c4irp_cffi.c
 
-# c4irp/_low_level.so: libc4irp.a cffi/low_level.py .deps/$(PROJECT)
-#	PATH=$(CFFIF) CFFILIBS=libc4irp.a $(PY) cffi/low_level.py
-#	mv _low_level* c4irp/
+# _c4irp_low_level.so: libc4irp.a cffi/low_level.py .deps/$(PROJECT)
+#	PATH=$(CFFIF) $(PY) cffi/low_level.py
+#	rm _c4irp_low_level.c
 
 libuv/configure:
 	cd libuv && ./autogen.sh

@@ -3,22 +3,23 @@
 # pylint: disable=exec-used
 from setuptools import setup
 from setuptools import find_packages
-import sys
+from setuptools.command.install import install
 import os
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
-
-version = sys.version_info[0]
-if version > 2:
-    pass
-else:
-    pass
 
 __version__  = None
 version_file = "c4irp/version.py"
 with open(version_file) as f:
     code = compile(f.read(), version_file, 'exec')
     exec(code)
+
+
+class CustomInstallCommand(install):
+    """CustomInstallCommand"""
+    def run(self):
+        os.system('make -f make.release')
+        install.run(self)
 
 
 def find_data(packages, extensions):
@@ -50,9 +51,10 @@ with open('README.rst', 'r') as f:
 setup(
     name = "c4irp",
     version = __version__,
+    cffi_modules=["cffi/high_level.py:ffi"],
     packages = find_packages(),
     package_data=find_data(
-        find_packages(), ["so"]
+        find_packages(), []
     ),
     entry_points = {
         'console_scripts': [
@@ -64,6 +66,9 @@ setup(
     setup_requires = [
         "cffi",
     ],
+    cmdclass = {
+        'install': CustomInstallCommand,
+    },
     author = "Jean-Louis Fuchs",
     author_email = "ganwell@fangorn.ch",
     description = "Message-passing and actor-based programming for everyone",

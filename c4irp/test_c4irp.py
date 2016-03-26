@@ -1,4 +1,4 @@
-from ._high_level import ffi, lib
+from _c4irp_cffi import ffi, lib
 
 
 def test_init_free():

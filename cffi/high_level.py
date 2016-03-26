@@ -2,13 +2,13 @@ from cffi import FFI
 ffi = FFI()
 
 ffi.set_source(
-    "_high_level",
+    "_c4irp_cffi",
     """
     #include <c4irp.h>
     """,
     libraries=["c4irp", "uv"],
     library_dirs=["."],
-    include_dirs=["../include"],
+    include_dirs=["include"],
 )
 
 
