@@ -9,6 +9,21 @@
 #include <stdlib.h>
 #include <uv.h>
 
+//
+// .. c:var:: ch_config_defaults
+//
+//    Default config of c4irp.
+//
+// .. code-block:: cpp
+//
+ch_config_t ch_config_defaults = {
+    .REUSE_TIME = 30,
+    .TIMEOUT    = 5,
+    .PORT       = 2998,
+    .BIND_V6    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    .BIND_V4    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+};
+
 // .. c:function::
 ch_error_t
 ch_chirp_init(ch_chirp_t* chirp)

@@ -51,13 +51,7 @@ typedef struct {
 //
 // .. code-block:: cpp
 
-static ch_config_t ch_config_defaults = {
-    .REUSE_TIME = 30,
-    .TIMEOUT    = 5,
-    .PORT       = 2998,
-    .BIND_V6    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    .BIND_V4    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-};
+extern ch_config_t ch_config_defaults;
 
 // .. c:type:: ch_chirp_t
 //
