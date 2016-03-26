@@ -45,13 +45,13 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-pymods: _c4irp_cffi.so
+pymods: _c4irp_cffi.o
 
-_c4irp_cffi.so: libc4irp.a cffi/high_level.py
+_c4irp_cffi.o: libc4irp.a cffi/high_level.py
 	PATH=$(CFFIF) $(PY) cffi/high_level.py
 	rm _c4irp_cffi.c
 
-# _c4irp_low_level.so: libc4irp.a cffi/low_level.py
+# _c4irp_low_level.o: libc4irp.a cffi/low_level.py
 #	PATH=$(CFFIF) $(PY) cffi/low_level.py
 #	rm _c4irp_low_level.c
 
