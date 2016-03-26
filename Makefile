@@ -14,7 +14,7 @@ endif
 
 COMMON    := config.h c4irpc/common.h
 CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude -Ilibuv/include
-MYFLAGS   := -std=c99 -pthread -D_XOPEN_SOURCE=700
+MYFLAGS   := -std=gnu99 -pthread
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
 CFFIF     := $(shell pwd)/home/cffi_fix:$(PATH)
