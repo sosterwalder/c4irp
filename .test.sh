@@ -5,3 +5,5 @@ make libc4irp-depends
 scan-build --status-bugs make libc4irp.a
 make clean
 make test-all
+make -f make.release
+pip install .

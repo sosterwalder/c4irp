@@ -13,7 +13,7 @@ else
 endif
 
 COMMON    := config.h c4irpc/common.h
-CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Iinclude -Ilibuv/include
+CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
 MYFLAGS   := -std=gnu99 -pthread
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
