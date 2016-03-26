@@ -7,5 +7,5 @@ make clean
 make test-all
 make -f make.release
 pip install .
-cd /tmp && python -m c4irp.test_c4irp
 make doc-all
+cd /tmp && python -m c4irp.test_c4irp
