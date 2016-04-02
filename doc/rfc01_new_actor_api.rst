@@ -88,7 +88,7 @@ Which makes the model incomplete.
 It also means, if you have a large data-set:
 
 * You have to either pass it along (maybe over the network)
-* Or you have to read it from a database/disk in every actor
+* Or you have to read it from a database/disk on every message
 
 Which is a nuisance, but does not make the model incomplete.
 
