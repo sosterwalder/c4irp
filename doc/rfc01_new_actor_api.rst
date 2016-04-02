@@ -294,9 +294,9 @@ But we need fine-grained locking
 
 No!
 
-The model is 100% deadlock free, since we don't allow locking the global and
-the local state at the same time. As soon as we allow finer grained locking
-deadlocks become possible.
+The model is 100% deadlock free, since we don't allow locking the global and the
+local state at the same time in the same actor. As soon as we allow finer
+grained locking deadlocks become possible.
 
 Keep in mind that every node has its own global_state so the bottle-neck is only
 per node. And if keep the lock time short there is no problem at all. And we
