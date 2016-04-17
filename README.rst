@@ -28,3 +28,10 @@ Development
 
    apt-get install build-essential automake autoconf cmake clang llvm
    make test-all
+
+License
+=======
+
+GNU AFFERO GENERAL PUBLIC LICENSE
+
+Please contact me for alternative licenses.
