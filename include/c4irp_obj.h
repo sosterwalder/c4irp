@@ -68,12 +68,14 @@ extern ch_config_t ch_config_defaults;
 
 typedef struct {
     char identity[16];
-    uv_loop_t* loop;
-    ch_config_t config;
-    struct sockaddr_in _addrv4;
+    uv_loop_t*          loop;
+    ch_config_t         config;
+    struct sockaddr_in  _addrv4;
     struct sockaddr_in6 _addrv6;
-    uv_tcp_t _serverv4;
-    uv_tcp_t _serverv6;
+    uv_tcp_t            _serverv4;
+    uv_tcp_t            _serverv6;
+    uv_async_t          _close;
+    int                 _auto_start;
 } ch_chirp_t;
 
 // .. c:function::
@@ -135,7 +137,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop);
 // .. c:function::
 extern
 ch_error_t
-ch_chirp_run(ch_config_t config);
+ch_chirp_run(ch_config_t config, ch_chirp_t** chirp);
 //
 //    Initializes, runs and cleans everything. Everything being:
 //    TODO: Add message callback
@@ -145,15 +147,23 @@ ch_chirp_run(ch_config_t config);
 //      * uv-sockets
 //      * callbacks
 //
+//     The method blocks, but chirp paramenter will be set. Can be used to run
+//     chirp in a user defined thread. Use ch_chirp_close_ts to close it chirp
+//     in any other thread.
+//
 //    :param ch_config_t config: Chirp config
+//    :param ch_chirp_t** chirp: Out: Pointer to chirp object pointer. Ca be
+//                               NULL
 //
 // .. c:function::
 extern
 ch_error_t
-ch_chirp_close(ch_chirp_t* chirp);
+ch_chirp_close_ts(ch_chirp_t* chirp);
 //
 //    Cleanup chirp object. Will remove all callbacks. Pending outs will be
 //    ignored after calling free.
+//
+//    This function is thread-safe
 //
 //    :param ch_chirp_t chirp: Chirp object
 //

@@ -126,11 +126,11 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop);
 
 extern
 ch_error_t
-ch_chirp_run(ch_config_t config);
+ch_chirp_run(ch_config_t config, ch_chirp_t**);
 
 extern
 ch_error_t
-ch_chirp_close(ch_chirp_t* chirp);
+ch_chirp_close_ts(ch_chirp_t* chirp);
 """)
 
 if __name__ == "__main__":

@@ -28,6 +28,24 @@ ch_config_t ch_config_defaults = {
 };
 
 // .. c:function::
+void 
+_ch_close_async_cb(uv_async_t* handle)
+//
+//    Internal callback to close chirp. Makes ch_chirp_close_ts thread-safe
+//
+// .. code-block:: cpp
+//
+{
+    ch_chirp_t* chirp = (ch_chirp_t*) handle->data;
+    uv_close((uv_handle_t*) &chirp->_serverv4, NULL);
+    uv_close((uv_handle_t*) &chirp->_serverv6, NULL);
+    uv_close((uv_handle_t*) &chirp->_close, NULL);
+    if(chirp->_auto_start) {
+        uv_stop(chirp->loop);
+    }
+}
+
+// .. c:function::
 ch_error_t
 ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 //    :noindex:
@@ -37,11 +55,11 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 // .. code-block:: cpp
 //
 {
-    ch_error_t        tmp_err;
-    ch_text_address_t tmp_addr;
-    chirp->loop     = loop;
-    chirp->config   = config;
-
+    ch_error_t           tmp_err;
+    ch_text_address_t    tmp_addr;
+    chirp->loop        = loop;
+    chirp->config      = config;
+    chirp->_auto_start = 0;
 
     // IPv4
     uv_tcp_init(chirp->loop, &chirp->_serverv4);
@@ -100,12 +118,15 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
     ) < 0) {
         return CH_EADDRINUSE;
     }
+    if(uv_async_init(chirp->loop, &chirp->_close, &_ch_close_async_cb) < 0) {
+        return CH_UV_ERROR;
+    }
     return CH_SUCCESS;
 }
 
 // .. c:function::
 ch_error_t
-ch_chirp_run(ch_config_t config)
+ch_chirp_run(ch_config_t config, ch_chirp_t** chirp_out)
 //    :noindex:
 //
 //    TODO testme
@@ -118,6 +139,9 @@ ch_chirp_run(ch_config_t config)
     ch_chirp_t chirp;
     uv_loop_t  loop;
     ch_error_t tmp_err;
+    if(chirp_out != NULL) {
+        *chirp_out = &chirp;
+    }
 
     tmp_err = _ch_uv_error_map(ch_loop_init(&loop));
     if(tmp_err != CH_SUCCESS) {
@@ -127,15 +151,8 @@ ch_chirp_run(ch_config_t config)
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;
     }
+    chirp._auto_start = 1;
     tmp_err = _ch_uv_error_map(ch_run(&loop, UV_RUN_DEFAULT));
-    if(tmp_err != CH_SUCCESS) {
-        return tmp_err;
-    }
-    tmp_err = ch_chirp_close(&chirp);
-    if(tmp_err != CH_SUCCESS) {
-        return tmp_err;
-    }
-    tmp_err = _ch_uv_error_map(ch_run(&loop, UV_RUN_ONCE));
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;
     }
@@ -147,18 +164,23 @@ ch_chirp_run(ch_config_t config)
 
 // .. c:function::
 ch_error_t
-ch_chirp_close(ch_chirp_t* chirp)
+ch_chirp_close_ts(ch_chirp_t* chirp)
 //    :noindex:
 //
 //    see: :c:func:`ch_chirp_close`
 //
+//    This function is thread-safe
+//
 // .. code-block:: cpp
 //
 {
-    uv_close((uv_handle_t*) &chirp->_serverv4, NULL);
-    uv_close((uv_handle_t*) &chirp->_serverv6, NULL);
+    chirp->_close.data = chirp;
+    if(uv_async_send(&chirp->_close) < 0) {
+        return CH_UV_ERROR;
+    }
     return CH_SUCCESS;
 }
+
 
 // .. c:function::
 void
