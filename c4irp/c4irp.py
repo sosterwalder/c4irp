@@ -8,7 +8,9 @@ from _c4irp_cffi import ffi, lib
 
 
 class ChirpPool(object):
-    """Chirp is message passing with fully automatic connection setup and
+    """TODO Documentation -> async to pool, ccchirp to c4irp
+
+    Chirp is message passing with fully automatic connection setup and
     cleanup. Just create a Chirp() object, await obj.start(), create a Message
     using port and address of a peer and then await obj.send(msg).
 
