@@ -7,6 +7,12 @@ from setuptools.command.install import install
 import os
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
+os.environ["CFLAGS"] = (
+    "-O3 -s -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include"
+)
+os.environ["LDLAGS"] = (
+    "-s"
+)
 
 __version__  = None
 version_file = "c4irp/version.py"
