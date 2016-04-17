@@ -14,16 +14,16 @@ class ChirpPool(object):
 
     .. code-block:: python
 
-       async def setup_chirp():
+       def setup_chirp():
            client = chirp.Chirp()
-           await client.start()
+           client.start()
            msg = chirp.Message(
                "10.10.10.10",
                2998,
                "yo dawg",
            )
-           await client.send(msg)
-           await client.close()
+           load = client.send(msg).result()
+           client.close()
 
     The connection will be removed if it wasn't used for REUSE_TIME or when you
     close chirp.
@@ -94,7 +94,7 @@ if sys.version_info > (3, 4):
                    2998,
                    "yo dawg",
                )
-               await client.send(msg)
+               load = await client.send(msg)
                await client.close()
 
         The connection will be removed if it wasn't used for REUSE_TIME or when
