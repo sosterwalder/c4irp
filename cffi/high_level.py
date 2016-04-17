@@ -96,9 +96,14 @@ typedef struct {
     uv_loop_t loop;
 } ch_chirp_t;
 
+static
+inline
+int
+ch_loop_init(uv_loop_t* loop);
+
 extern
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t config);
+ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t loop);
 
 extern
 ch_error_t
