@@ -60,7 +60,7 @@ class ChirpPool(object):
         lib.ch_chirp_register_log_cb(self._chirp, lib.python_log_cb)
 
         def run():
-            lib.ch_run(self._loop, lib.UV_RUN_ONCE)
+            lib.ch_run(self._loop, lib.UV_RUN_DEFAULT)
             lib.ch_loop_close(self._loop)
 
         self._pool   = fut.ThreadPoolExecutor(
