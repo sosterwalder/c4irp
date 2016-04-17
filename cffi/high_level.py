@@ -14,6 +14,12 @@ ffi.set_source(
 
 ffi.cdef("""
 //uv.h
+typedef enum {
+    UV_RUN_DEFAULT = 0,
+    UV_RUN_ONCE,
+    UV_RUN_NOWAIT
+} uv_run_mode;
+
 struct uv_loop_s {
   /* User data - use this for whatever. */
   void* data;
@@ -82,9 +88,10 @@ ch_msg_get_address(
 
 //c4irp.h
 typedef struct {
-    int REUSE_TIME;
-    int TIMEOUT;
-    int PORT;
+    int  REUSE_TIME;
+    int  TIMEOUT;
+    int  PORT;
+    int  BACKLOG;
     char BIND_V6[16];
     char BIND_V4[4];
 } ch_config_t;
@@ -93,7 +100,9 @@ extern ch_config_t ch_config_defaults;
 
 typedef struct {
     char identity[16];
-    uv_loop_t loop;
+    uv_loop_t* loop;
+    ch_config_t config;
+    ...;
 } ch_chirp_t;
 
 static
@@ -101,9 +110,18 @@ inline
 int
 ch_loop_init(uv_loop_t* loop);
 
+static
+inline
+int
+ch_run(uv_loop_t* loop, uv_run_mode mode);
+
 extern
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t loop);
+ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop);
+
+extern
+ch_error_t
+ch_chirp_run(ch_config_t config);
 
 extern
 ch_error_t

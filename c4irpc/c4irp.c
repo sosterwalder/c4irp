@@ -29,7 +29,7 @@ ch_config_t ch_config_defaults = {
 
 // .. c:function::
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t loop)
+ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 //    :noindex:
 //
 //    see: :c:func:`ch_chirp_init`
@@ -39,33 +39,33 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t loop)
 {
     ch_error_t        tmp_err;
     ch_text_address_t tmp_addr;
-    chirp->loop   = loop;
-    chirp->config = config;
+    chirp->loop     = loop;
+    chirp->config   = config;
 
 
     // IPv4
-    uv_tcp_init(&chirp->loop, &chirp->serverv4);
+    uv_tcp_init(chirp->loop, &chirp->_serverv4);
     if(uv_inet_ntop(
             AF_INET, config.BIND_V4, tmp_addr.data, sizeof(ch_text_address_t)
     ) < 0) {
         return CH_VALUE_ERROR; // NOCOV there is no bad binary IP-addr
     }
-    if(uv_ip4_addr(tmp_addr.data, config.PORT, &chirp->addrv4) < 0) {
+    if(uv_ip4_addr(tmp_addr.data, config.PORT, &chirp->_addrv4) < 0) {
         return CH_VALUE_ERROR;
     }
     tmp_err = _ch_uv_error_map(uv_tcp_bind(
-            &chirp->serverv4,
-            (const struct sockaddr*)&chirp->addrv4,
+            &chirp->_serverv4,
+            (const struct sockaddr*)&chirp->_addrv4,
             0
     ));
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;
     }
-    if(uv_tcp_nodelay(&chirp->serverv4, 1) < 0) {
+    if(uv_tcp_nodelay(&chirp->_serverv4, 1) < 0) {
         return CH_UV_ERROR;
     }
     if(uv_listen(
-            (uv_stream_t*) &chirp->serverv4,
+            (uv_stream_t*) &chirp->_serverv4,
             config.BACKLOG,
             _ch_on_new_connection
     ) < 0) {
@@ -73,32 +73,70 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t loop)
     }
 
     // IPv6, as the dual stack feature doesn't work everywhere we bind both
-    uv_tcp_init(&chirp->loop, &chirp->serverv6);
+    uv_tcp_init(chirp->loop, &chirp->_serverv6);
     if(uv_inet_ntop(
             AF_INET6, config.BIND_V6, tmp_addr.data, sizeof(ch_text_address_t)
     ) < 0) {
         return CH_VALUE_ERROR; // NOCOV there is no bad binary IP-addr
     }
-    if(uv_ip6_addr(tmp_addr.data, config.PORT, &chirp->addrv6) < 0) {
+    if(uv_ip6_addr(tmp_addr.data, config.PORT, &chirp->_addrv6) < 0) {
         return CH_VALUE_ERROR;
     }
     tmp_err = _ch_uv_error_map(uv_tcp_bind(
-            &chirp->serverv6,
-            (const struct sockaddr*) &chirp->addrv6,
+            &chirp->_serverv6,
+            (const struct sockaddr*) &chirp->_addrv6,
             UV_TCP_IPV6ONLY
     ));
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;
     }
-    if(uv_tcp_nodelay(&chirp->serverv6, 1) < 0) {
+    if(uv_tcp_nodelay(&chirp->_serverv6, 1) < 0) {
         return CH_UV_ERROR;
     }
     if(uv_listen(
-            (uv_stream_t*) &chirp->serverv6,
+            (uv_stream_t*) &chirp->_serverv6,
             config.BACKLOG,
             _ch_on_new_connection
     ) < 0) {
         return CH_EADDRINUSE;
+    }
+    return CH_SUCCESS;
+}
+
+// .. c:function::
+ch_error_t
+ch_chirp_run(ch_config_t config)
+//    :noindex:
+//
+//    TODO testme
+//
+//    see: :c:func:`ch_chirp_run`
+//
+// .. code-block:: cpp
+//
+{
+    ch_chirp_t chirp;
+    uv_loop_t  loop;
+    ch_error_t tmp_err;
+
+    tmp_err = _ch_uv_error_map(ch_loop_init(&loop));
+    if(tmp_err != CH_SUCCESS) {
+        return tmp_err;
+    }
+    tmp_err = ch_chirp_init(&chirp, config, &loop);
+    if(tmp_err != CH_SUCCESS) {
+        return tmp_err;
+    }
+    tmp_err = _ch_uv_error_map(ch_run(&loop, UV_RUN_DEFAULT));
+    if(tmp_err != CH_SUCCESS) {
+        return tmp_err;
+    }
+    tmp_err = ch_chirp_close(&chirp);
+    if(tmp_err != CH_SUCCESS) {
+        return tmp_err;
+    }
+    if(uv_loop_close(chirp.loop)) {
+        return CH_UV_ERROR; // NOCOV
     }
     return CH_SUCCESS;
 }
@@ -113,9 +151,6 @@ ch_chirp_close(ch_chirp_t* chirp)
 // .. code-block:: cpp
 //
 {
-    if(uv_loop_close(&chirp->loop)) {
-        return CH_UV_ERROR; // NOCOV
-    }
     return CH_SUCCESS;
 }
 
