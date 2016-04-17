@@ -91,6 +91,20 @@ ch_loop_init(uv_loop_t* loop)
 {
     return uv_loop_init(loop);
 }
+static
+inline
+int
+ch_loop_close(uv_loop_t* loop)
+//
+//    An alias for uv_loop_close. Please refer to the libuv documentation.
+//
+//    :param uv_loop_t* loop: Loop struct allocated by user.
+//
+// .. code-block:: cpp
+//
+{
+    return uv_loop_close(loop);
+}
 // .. c:function::
 static
 inline

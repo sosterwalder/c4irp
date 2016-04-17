@@ -135,7 +135,11 @@ ch_chirp_run(ch_config_t config)
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;
     }
-    if(uv_loop_close(chirp.loop)) {
+    tmp_err = _ch_uv_error_map(ch_run(&loop, UV_RUN_ONCE));
+    if(tmp_err != CH_SUCCESS) {
+        return tmp_err;
+    }
+    if(ch_loop_close(chirp.loop)) {
         return CH_UV_ERROR; // NOCOV
     }
     return CH_SUCCESS;
@@ -151,6 +155,8 @@ ch_chirp_close(ch_chirp_t* chirp)
 // .. code-block:: cpp
 //
 {
+    uv_close((uv_handle_t*) &chirp->_serverv4, NULL);
+    uv_close((uv_handle_t*) &chirp->_serverv6, NULL);
     return CH_SUCCESS;
 }
 

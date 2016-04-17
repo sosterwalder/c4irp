@@ -113,6 +113,11 @@ ch_loop_init(uv_loop_t* loop);
 static
 inline
 int
+ch_loop_close(uv_loop_t* loop);
+
+static
+inline
+int
 ch_run(uv_loop_t* loop, uv_run_mode mode);
 
 extern
