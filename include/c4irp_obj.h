@@ -57,7 +57,7 @@ typedef struct {
 //
 // .. code-block:: cpp
 
-typedef void (*ch_log_cb_t)(char* msg);
+typedef void (*ch_log_cb_t)(char msg[]);
 
 //
 // .. c:var:: ch_config_defaults

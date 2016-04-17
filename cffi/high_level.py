@@ -97,8 +97,8 @@ typedef struct {
     char BIND_V4[4];
 } ch_config_t;
 
-typedef void (*ch_log_cb_t)(char* msg);
-extern "Python" void python_log_cb(char* msg);
+typedef void (*ch_log_cb_t)(char msg[]);
+extern "Python" void python_log_cb(char msg[]);
 
 extern ch_config_t ch_config_defaults;
 

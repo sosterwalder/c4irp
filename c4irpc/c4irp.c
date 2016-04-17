@@ -45,6 +45,7 @@ _ch_close_async_cb(uv_async_t* handle)
         uv_stop(chirp->loop);
         L(chirp, "UV-Loop %p stopped by c4irp", chirp->loop);
     }
+    L(chirp, "Closed chirp %p", chirp);
 }
 
 // .. c:function::
@@ -124,7 +125,6 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
     if(uv_async_init(chirp->loop, &chirp->_close, &_ch_close_async_cb) < 0) {
         return CH_UV_ERROR;
     }
-    L(chirp, "Chirp %p initialized", chirp);
     return CH_SUCCESS;
 }
 
