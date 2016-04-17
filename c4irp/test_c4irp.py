@@ -1,19 +1,23 @@
 import threading
 import time
 from _c4irp_cffi import ffi, lib
+from . import log
 
 
 def test_init_free():
     """Test if we can initialize and free c4irp"""
+    log.debug("Running test_init_free")
     chirp = ffi.new("ch_chirp_t*")
     loop = ffi.new("uv_loop_t*")
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
     assert lib.ch_chirp_init(
         chirp, lib.ch_config_defaults, loop
     ) == lib.CH_SUCCESS
+    lib.ch_chirp_register_log_cb(chirp, lib.python_log_cb)
     assert lib.ch_chirp_close_ts(chirp) == lib.CH_SUCCESS
     assert lib.ch_run(loop, lib.UV_RUN_ONCE) == lib.CH_SUCCESS
     assert lib.ch_loop_close(loop) == lib.CH_SUCCESS
+    assert False
 
 
 def test_chirp_run():

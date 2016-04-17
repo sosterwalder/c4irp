@@ -1,4 +1,5 @@
 from cffi import FFI
+
 ffi = FFI()
 
 ffi.set_source(
@@ -96,6 +97,9 @@ typedef struct {
     char BIND_V4[4];
 } ch_config_t;
 
+typedef void (*ch_log_cb_t)(char* msg);
+extern "Python" void python_log_cb(char* msg);
+
 extern ch_config_t ch_config_defaults;
 
 typedef struct {
@@ -104,6 +108,11 @@ typedef struct {
     ch_config_t config;
     ...;
 } ch_chirp_t;
+
+static
+inline
+void
+ch_chirp_register_log_cb(ch_chirp_t* chirp, ch_log_cb_t log_cb);
 
 static
 inline
@@ -132,6 +141,7 @@ extern
 ch_error_t
 ch_chirp_close_ts(ch_chirp_t* chirp);
 """)
+
 
 if __name__ == "__main__":
     ffi.compile()

@@ -1,7 +1,7 @@
 .PHONY: clean libc4irp libuv mbedtls
 
 COMMON        := config.h c4irpc/common.h
-export CFLAGS := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
+export CFLAGS := -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
 
 SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)

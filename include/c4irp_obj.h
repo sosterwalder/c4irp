@@ -51,6 +51,14 @@ typedef struct {
     char BIND_V4[4];
 } ch_config_t;
 
+// .. c:type:: ch_log_cb_t
+//
+//    Logging callback
+//
+// .. code-block:: cpp
+
+typedef void (*ch_log_cb_t)(char* msg);
+
 //
 // .. c:var:: ch_config_defaults
 //
@@ -67,7 +75,7 @@ extern ch_config_t ch_config_defaults;
 // .. code-block:: cpp
 
 typedef struct {
-    char identity[16];
+    char                identity[16];
     uv_loop_t*          loop;
     ch_config_t         config;
     struct sockaddr_in  _addrv4;
@@ -76,8 +84,25 @@ typedef struct {
     uv_tcp_t            _serverv6;
     uv_async_t          _close;
     int                 _auto_start;
+    ch_log_cb_t         _log;
 } ch_chirp_t;
 
+// .. c:function::
+static
+inline
+void
+ch_chirp_register_log_cb(ch_chirp_t* chirp, ch_log_cb_t log_cb)
+//
+//    Register a callback for sending log messages.
+//
+//    :param ch_chirp_t* chirp: Chirp instance
+//    :param ch_log_cb_t   log: Callback to be called on log messages
+//
+// .. code-block:: cpp
+//
+{
+    chirp->_log = log_cb;
+}
 // .. c:function::
 static
 inline
