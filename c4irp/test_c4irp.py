@@ -1,5 +1,6 @@
 import threading
 import time
+import c4irp
 
 from _c4irp_cffi import ffi, lib
 
@@ -19,7 +20,6 @@ def test_init_free():
     assert lib.ch_chirp_close_ts(chirp) == lib.CH_SUCCESS
     assert lib.ch_run(loop, lib.UV_RUN_ONCE) == lib.CH_SUCCESS
     assert lib.ch_loop_close(loop) == lib.CH_SUCCESS
-    assert False
 
 
 def test_chirp_run():
@@ -39,6 +39,16 @@ def test_chirp_run():
     lib.ch_chirp_close_ts(chirp_p[0])
     thread.join()
     assert res[0] == lib.CH_SUCCESS
+
+
+def test_chirp_object_basic():
+    """Test if initializing and closing the ChirpPool object works"""
+    chirp = c4irp.ChirpPool()
+    chirp._chirp.loop = ffi.NULL
+    assert chirp._chirp.loop == ffi.NULL
+    chirp.start()
+    assert chirp._chirp.loop != ffi.NULL
+    chirp.close()
 
 if __name__ == "__main__":  # pragma: no cover
     test_init_free()

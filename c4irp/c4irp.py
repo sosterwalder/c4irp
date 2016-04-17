@@ -1,7 +1,10 @@
 """C4irp bindings"""
+import concurrent.futures as fut
 import sys
+import threading
 
 from . import common, const
+from _c4irp_cffi import ffi, lib
 
 
 class ChirpPool(object):
@@ -38,7 +41,39 @@ class ChirpPool(object):
             self,
             config = None,
     ):
-        self._config       = common.complete_config(config, const.Config())
+        self._config = common.complete_config(config, const.Config())
+        self._chirp  = ffi.new("ch_chirp_t*")
+        self._loop   = ffi.new("uv_loop_t*")
+        self._thread = None
+        self._pool   = None
+
+    # TODO properties
+
+    def start(self):
+        """Start servers and cleanup routines."""
+        # TODO error to excetion method
+        lib.ch_loop_init(self._loop)
+        # TODO config
+        lib.ch_chirp_init(
+            self._chirp, lib.ch_config_defaults, self._loop
+        )
+        lib.ch_chirp_register_log_cb(self._chirp, lib.python_log_cb)
+
+        def run():
+            lib.ch_run(self._loop, lib.UV_RUN_ONCE)
+            lib.ch_loop_close(self._loop)
+
+        self._pool   = fut.ThreadPoolExecutor(
+            max_workers=self._config.MAX_HANDLERS
+        )
+        self._thread = threading.Thread(target=run)
+        self._thread.start()
+
+    def close(self):
+        """Closing everything."""
+        lib.ch_chirp_close_ts(self._chirp)
+        self._thread.join()
+        self._pool.shutdown()
 
 if sys.version_info > (3, 4):
 
