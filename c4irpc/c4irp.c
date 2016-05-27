@@ -138,8 +138,6 @@ ch_error_t
 ch_chirp_run(ch_config_t config, ch_chirp_t** chirp_out)
 //    :noindex:
 //
-//    TODO testme
-//
 //    see: :c:func:`ch_chirp_run`
 //
 // .. code-block:: cpp
