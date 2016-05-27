@@ -5,6 +5,7 @@ from setuptools import setup
 from setuptools import find_packages
 from setuptools.command.install import install
 import os
+import sys
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 os.environ["CFLAGS"] = (
@@ -13,6 +14,12 @@ os.environ["CFLAGS"] = (
 os.environ["LDLAGS"] = (
     "-s"
 )
+
+requires = [
+    "cffi",
+]
+if sys.version_info < (3, 2):
+    requires.append("futures")
 
 __version__  = None
 version_file = "c4irp/version.py"
@@ -66,9 +73,7 @@ setup(
         'console_scripts': [
         ]
     },
-    install_requires = [
-        "cffi",
-    ],
+    install_requires = requires,
     setup_requires = [
         "cffi",
     ],
