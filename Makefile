@@ -44,8 +44,7 @@ doc-all: $(DOCRST) doc
 test-all: pre-install pymods test test-array coverage test-lib
 
 pre-install: libc4irp.a
-	CC="gcc" pip install --upgrade -r .requirements.txt -e .
-	rm *.so
+	CC="clang -Qunused-arguments" pip install --upgrade -r .requirements.txt -e .
 
 test-cov: clean pymods pytest test-array coverage
 
