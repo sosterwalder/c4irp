@@ -1,7 +1,7 @@
 import threading
 import time
-import c4irp
 
+import c4irp
 from _c4irp_cffi import ffi, lib
 
 from . import log

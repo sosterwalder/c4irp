@@ -156,6 +156,7 @@ ch_chirp_run(ch_config_t config, ch_chirp_t** chirp_out)
         return tmp_err;
     }
     chirp._auto_start = 1;
+    L((&chirp), "UV-Loop %p run by c4irp", &loop);
     tmp_err = _ch_uv_error_map(ch_run(&loop, UV_RUN_DEFAULT));
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;

@@ -55,16 +55,22 @@ typedef struct {
 } ch_text_address_t;
 
 typedef struct {
+    char     identity[16];
+    char     serial[16];
+    int8_t   message_type;
+    int16_t  header_len;
+    int16_t  actor_len;
+    int32_t  data_len;
+    char*    header;
+    char*    actor;
+    char*    data;
     uint8_t  ip_protocol;
     uint8_t  address[16];
     int32_t  port;
-    char     identity[16];
-    char     serial[16];
-    int16_t  actor_len;
-    int32_t  data_len;
     int8_t   host_order;
-    char*    actor;
-    char*    data;
+    int8_t   free_header;
+    int8_t   free_actor;
+    int8_t   free_data;
 } ch_message_t;
 
 extern

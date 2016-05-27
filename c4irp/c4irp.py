@@ -3,8 +3,9 @@ import concurrent.futures as fut
 import sys
 import threading
 
-from . import common, const
 from _c4irp_cffi import ffi, lib
+
+from . import common, const
 
 
 class ChirpPool(object):
@@ -79,7 +80,7 @@ class ChirpPool(object):
 
 if sys.version_info > (3, 4):
 
-    class ChirpAsync(object):
+    class ChirpAsync(object):  # pragma: no cover TODO
         """TODO
 
         Chirp is message passing with fully automatic connection setup and

@@ -35,17 +35,52 @@ typedef struct {
 // .. code-block:: cpp
 
 typedef struct {
+    // Network data, has to be sent in network order
+    char     identity[16];
+    char     serial[16];
+    int8_t   message_type;
+    int16_t  header_len;
+    int16_t  actor_len;
+    int32_t  data_len;
+    // These fields follow the message in this order (see _len above)
+    char*    header;
+    char*    actor;
+    char*    data;
+    // Local only data
     uint8_t  ip_protocol;
     uint8_t  address[16];
     int32_t  port;
-    char     identity[16];
-    char     serial[16];
-    int16_t  actor_len;
-    int32_t  data_len;
     int8_t   host_order;
-    char*    actor;
-    char*    data;
+    int8_t   free_header;
+    int8_t   free_actor;
+    int8_t   free_data;
 } ch_message_t;
+
+// Protocol receiver /Pseudo code/
+// ch_message_t msg;
+// recv_wait(buffer=&msg, size=39)
+// msg.actor = malloc(msg.actor_len) *
+// if(msg.header_len) {
+//     msg.header = malloc(msg.header_len) *
+//     recv_exactly(buffer=msg.header, msg.header_len)
+// }
+// if(msg.actor_len) {
+//     msg.actor = malloc(msg.actor_len) *
+//     recv_exactly(buffer=msg.actor, msg.actor_len)
+// }
+// if(msg.data_len) {
+//     msg.data  = malloc(msg.data_len) *
+//     recv_exactly(buffer=msg.data, msg.data_len)
+// }
+//
+// * Please use MAX_HANDLERS preallocated buffers of size 16 for header
+// * Please use MAX_HANDLERS preallocated buffers of size 256 for actor
+// * Please use MAX_HANDLERS preallocated buffers of size 1024 for data
+//
+// Either fields may exceed the limit, in which case you have to alloc and set
+// the free_* field.
+//
+// The default actor is encoded as actor_len = 0
 
 // .. c:function::
 extern
