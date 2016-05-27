@@ -2,6 +2,7 @@
 // Common header
 // =============
 // .. code-block:: cpp
+//
 #ifndef ch_common_h
 #define ch_common_h
 
@@ -22,6 +23,7 @@ _ch_uv_error_map(int error)
 //    :rtype: ch_error_t
 //
 // .. code-block:: cpp
+//
 {
     switch(error) {
         case(0):
