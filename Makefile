@@ -41,10 +41,11 @@ lldb:
 
 doc-all: $(DOCRST) doc
 
-test-all: pre-install test test-array coverage test-lib
+test-all: pre-install pymods test test-array coverage test-lib
 
-pre-install: pymods
+pre-install: libc4irp.a
 	CC="gcc" pip install --upgrade -r .requirements.txt -e .
+	rm *.so
 
 test-cov: clean pymods pytest test-array coverage
 
