@@ -35,4 +35,3 @@ License
 GNU AFFERO GENERAL PUBLIC LICENSE
 
 Please contact me for alternative licenses.
-

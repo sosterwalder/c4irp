@@ -1,6 +1,6 @@
-from contextlib import contextmanager
 import threading
 import time
+from contextlib import contextmanager
 
 import c4irp
 from _c4irp_cffi import ffi, lib
