@@ -115,7 +115,7 @@ ca_##type##_p(                                     \
             "\tindex: %zu\n",                      \
             file, line, #type, array.len, index    \
         );                                         \
-        assert(0);                                 \
+        assert(index < array.len);                 \
     }                                              \
     return &(array.data[index]);                   \
 }

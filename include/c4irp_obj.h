@@ -85,6 +85,7 @@ typedef struct {
     uv_async_t          _close;
     int                 _auto_start;
     ch_log_cb_t         _log;
+    int                 _init;
 } ch_chirp_t;
 
 // .. c:function::

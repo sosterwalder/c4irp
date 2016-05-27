@@ -4,21 +4,36 @@
 //#define LOG_TO_STDERR
 
 #ifndef NDEBUG
-#ifdef LOG_TO_STDERR
 #include <stdio.h>
-#define L(chirp, ...) fprintf (stderr, __VA_ARGS__)
+#ifdef LOG_TO_STDERR
+#define L(chirp, ...) fprintf(stderr, ##__VA_ARGS__)
 #else  //LOG_TO_STDERR
 #include "include/c4irp_obj.h"
-#define L(chirp, ...) do { \
+#define L(chirp, message, ...) do { \
     if(chirp->_log != NULL) { \
         char buf[1024]; \
-        snprintf(buf, 1024, ##__VA_ARGS__); \
+        snprintf( \
+            buf, \
+            1024, \
+            "%s:%d " message, \
+            __FILE__, \
+            __LINE__, \
+            ##__VA_ARGS__ \
+        ); \
         chirp->_log(buf); \
     } \
 } while(0)
 #endif
+#define A(condition, ...) do { \
+    if(!(condition)) { \
+        fprintf(stderr, ##__VA_ARGS__); \
+        fprintf(stderr, "\n"); \
+        assert(condition); \
+    } \
+} while(0)
 #else //NDEBUG
 #define L(...)
+#define A(...)
 #endif
 
 #endif //ch_global_config_h

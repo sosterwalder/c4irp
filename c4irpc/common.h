@@ -7,6 +7,7 @@
 #define ch_common_h
 
 #include <uv.h>
+#include <assert.h>
 #include "../include/error.h"
 //
 // .. code-block:: cpp
@@ -36,5 +37,7 @@ _ch_uv_error_map(int error)
             return CH_UV_ERROR;
     }
 }
+
+#define CH_CHIRP_MAGIC 42429
 
 #endif //ch_common_h

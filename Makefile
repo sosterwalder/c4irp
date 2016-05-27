@@ -46,7 +46,7 @@ test-all: pre-install pymods test test-array coverage test-lib
 pre-install: libc4irp.a
 	CC="clang -Qunused-arguments" pip install --upgrade -r .requirements.txt -e .
 
-test-cov: clean pymods pytest test-array coverage
+test-cov: clean pre-install pymods pytest test-array coverage
 
 config.h: config.defs.h
 	cp config.defs.h config.h

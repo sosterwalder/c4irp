@@ -66,6 +66,9 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
     chirp->_log        = NULL;
 
     // IPv4
+    if(config.PORT < -1 || config.PORT > ((1<<16) - 1)) {
+        return CH_VALUE_ERROR;
+    }
     uv_tcp_init(chirp->loop, &chirp->_serverv4);
     if(uv_inet_ntop(
             AF_INET, config.BIND_V4, tmp_addr.data, sizeof(ch_text_address_t)
@@ -73,7 +76,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
         return CH_VALUE_ERROR; // NOCOV there is no bad binary IP-addr
     }
     if(uv_ip4_addr(tmp_addr.data, config.PORT, &chirp->_addrv4) < 0) {
-        return CH_VALUE_ERROR;
+        return CH_VALUE_ERROR; // NOCOV uv will just wrap bad port
     }
     tmp_err = _ch_uv_error_map(uv_tcp_bind(
             &chirp->_serverv4,
@@ -125,6 +128,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
     if(uv_async_init(chirp->loop, &chirp->_close, &_ch_close_async_cb) < 0) {
         return CH_UV_ERROR;
     }
+    chirp->_init = CH_CHIRP_MAGIC;
     return CH_SUCCESS;
 }
 
@@ -179,6 +183,7 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 // .. code-block:: cpp
 //
 {
+    A(chirp->_init == CH_CHIRP_MAGIC, "Chirp not initialized");
     chirp->_close.data = chirp;
     if(uv_async_send(&chirp->_close) < 0) {
         return CH_UV_ERROR;
