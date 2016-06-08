@@ -13,6 +13,10 @@ RULES
 * Embrace libuv styles and use it for c4irp API
 * Literate programming
 * Local messages are sent to scheduler directly
+* Localhost messages bypass TLS and don't use garbage-collection
+
+  - Therefore no retry etc is needed! -> speed speed speed
+
 * Binding will send local messages to scheduler directly (not using c4irp)
 * Use C99 plus the extension used by libuv
 * PEP8 style in C is ok
