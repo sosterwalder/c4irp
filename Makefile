@@ -17,7 +17,7 @@ CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
 MYFLAGS   := -std=gnu99 -pthread
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
-CFFIF     := $(shell pwd)/home/cffi_fix:$(PATH)
+CFFIF     := $(shell pwd)/pyproject/cffi_fix:$(PATH)
 PY        := python
 
 export CFLAGS   := $(DCFLAGS) $(MYFLAGS)
@@ -29,13 +29,24 @@ SRCS=$(wildcard c4irpc/*.c)
 OBJS=$(SRCS:.c=.o)
 COVOUT=$(SRCS:.c=.c.gcov)
 
-include home/Makefile
+include pyproject/Makefile
 
-all: test-all
+all: pre-install pymods
+
+vi:
+	vi c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h
+
+lldb:
+	lldb `pyenv which python` -- -m pytest -x
 
 doc-all: $(DOCRST) doc
 
-test-all: pymods test test-array coverage test-lib
+test-all: pre-install pymods test test-array coverage test-lib
+
+pre-install: libc4irp.a
+	CC="clang -Qunused-arguments" pip install --upgrade -r .requirements.txt -e .
+
+test-cov: clean pre-install pymods pytest test-array coverage
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -72,14 +83,14 @@ mbedtls/library/libmbedtls.a:
 mbedtls: mbedtls/library/libmbedtls.a
 
 %.c.rst: %.c
-	home/c2rst $<
+	pyproject/c2rst $<
 
 %.h.rst: %.h
-	home/c2rst $<
+	pyproject/c2rst $<
 
 %.c: %.h
 
-%.o: %.c $(COMMON)
+%.o: %.c $(COMMON) $(DOCH)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 array_test: c4irpc/array_test.o

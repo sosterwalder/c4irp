@@ -8,31 +8,82 @@
 #define ch_inc_message_h
 
 #include "error.h"
+#include "const.h"
 
 #include <stdint.h>
+#include <stddef.h>
+
+#include <arpa/inet.h>
+
+// .. c:type:: ch_text_address_t
+//
+//    Type to be used with :c:func:`ch_msg_get_address`
+
+typedef struct {
+    char data[INET6_ADDRSTRLEN];
+} ch_text_address_t;
 
 // .. c:type:: ch_message_t
 //
 //    Represents a message.
 //  
-//    .. c:member:: char[16] address
+//    .. c:member:: uint8_t[16] address
 //
 //       IPv4/6 address of the sender if the message was received.  IPv4/6
 //       address of the recipient if the message is going to be sent.
 //
 // .. code-block:: cpp
-
+//
 typedef struct {
-    char     address[16];
-    int32_t  port;
+    // Network data, has to be sent in network order
     char     identity[16];
     char     serial[16];
-    int8_t   host_order;
+    int8_t   message_type;
+    int16_t  header_len;
     int16_t  actor_len;
     int32_t  data_len;
+    // These fields follow the message in this order (see _len above)
+    char*    header;
     char*    actor;
     char*    data;
+    // Local only data
+    uint8_t  ip_protocol;
+    uint8_t  address[16];
+    int32_t  port;
+    int8_t   host_order;
+    int8_t   free_header;
+    int8_t   free_actor;
+    int8_t   free_data;
 } ch_message_t;
+
+// Protocol receiver /Pseudo code/
+//
+// .. code-block:: cpp
+//
+//    ch_message_t msg;
+//    recv_wait(buffer=&msg, size=39)
+//    msg.actor = malloc(msg.actor_len) *
+//    if(msg.header_len) {
+//        msg.header = malloc(msg.header_len) *
+//        recv_exactly(buffer=msg.header, msg.header_len)
+//    }
+//    if(msg.actor_len) {
+//        msg.actor = malloc(msg.actor_len) *
+//        recv_exactly(buffer=msg.actor, msg.actor_len)
+//    }
+//    if(msg.data_len) {
+//        msg.data  = malloc(msg.data_len) *
+//        recv_exactly(buffer=msg.data, msg.data_len)
+//    }
+//
+// * Please use MAX_HANDLERS preallocated buffers of size 16 for header
+// * Please use MAX_HANDLERS preallocated buffers of size 256 for actor
+// * Please use MAX_HANDLERS preallocated buffers of size 1024 for data
+//
+// Either fields may exceed the limit, in which case you have to alloc and set
+// the free_* field.
+//
+// The default actor is encoded as actor_len = 0
 
 // .. c:function::
 extern
@@ -42,6 +93,38 @@ ch_msg_init(ch_message_t* message);
 //    Intialiaze a message. Memory provided by caller (for performance).
 //
 //    :param ch_message_t* message: Pointer to the message
+//
+// .. c:function::
+extern
+ch_error_t
+ch_msg_set_address(
+    ch_message_t* message,
+    ch_ip_protocol_t ip_protocol,
+    const char* address,
+    int32_t port
+);
+//
+//    Set the messages' address: IP-address and port
+//
+//    :param ch_message_t* message: Pointer to the message
+//    :param ch_ip_protocol_t ip_protocol: IP-protocol of the address
+//    :param char* address: Textual representation of IP
+//    :param int32_t port: Port of the remote
+//
+// .. c:function::
+extern
+ch_error_t
+ch_msg_get_address(
+    const ch_message_t* message,
+    ch_text_address_t* address
+);
+//
+//    Get the messages' address: IP-address. The port and ip_protocol can be
+//    read from the message directly. Address must be of the size
+//    INET(6)_ADDRSTRLEN.
+//
+//    :param ch_message_t* message: Pointer to the message
+//    :param ch_text_address_t* address: Out: Textual representation of IP
 //
 // .. code-block:: cpp
 

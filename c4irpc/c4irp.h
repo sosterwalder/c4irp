@@ -9,11 +9,7 @@
 
 #include "../include/c4irp_obj.h"
 
-#include <uv.h>
-
-struct ch_chirp_s {
-    char identity[16];
-    uv_loop_t loop;
-};
+void
+_ch_on_new_connection(uv_stream_t *server, int status);
 
 #endif //ch_c4irp_h

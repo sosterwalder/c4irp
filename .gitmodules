@@ -1,10 +1,9 @@
-[submodule "home"]
-	path = home
-	url = https://github.com/concretecloud/home.git
 [submodule "libuv"]
 	path = libuv
 	url = https://github.com/libuv/libuv.git
 [submodule "mbedtls"]
 	path = mbedtls
 	url = https://github.com/ARMmbed/mbedtls.git
-
+[submodule "pyproject"]
+	path = pyproject
+	url = https://github.com/adfinis-sygroup/pyproject.git

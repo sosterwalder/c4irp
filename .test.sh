@@ -8,4 +8,3 @@ make test-all
 make -f make.release clean all
 pip install .
 make doc-all
-cd /tmp && python -m c4irp.test_c4irp

@@ -5,6 +5,11 @@ API Reference
 Public C API
 ============
 
+.. note::
+
+   The C API is not thread-safe except where stated. Functions have \*_ts suffix.
+   uv_async_send() can be used.
+
 .. toctree::
    :maxdepth: 2
 
@@ -12,6 +17,7 @@ Public C API
    inc/message.h.rst
    inc/error.h.rst
    inc/c4irp_obj.h.rst
+   inc/const.h.rst
 
 Internal C API
 ==============
