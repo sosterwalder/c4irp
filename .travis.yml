@@ -12,10 +12,10 @@ branches:
 # command to install dependencies
 install: "pip install -r .requirements.txt"
 # command to run tests
-script: ./.test.sh
+script: ./.scripts/test.sh
 before_install:
-  - ./.fix-pypy1.sh
+  - ./.scripts/fix-pypy1.sh
   - export PATH=$HOME/.pyenv/bin:$PATH
-  - ./.fix-pypy2.sh
+  - ./.scripts/fix-pypy2.sh
   - eval "$(pyenv init -)"
   - sudo apt-get -y install clang llvm
