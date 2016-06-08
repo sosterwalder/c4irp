@@ -31,7 +31,7 @@ COVOUT=$(SRCS:.c=.c.gcov)
 
 include pyproject/Makefile
 
-all: test-all
+all: pre-install pymods
 
 vi:
 	vi c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h

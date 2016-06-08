@@ -33,7 +33,7 @@ typedef struct {
 //       address of the recipient if the message is going to be sent.
 //
 // .. code-block:: cpp
-
+//
 typedef struct {
     // Network data, has to be sent in network order
     char     identity[16];
@@ -57,21 +57,24 @@ typedef struct {
 } ch_message_t;
 
 // Protocol receiver /Pseudo code/
-// ch_message_t msg;
-// recv_wait(buffer=&msg, size=39)
-// msg.actor = malloc(msg.actor_len) *
-// if(msg.header_len) {
-//     msg.header = malloc(msg.header_len) *
-//     recv_exactly(buffer=msg.header, msg.header_len)
-// }
-// if(msg.actor_len) {
-//     msg.actor = malloc(msg.actor_len) *
-//     recv_exactly(buffer=msg.actor, msg.actor_len)
-// }
-// if(msg.data_len) {
-//     msg.data  = malloc(msg.data_len) *
-//     recv_exactly(buffer=msg.data, msg.data_len)
-// }
+//
+// .. code-block:: cpp
+//
+//    ch_message_t msg;
+//    recv_wait(buffer=&msg, size=39)
+//    msg.actor = malloc(msg.actor_len) *
+//    if(msg.header_len) {
+//        msg.header = malloc(msg.header_len) *
+//        recv_exactly(buffer=msg.header, msg.header_len)
+//    }
+//    if(msg.actor_len) {
+//        msg.actor = malloc(msg.actor_len) *
+//        recv_exactly(buffer=msg.actor, msg.actor_len)
+//    }
+//    if(msg.data_len) {
+//        msg.data  = malloc(msg.data_len) *
+//        recv_exactly(buffer=msg.data, msg.data_len)
+//    }
 //
 // * Please use MAX_HANDLERS preallocated buffers of size 16 for header
 // * Please use MAX_HANDLERS preallocated buffers of size 256 for actor

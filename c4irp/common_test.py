@@ -53,7 +53,7 @@ class ConfigTest(unittest.TestCase):
         assert config.REUSE_TIME == const.Config.REUSE_TIME
         assert config.TIMEOUT    == -1
 
-    @given(st.dictionaries(st.text(), _any))
+    @given(st.dictionaries(st.text("ASCII"), _any))
     def test_generated(self, config_in):
         """Test if complete_config can handle any dicts created by
         hypothesis."""

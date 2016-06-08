@@ -24,7 +24,7 @@ main(
 //    The test function will trigger the bound check if called with 3+.
 //
 //    :param int argc: Argument count
-//    :param char** argv: List of arguments
+//    :param char\*\* argv: List of arguments
 //
 // .. code-block:: cpp
 

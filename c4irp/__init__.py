@@ -9,7 +9,7 @@ from .const import Config  # noqa
 log = logging.getLogger("c4irp")
 
 if sys.version_info > (3, 4):  # noqa
-    from .c4irp import ChirpAsync  # noqa
+    from .c4irp import ChirpAsync  # noqa # pragma: no cover
 
 
 @ffi.def_extern()

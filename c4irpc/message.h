@@ -3,7 +3,7 @@
 // ==============
 // 
 // .. code-block:: cpp
-
+//
 #ifndef ch_msg_message_h
 #define ch_msg_message_h
 
