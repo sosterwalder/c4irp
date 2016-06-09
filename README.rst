@@ -4,7 +4,7 @@ C4irp
 
 Message-passing and actor-based programming for everyone
 
-It part of Concreteclouds_ and the C99 implementation of Chirp_.
+It is part of Concreteclouds_ and the C99 implementation of Chirp_.
 
 .. _Concreteclouds: https://concretecloud.github.io/
 
