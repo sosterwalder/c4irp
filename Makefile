@@ -1,7 +1,6 @@
 .PHONY: clean libc4irp sublibs libuv mbedtls test_ext doc c4irp
 
 PROJECT     := c4irp
-export CC   := clang
 
 PYPY      := $(shell python --version 2>&1 | grep PyPy > /dev/null 2> /dev/null; echo $$?)
 NEWCOV    := $(shell llvm-cov --help 2>&1 | grep -E "USAGE:.*SOURCEFILE" > /dev/null 2> /dev/null; echo $$?)
@@ -19,8 +18,9 @@ DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
 CFFIF     := $(shell pwd)/pyproject/cffi_fix:$(PATH)
 PY        := python
+MYCC      := clang
 
-export CFLAGS   := $(DCFLAGS) $(MYFLAGS)
+SETCFLAGS := $(DCFLAGS) $(MYFLAGS)
 
 DOCC=$(wildcard c4irpc/*.c)
 DOCH=$(wildcard c4irpc/*.h) $(wildcard include/*.h)
@@ -43,8 +43,7 @@ doc-all: $(DOCRST) doc
 
 test-all: pre-install pymods test test-array coverage test-lib
 
-pre-install: libc4irp.a
-	CC="clang -Qunused-arguments" pip install --upgrade -r .requirements.txt -e .
+pre-install: .deps/cffi libc4irp.a install-edit
 
 test-cov: clean pre-install pymods pytest test-array coverage
 
@@ -59,11 +58,12 @@ genhtml:
 pymods: _c4irp_cffi.o
 
 _c4irp_cffi.o: libc4irp.a cffi/high_level.py
-	PATH=$(CFFIF) $(PY) cffi/high_level.py
+	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
+	   $(PY) cffi/high_level.py
 	rm _c4irp_cffi.c
 
 # _c4irp_low_level.o: libc4irp.a cffi/low_level.py
-#	PATH=$(CFFIF) $(PY) cffi/low_level.py
+#	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" $(PY) cffi/low_level.py
 #	rm _c4irp_low_level.c
 
 libuv/configure:
@@ -91,10 +91,10 @@ mbedtls: mbedtls/library/libmbedtls.a
 %.c: %.h
 
 %.o: %.c $(COMMON) $(DOCH)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(MYCC) -c -o $@ $< $(SETCFLAGS)
 
 array_test: c4irpc/array_test.o
-	$(CC) -o $@ $< $(CFLAGS)
+	$(MYCC) -o $@ $< $(SETCFLAGS)
 
 libc4irp: libc4irp.a
 
