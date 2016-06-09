@@ -13,7 +13,7 @@ RULES
 * Embrace libuv styles and use it for c4irp API
 * Literate programming
 * Local messages are sent to scheduler directly
-* Localhost messages bypass TLS and don't use garbage-collection
+* Localhost connections bypass TLS and don't use cleanup
 
   - Therefore no retry etc is needed! -> speed speed speed
 
