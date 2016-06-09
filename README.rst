@@ -4,6 +4,12 @@ C4irp
 
 Message-passing and actor-based programming for everyone
 
+It part of Concreteclouds_ and the C99 implementation of Chirp_.
+
+.. _Concreteclouds: https://concretecloud.github.io/
+
+.. _Chirp: https://github.com/concretecloud/chirp
+
 |travis| |rtd| |coverage| [1]_
 
 .. |travis|  image:: https://travis-ci.org/concretecloud/c4irp.svg?branch=master
