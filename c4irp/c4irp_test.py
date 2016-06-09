@@ -2,8 +2,29 @@ import threading
 import time
 from contextlib import contextmanager
 
+from hypothesis import strategies as st
+from hypothesis import given
+
 import c4irp
 from _c4irp_cffi import ffi, lib
+
+config_st = st.fixed_dictionaries({
+    "REUSE_TIME"   : st.integers(2, 3600),
+    "TIMEOUT"      : st.floats(0.1, 60),
+    "IP_PROTOCOLS" : st.integers(0, 3),
+    "BACKLOG"      : st.integers(0, 1000),
+    "RETRIES"      : st.integers(0, 4),
+    "DEBUG"        : st.booleans(),
+    "MAX_HANDLERS" : st.integers(1, 100),
+    # TODO in python chirp MAX_HANDLERS arent validated complete
+    # add this to cccirp and c4irp
+    "REQUIRE_ACK"  : st.booleans(),
+    "FLOW_CONTROL" : st.booleans(),
+    "RESOLVE"      : st.booleans(),
+    "DISABLE_TASKS": st.booleans(),
+    "DISABLE_TLS"  : st.booleans(),
+    "LOCALHOST_OPT": st.booleans(),
+})
 
 
 def test_init_free():
@@ -77,6 +98,20 @@ def test_chirp_run():
     lib.ch_chirp_close_ts(chirp_p[0])
     thread.join()
     assert res[0] == lib.CH_SUCCESS
+
+
+@given(config_st)
+def test_chirp_object_config(config):
+    """Test if initializing, using and closing the ChirpPool object works with
+    hypothesis generated config"""
+    # TODO as validate is implemented this is going to need assume()s
+    chirp = c4irp.ChirpPool(config)
+    chirp._chirp.loop = ffi.NULL
+    assert chirp._chirp.loop == ffi.NULL
+    chirp.start()
+    # TODO send a message to second (standard c chirp)
+    assert chirp._chirp.loop != ffi.NULL
+    chirp.close()
 
 
 def test_chirp_object_basic():
