@@ -35,17 +35,6 @@ Development
    apt-get install build-essential automake autoconf cmake clang llvm
    make test-all
 
-Because of many contradicting properties of setuptools, cffi and my choice to
-develop using clang, I can't guarantee that every target just works, like in
-other pyproject-based projects. Therefore:
-
-.. code-block:: bash
-
-   apt-get install build-essential automake autoconf cmake clang llvm
-   make all
-
-After that every target should work.
-
 License
 =======
 

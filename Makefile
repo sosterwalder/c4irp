@@ -41,11 +41,13 @@ lldb:
 
 doc-all: $(DOCRST) doc
 
-test-all: pre-install pymods test test-array coverage test-lib
+test-all: all test test-array coverage test-lib
 
-pre-install: .deps/cffi libc4irp.a install-edit
+test_dep: all
 
-test-cov: clean pre-install pymods pytest test-array coverage
+pre-install: libc4irp.a install-edit
+
+test-cov: clean all pytest test-array coverage
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -63,7 +65,8 @@ _c4irp_cffi.o: libc4irp.a cffi/high_level.py
 	rm _c4irp_cffi.c
 
 # _c4irp_low_level.o: libc4irp.a cffi/low_level.py
-#	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" $(PY) cffi/low_level.py
+#	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
+#	   $(PY) cffi/low_level.py
 #	rm _c4irp_low_level.c
 
 libuv/configure:
