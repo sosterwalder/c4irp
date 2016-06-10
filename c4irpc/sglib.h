@@ -1763,6 +1763,7 @@ int sglib_##type##_len(type *t) {\
     int   n;\
     type  *e;\
     n = 0;\
+    (void)(e); \
     SGLIB_BIN_TREE_MAP_ON_ELEMENTS(type, t, e, left, right, n++);\
     return(n);\
 }\
@@ -1771,6 +1772,7 @@ void sglib__##type##_it_compute_current_elem(struct sglib_##type##_iterator *it)
     int   i,j,cmp;\
     type  *s, *eqt;\
     int   (*subcomparator)(type *, type *);\
+    (void)(cmp); \
     eqt = it->equalto;\
     subcomparator = it->subcomparator;\
     it->currentelem = NULL;\
