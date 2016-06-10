@@ -7,11 +7,12 @@
 #include "../config.h"
 #include "common.h"
 #include "c4irp.h"
-#include "message.h"
+#include "message.h"  // TODO remove?
+#include "protocol.h"
 
+#include <uv.h>
 #include <limits.h>
 #include <stdlib.h>
-#include <uv.h>
 
 //
 // .. c:var:: ch_config_defaults
@@ -38,12 +39,13 @@ _ch_close_async_cb(uv_async_t* handle)
 // .. code-block:: cpp
 //
 {
+    int tmp_err;
     ch_chirp_t* chirp = (ch_chirp_t*) handle->data;
     ch_chirp_int_t* ichirp = chirp->_;
+    tmp_err = ch_pr_stop(&ichirp->protocol);
+    A(tmp_err == CH_SUCCESS, "Closing failed with error %d", tmp_err);
     mbedtls_ctr_drbg_free(&ichirp->rng);
     mbedtls_entropy_free(&ichirp->entropy);
-    uv_close((uv_handle_t*) &ichirp->serverv4, NULL);
-    uv_close((uv_handle_t*) &ichirp->serverv6, NULL);
     uv_close((uv_handle_t*) &ichirp->close, NULL);
     if(ichirp->auto_start) {
         uv_stop(chirp->loop);
@@ -62,14 +64,14 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 // .. code-block:: cpp
 //
 {
-    int                      tmp_err;
-    ch_text_address_t        tmp_addr;
-    ch_chirp_int_t* ichirp = malloc(sizeof(ch_chirp_int_t));
-    chirp->_               = ichirp;
-    chirp->loop            = loop;
-    chirp->config          = config;
-    ichirp->auto_start     = 0;
-    chirp->_log            = NULL;
+    int                       tmp_err;
+    ch_chirp_int_t* ichirp  = malloc(sizeof(ch_chirp_int_t));
+    ch_protocol_t* protocol = &ichirp->protocol;
+    chirp->_                = ichirp;
+    chirp->loop             = loop;
+    chirp->config           = config;
+    ichirp->auto_start      = 0;
+    chirp->_log             = NULL;
 
     // RNG
 
@@ -89,70 +91,18 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
     mbedtls_ctr_drbg_set_reseed_interval(&ichirp->rng, INT_MAX);
     tmp_err = mbedtls_ctr_drbg_random(&ichirp->rng, chirp->identity, 16);
     _CH_TLS_RAND_ERROR(tmp_err);
-
-    // IPv4
-    if(config.PORT < -1 || config.PORT > ((1<<16) - 1)) {
-        return CH_VALUE_ERROR;
-    }
-    uv_tcp_init(chirp->loop, &ichirp->serverv4);
-    if(uv_inet_ntop(
-            AF_INET, config.BIND_V4, tmp_addr.data, sizeof(ch_text_address_t)
-    ) < 0) {
-        return CH_VALUE_ERROR; // NOCOV there is no bad binary IP-addr
-    }
-    if(uv_ip4_addr(tmp_addr.data, config.PORT, &ichirp->addrv4) < 0) {
-        return CH_VALUE_ERROR; // NOCOV uv will just wrap bad port
-    }
-    tmp_err = _ch_uv_error_map(uv_tcp_bind(
-            &ichirp->serverv4,
-            (const struct sockaddr*)&ichirp->addrv4,
-            0
-    ));
-    if(tmp_err != CH_SUCCESS) {
-        return tmp_err;  // NOCOV UV_EADDRINUSE can happen in tcp_bind or listen
-                         // on my systems it happends in listen
-    }
-    if(uv_tcp_nodelay(&ichirp->serverv4, 1) < 0) {
-        return CH_UV_ERROR;  // NOCOV don't know how to produce
-    }
-    if(uv_listen(
-            (uv_stream_t*) &ichirp->serverv4,
-            config.BACKLOG,
-            _ch_on_new_connection
-    ) < 0) {
-        return CH_EADDRINUSE;
-    }
-
-    // IPv6, as the dual stack feature doesn't work everywhere we bind both
-    uv_tcp_init(chirp->loop, &ichirp->serverv6);
-    if(uv_inet_ntop(
-            AF_INET6, config.BIND_V6, tmp_addr.data, sizeof(ch_text_address_t)
-    ) < 0) {
-        return CH_VALUE_ERROR; // NOCOV there is no bad binary IP-addr
-    }
-    if(uv_ip6_addr(tmp_addr.data, config.PORT, &ichirp->addrv6) < 0) {
-        return CH_VALUE_ERROR; // NOCOV errors happend for IPV4
-    }
-    tmp_err = _ch_uv_error_map(uv_tcp_bind(
-            &ichirp->serverv6,
-            (const struct sockaddr*) &ichirp->addrv6,
-            UV_TCP_IPV6ONLY
-    ));
-    if(tmp_err != CH_SUCCESS) {
-        return tmp_err; // NOCOV errors happend for IPV4
-    }
-    if(uv_tcp_nodelay(&ichirp->serverv6, 1) < 0) {
-        return CH_UV_ERROR; // NOCOV errors happend for IPV4 
-    }
-    if(uv_listen(
-            (uv_stream_t*) &ichirp->serverv6,
-            config.BACKLOG,
-            _ch_on_new_connection
-    ) < 0) {
-        return CH_EADDRINUSE; // NOCOV errors happend for IPV4
-    }
     if(uv_async_init(chirp->loop, &ichirp->close, &_ch_close_async_cb) < 0) {
-        return CH_UV_ERROR; // NOCOV errors happend for IPV4
+        return CH_UV_ERROR; // NOCOV
+    }
+
+    // TODO identity
+    protocol->loop    = chirp->loop;
+    protocol->config  = &chirp->config;
+    protocol->entropy = &ichirp->entropy;
+    protocol->rng     = &ichirp->rng;
+    tmp_err           = ch_pr_start(protocol);
+    if(tmp_err != CH_SUCCESS) {
+        return tmp_err;
     }
     chirp->_init = CH_CHIRP_MAGIC;
     return CH_SUCCESS;
@@ -214,18 +164,4 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this
     }
     return CH_SUCCESS;
-}
-
-
-// .. c:function::
-static void
-_ch_on_new_connection(uv_stream_t *server, int status)
-//    :noindex:
-//
-//    see: :c:func:`_ch_on_new_connection`
-//
-// .. code-block:: cpp
-//
-{
-    return; // NOCOV
 }

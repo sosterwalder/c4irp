@@ -17,21 +17,6 @@
 //
 //    Chirp object.
 //  
-//    .. c:member:: struct sockaddr_in addrv4
-//
-//       BIND_V4 addr converted to a sockaddr_in 
-//
-//    .. c:member:: struct sockaddr_in addrv4
-//
-//       BIND_V6 addr converted to a sockaddr_in6
-//
-//    .. c:member:: uv_tcp_t serverv4
-//
-//       reference to the libuv tcp server
-//
-//    .. c:member:: uv_tcp_t serverv6
-//
-//       reference to the libuv tcp server
 //
 //    .. c:member:: uv_async_t close
 //
@@ -50,15 +35,15 @@
 //
 //       non-cryptographic random number generator
 //
+//    .. c:member:: mbedtls_ctr_drbg_context rng
+//
+//       non-cryptographic random number generator
+//
 // .. code-block:: cpp
 //
 struct ch_chirp_int {
-    struct sockaddr_in       addrv4;
-    struct sockaddr_in6      addrv6;
-    uv_tcp_t                 serverv4;
-    uv_tcp_t                 serverv6;
-    uv_async_t               close;
     int                      auto_start;
+    uv_async_t               close;
     mbedtls_entropy_context  entropy;
     mbedtls_ctr_drbg_context rng;
     ch_protocol_t            protocol;
