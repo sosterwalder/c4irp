@@ -70,8 +70,17 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 
     // RNG
 
-    // mbedtls_ctr_drbg_init(&ichirp->rng);
-    // mbedtls_ctr_drbg_random(&ichirp->rng, chirp->identity, 16);
+    // TODO error handling
+    mbedtls_entropy_init(&ichirp->entropy);
+    mbedtls_ctr_drbg_init(&ichirp->rng);
+    mbedtls_ctr_drbg_seed(
+        &ichirp->rng,
+        mbedtls_entropy_func,
+        &ichirp->entropy,
+        NULL,
+        0
+    );
+    mbedtls_ctr_drbg_random(&ichirp->rng, chirp->identity, 16);
 
     // IPv4
     if(config.PORT < -1 || config.PORT > ((1<<16) - 1)) {
@@ -193,6 +202,7 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
     A(chirp->_init == CH_CHIRP_MAGIC, "Chirp not initialized");
     ch_chirp_int_t* ichirp = chirp->_;
     mbedtls_ctr_drbg_free(&ichirp->rng);
+    mbedtls_entropy_free(&ichirp->entropy);
     ichirp->close.data = chirp;
     if(uv_async_send(&ichirp->close) < 0) {
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this

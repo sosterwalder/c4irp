@@ -9,7 +9,8 @@
 
 #include "../include/c4irp_obj.h"
 
-#include "mbedtls/ctr_drbg.h"
+#include <mbedtls/ctr_drbg.h>
+#include <mbedtls/entropy.h>
 
 struct ch_chirp_int {
     struct sockaddr_in       addrv4;
@@ -18,6 +19,7 @@ struct ch_chirp_int {
     uv_tcp_t                 serverv6;
     uv_async_t               close;
     int                      auto_start;
+    mbedtls_entropy_context  entropy;
     mbedtls_ctr_drbg_context rng;
 };
 

@@ -36,7 +36,7 @@ all: pre-install pymods
 vi:
 	vi c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h
 
-lldb:
+lldb: all
 	lldb `pyenv which python` -- -m pytest -x
 
 doc-all: $(DOCRST) doc

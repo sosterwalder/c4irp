@@ -105,23 +105,27 @@ def test_chirp_object_config(config):
     """Test if initializing, using and closing the ChirpPool object works with
     hypothesis generated config"""
     # TODO as validate is implemented this is going to need assume()s
-    chirp = c4irp.ChirpPool(config)
-    chirp._chirp.loop = ffi.NULL
-    assert chirp._chirp.loop == ffi.NULL
-    chirp.start()
+    chirp = init_chirp()
     # TODO send a message to second (standard c chirp)
-    assert chirp._chirp.loop != ffi.NULL
     chirp.close()
 
 
 def test_chirp_object_basic():
     """Test if initializing and closing the ChirpPool object works"""
+    chirp = init_chirp()
+    chirp.close()
+
+
+def init_chirp():
+    """Initialize chirp for basic tests"""
     chirp = c4irp.ChirpPool()
+    chirp._chirp.identity = b"\0" * 16
     chirp._chirp.loop = ffi.NULL
     assert chirp._chirp.loop == ffi.NULL
     chirp.start()
+    assert chirp._chirp.identity != b"\0" * 16
     assert chirp._chirp.loop != ffi.NULL
-    chirp.close()
+    return chirp
 
 if __name__ == "__main__":  # pragma: no cover
     test_init_free()
