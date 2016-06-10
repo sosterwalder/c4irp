@@ -33,6 +33,8 @@ Internal C API
    c4irpc/message.c.rst
    c4irpc/c4irp.h.rst
    c4irpc/c4irp.c.rst
+   c4irpc/protocol.h.rst
+   c4irpc/protocol.c.rst
 
 Public Python API
 =================

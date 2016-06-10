@@ -9,6 +9,7 @@
 #include "c4irp.h"
 #include "message.h"
 
+#include <limits.h>
 #include <stdlib.h>
 #include <uv.h>
 
@@ -39,6 +40,8 @@ _ch_close_async_cb(uv_async_t* handle)
 {
     ch_chirp_t* chirp = (ch_chirp_t*) handle->data;
     ch_chirp_int_t* ichirp = chirp->_;
+    mbedtls_ctr_drbg_free(&ichirp->rng);
+    mbedtls_entropy_free(&ichirp->entropy);
     uv_close((uv_handle_t*) &ichirp->serverv4, NULL);
     uv_close((uv_handle_t*) &ichirp->serverv6, NULL);
     uv_close((uv_handle_t*) &ichirp->close, NULL);
@@ -59,7 +62,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 // .. code-block:: cpp
 //
 {
-    ch_error_t               tmp_err;
+    int                      tmp_err;
     ch_text_address_t        tmp_addr;
     ch_chirp_int_t* ichirp = malloc(sizeof(ch_chirp_int_t));
     chirp->_               = ichirp;
@@ -73,14 +76,19 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
     // TODO error handling
     mbedtls_entropy_init(&ichirp->entropy);
     mbedtls_ctr_drbg_init(&ichirp->rng);
-    mbedtls_ctr_drbg_seed(
+    tmp_err = mbedtls_ctr_drbg_seed(
         &ichirp->rng,
         mbedtls_entropy_func,
         &ichirp->entropy,
         NULL,
         0
     );
-    mbedtls_ctr_drbg_random(&ichirp->rng, chirp->identity, 16);
+    _CH_TLS_RAND_ERROR(tmp_err);
+    // We don't want reseed (peformance) and we don't need ressed
+    // (no cryptographic use)
+    mbedtls_ctr_drbg_set_reseed_interval(&ichirp->rng, INT_MAX);
+    tmp_err = mbedtls_ctr_drbg_random(&ichirp->rng, chirp->identity, 16);
+    _CH_TLS_RAND_ERROR(tmp_err);
 
     // IPv4
     if(config.PORT < -1 || config.PORT > ((1<<16) - 1)) {
@@ -192,7 +200,7 @@ ch_error_t
 ch_chirp_close_ts(ch_chirp_t* chirp)
 //    :noindex:
 //
-//    see: :c:func:`ch_chirp_close`
+//    see: :c:func:`ch_chirp_close_ts`
 //
 //    This function is thread-safe
 //
@@ -201,8 +209,6 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 {
     A(chirp->_init == CH_CHIRP_MAGIC, "Chirp not initialized");
     ch_chirp_int_t* ichirp = chirp->_;
-    mbedtls_ctr_drbg_free(&ichirp->rng);
-    mbedtls_entropy_free(&ichirp->entropy);
     ichirp->close.data = chirp;
     if(uv_async_send(&ichirp->close) < 0) {
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this
@@ -214,8 +220,9 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 // .. c:function::
 static void
 _ch_on_new_connection(uv_stream_t *server, int status)
+//    :noindex:
 //
-//  Callback from libuv on new connection
+//    see: :c:func:`_ch_on_new_connection`
 //
 // .. code-block:: cpp
 //

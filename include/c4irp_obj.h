@@ -61,16 +61,22 @@ typedef void (*ch_log_cb_t)(char msg[]);
 
 //
 // .. c:var:: ch_config_defaults
+//    :noindex:
 //
 //    Default config of c4irp.
+//
+//    see: :c:type:`ch_config_defaults`
 //
 // .. code-block:: cpp
 
 extern ch_config_t ch_config_defaults;
 
 // .. c:type:: ch_chirp_int_t
+//    :noindex:
 //
 //    Opaque pointer to internals.
+//
+//    see: :c:type:`ch_chirp_int_t`
 //
 // .. code-block:: cpp
 
