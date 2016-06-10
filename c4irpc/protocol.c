@@ -160,7 +160,7 @@ _ch_pr_free_receipts(ch_receipt_t* receipts)
     ch_receipt_t* t;
     struct sglib_ch_receipt_t_iterator it;
     for(
-            t = sglib_ch_receipt_t_it_init_inorder(
+            t = sglib_ch_receipt_t_it_init(
                 &it,
                 receipts
             );
