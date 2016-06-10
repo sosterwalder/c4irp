@@ -106,21 +106,25 @@ typedef struct {
 ch_error_t
 ch_pr_start(ch_protocol_t* protocol);
 //
-//  Start the protocol
-//
-// .. code-block:: cpp
+//    Start the protocol
 //
 // .. c:function::
 ch_error_t
 ch_pr_stop(ch_protocol_t* protocol);
 //
-//  Stop the protocol
+//    Stop the protocol
 //
 // .. c:function::
 static void
 _ch_on_new_connection(uv_stream_t *server, int status);
 //
-//  Callback from libuv on new connection
+//    Callback from libuv on new connection
+//
+// .. c:function::
+static void
+_ch_pr_free_receipts(ch_receipt_t* receipts);
+//
+//    Free all remaining items in a receipts set
 //
 // .. code-block:: cpp
 

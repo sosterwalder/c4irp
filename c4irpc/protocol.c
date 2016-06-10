@@ -22,8 +22,9 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
 // .. c:function::
 ch_error_t
 ch_pr_start(ch_protocol_t* protocol)
+//    :noindex:
 //
-//  Start the protocol
+//    see: :c:func:`ch_pr_start`
 //
 // .. code-block:: cpp
 //
@@ -120,14 +121,17 @@ ch_pr_start(ch_protocol_t* protocol)
 // .. c:function::
 ch_error_t
 ch_pr_stop(ch_protocol_t* protocol)
+//    :noindex:
 //
-//  Stop the protocol
+//    see: :c:func:`ch_pr_stop`
 //
 // .. code-block:: cpp
 //
 {
     uv_close((uv_handle_t*) &protocol->serverv4, NULL);
     uv_close((uv_handle_t*) &protocol->serverv6, NULL);
+    _ch_pr_free_receipts(protocol->receipts);
+    _ch_pr_free_receipts(protocol->late_receipts);
     return CH_SUCCESS;
 }
 
@@ -142,4 +146,27 @@ _ch_on_new_connection(uv_stream_t *server, int status)
 //
 {
     return; // NOCOV
+}
+// .. c:function::
+static void
+_ch_pr_free_receipts(ch_receipt_t* receipts)
+//    :noindex:
+//
+//    see: :c:func:`_ch_pr_free_receipts`
+//
+// .. code-block:: cpp
+//
+{
+    ch_receipt_t* t;
+    struct sglib_ch_receipt_t_iterator it;
+    for(
+            t = sglib_ch_receipt_t_it_init_inorder(
+                &it,
+                receipts
+            );
+            t != NULL;
+            t = sglib_ch_receipt_t_it_next(&it)
+    ) {
+        free(t);
+    }
 }
