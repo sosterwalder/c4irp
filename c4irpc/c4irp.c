@@ -192,7 +192,7 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 
 
 // .. c:function::
-void
+static void
 _ch_on_new_connection(uv_stream_t *server, int status)
 //
 //  Callback from libuv on new connection
