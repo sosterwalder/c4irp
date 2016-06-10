@@ -28,7 +28,7 @@ struct ch_chirp;
 //
 // .. code-block:: cpp
 
-/*typedef struct ch_receipt {
+typedef struct ch_receipt {
   unsigned char      receipt[16];
   char               color_field;
   struct ch_receipt* left;
@@ -45,13 +45,6 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
     color_field,
     CH_RECEIPT_CMP
 );
-SGLIB_DEFINE_RBTREE_FUNCTIONS(
-    ch_receipt_t,
-    left,
-    right,
-    color_field,
-    CH_RECEIPT_CMP
-);*/
 
 // .. c:type:: ch_protocol_t
 //
@@ -96,7 +89,7 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS(
 // .. code-block:: cpp
 
 typedef struct {
-    unsigned char*            identity[16];
+    unsigned char*            identity;
     uv_loop_t*                loop;
     ch_config_t*              config;
     struct sockaddr_in        addrv4;
@@ -105,6 +98,8 @@ typedef struct {
     uv_tcp_t                  serverv6;
     mbedtls_entropy_context*  entropy;
     mbedtls_ctr_drbg_context* rng;
+    ch_receipt_t*             receipts;
+    ch_receipt_t*             late_receipts;
 } ch_protocol_t;
 
 // .. c:function::

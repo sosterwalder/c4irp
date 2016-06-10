@@ -9,6 +9,15 @@
 #include "common.h"
 #include "message.h"
 #include "c4irp.h"
+#include <stdlib.h>
+
+SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
+    ch_receipt_t,
+    left,
+    right,
+    color_field,
+    CH_RECEIPT_CMP
+);
 
 // .. c:function::
 ch_error_t
@@ -83,6 +92,29 @@ ch_pr_start(ch_protocol_t* protocol)
     ) < 0) {
         return CH_EADDRINUSE; // NOCOV errors happend for IPV4
     }
+    protocol->receipts = NULL;
+    protocol->late_receipts = NULL;
+    /*ch_receipt_t* t;
+    struct sglib_ch_receipt_t_iterator it;
+    for(int i = 0; i < 10; ++i) {
+        t = malloc(sizeof(ch_receipt_t));
+        mbedtls_ctr_drbg_random(
+            protocol->rng,
+            t->receipt,
+            16
+        );
+        sglib_ch_receipt_t_add(&protocol->receipts, t);
+    }
+    for(
+            t = sglib_ch_receipt_t_it_init_inorder(
+                &it,
+                protocol->receipts
+            );
+            t != NULL;
+            t = sglib_ch_receipt_t_it_next(&it)
+    ) {
+        printf("%d ", t->receipt[0]);
+    } */
     return CH_SUCCESS;
 }
 // .. c:function::
