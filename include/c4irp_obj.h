@@ -68,6 +68,14 @@ typedef void (*ch_log_cb_t)(char msg[]);
 
 extern ch_config_t ch_config_defaults;
 
+// .. c:type:: ch_chirp_int_t
+//
+//    Opaque pointer to internals.
+//
+// .. code-block:: cpp
+
+typedef struct ch_chirp_int ch_chirp_int_t;
+
 // .. c:type:: ch_chirp_t
 //
 //    Chirp object.
@@ -75,17 +83,11 @@ extern ch_config_t ch_config_defaults;
 // .. code-block:: cpp
 
 typedef struct {
-    char                identity[16];
-    uv_loop_t*          loop;
-    ch_config_t         config;
-    struct sockaddr_in  _addrv4;
-    struct sockaddr_in6 _addrv6;
-    uv_tcp_t            _serverv4;
-    uv_tcp_t            _serverv6;
-    uv_async_t          _close;
-    int                 _auto_start;
-    ch_log_cb_t         _log;
-    int                 _init;
+    char            identity[16];
+    uv_loop_t*      loop;
+    ch_config_t     config;
+    ch_log_cb_t     _log;
+    ch_chirp_int_t* _;
 } ch_chirp_t;
 
 // .. c:function::
