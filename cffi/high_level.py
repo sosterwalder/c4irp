@@ -7,7 +7,7 @@ ffi.set_source(
     """
     #include <c4irp.h>
     """,
-    libraries=["c4irp", "uv", "m", "rt", "pthread"],
+    libraries=["c4irp", "uv", "m", "rt", "pthread", "mbedcrypto"],
     library_dirs=["."],
     include_dirs=["include"],
 )
@@ -109,7 +109,7 @@ extern "Python" void python_log_cb(char msg[]);
 extern ch_config_t ch_config_defaults;
 
 typedef struct {
-    char identity[16];
+    unsigned char identity[16];
     uv_loop_t* loop;
     ch_config_t config;
     ...;

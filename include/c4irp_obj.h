@@ -80,13 +80,26 @@ typedef struct ch_chirp_int ch_chirp_int_t;
 //
 //    Chirp object.
 //  
+//    .. c:member:: char identity[16]
+//
+//       Identity of this chirp node, 16 bytes
+//
+//    .. c:member:: uv_loop_t* loop
+//
+//       libuv event loop used by chirp
+//
+//    .. c:member:: ch_config_t config
+//
+//       config used by chirp (DO NOT CHANGE)
+//
 // .. code-block:: cpp
 
 typedef struct {
-    char            identity[16];
+    unsigned char   identity[16];
     uv_loop_t*      loop;
     ch_config_t     config;
     ch_log_cb_t     _log;
+    int             _init;
     ch_chirp_int_t* _;
 } ch_chirp_t;
 

@@ -12,7 +12,7 @@ else
 endif
 
 COMMON    := config.h c4irpc/common.h
-CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
+CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include -Imbedtls/include
 MYFLAGS   := -std=gnu99 -pthread
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
@@ -105,7 +105,7 @@ libc4irp.a: $(OBJS) | libc4irp-depends
 	ar $(ARFLAGS) $@ $^
 
 libc4irp-depends:
-	@make CFLAGS="$(PCFLAGS)" libuv mbedtls
+	@make CFLAGS="$(CCFLAGS) -g" libuv mbedtls
 
 clean-all: clean clean-sub
 

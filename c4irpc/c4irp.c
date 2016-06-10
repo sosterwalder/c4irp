@@ -59,14 +59,19 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 // .. code-block:: cpp
 //
 {
-    ch_error_t           tmp_err;
-    ch_text_address_t    tmp_addr;
+    ch_error_t               tmp_err;
+    ch_text_address_t        tmp_addr;
     ch_chirp_int_t* ichirp = malloc(sizeof(ch_chirp_int_t));
     chirp->_               = ichirp;
     chirp->loop            = loop;
     chirp->config          = config;
     ichirp->auto_start     = 0;
     chirp->_log            = NULL;
+
+    // RNG
+
+    // mbedtls_ctr_drbg_init(&ichirp->rng);
+    // mbedtls_ctr_drbg_random(&ichirp->rng, chirp->identity, 16);
 
     // IPv4
     if(config.PORT < -1 || config.PORT > ((1<<16) - 1)) {
@@ -132,7 +137,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
     if(uv_async_init(chirp->loop, &ichirp->close, &_ch_close_async_cb) < 0) {
         return CH_UV_ERROR; // NOCOV errors happend for IPV4
     }
-    ichirp->init = CH_CHIRP_MAGIC;
+    chirp->_init = CH_CHIRP_MAGIC;
     return CH_SUCCESS;
 }
 
@@ -185,8 +190,9 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 // .. code-block:: cpp
 //
 {
+    A(chirp->_init == CH_CHIRP_MAGIC, "Chirp not initialized");
     ch_chirp_int_t* ichirp = chirp->_;
-    A(ichirp->init == CH_CHIRP_MAGIC, "Chirp not initialized");
+    mbedtls_ctr_drbg_free(&ichirp->rng);
     ichirp->close.data = chirp;
     if(uv_async_send(&ichirp->close) < 0) {
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this
