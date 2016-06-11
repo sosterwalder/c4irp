@@ -57,17 +57,17 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-pymods: _c4irp_cffi.o
+pymods: _c4irp_cffi.o _c4irp_low_level.o
 
 _c4irp_cffi.o: libc4irp.a cffi/high_level.py
 	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
 	   $(PY) cffi/high_level.py
 	rm _c4irp_cffi.c
 
-# _c4irp_low_level.o: libc4irp.a cffi/low_level.py
-#	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
-#	   $(PY) cffi/low_level.py
-#	rm _c4irp_low_level.c
+_c4irp_low_level.o: libc4irp.a cffi/low_level.py
+	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
+	   $(PY) cffi/low_level.py
+	rm _c4irp_low_level.c
 
 libuv/configure:
 	cd libuv && ./autogen.sh

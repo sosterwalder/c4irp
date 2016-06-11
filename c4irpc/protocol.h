@@ -16,8 +16,6 @@
 #include <uv.h>
 #include <string.h>
 
-struct ch_chirp;
-
 // .. c:type:: ch_receipt_t
 //
 //    Receipt set implemented as rbtree.
