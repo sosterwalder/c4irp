@@ -24,10 +24,10 @@ typedef struct ch_connection {
     struct ch_connection* right;
 } ch_connection_t;
 
-//connection_test
+//connection_test.h
 extern
 void
-ch_cn_conn_dict_test(
+test_ch_cn_conn_dict(
         ch_connection_t* x,
         ch_connection_t* y,
         int* cmp,

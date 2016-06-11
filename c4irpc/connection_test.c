@@ -7,7 +7,7 @@
 #include "connection_test.h"
 
 void
-ch_cn_conn_dict_test(
+test_ch_cn_conn_dict(
         ch_connection_t* x,
         ch_connection_t* y,
         int* cmp,
