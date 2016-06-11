@@ -61,6 +61,8 @@ class Config(object):
     a message router that isn't interested in the tasks."""
     DISABLE_TLS   = False
     """Do not use TLS encryption. Not recommended."""
+    LOCALHOST_OPT = True
+    """Optimize localhost connections by disabling TLS"""
     CERT_CHAIN_PEM = None
     """Set a certification chain for TLS. If you don't set this a default
     self-sign cert is used, which is not recommended.  Create a certication

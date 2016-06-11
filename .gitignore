@@ -24,3 +24,5 @@ __pycache__
 /c4irpc/*.rst
 /include/*.rst
 /.hypothesis/
+/.eggs
+/FINJA

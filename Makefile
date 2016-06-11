@@ -1,7 +1,6 @@
 .PHONY: clean libc4irp sublibs libuv mbedtls test_ext doc c4irp
 
 PROJECT     := c4irp
-export CC   := clang
 
 PYPY      := $(shell python --version 2>&1 | grep PyPy > /dev/null 2> /dev/null; echo $$?)
 NEWCOV    := $(shell llvm-cov --help 2>&1 | grep -E "USAGE:.*SOURCEFILE" > /dev/null 2> /dev/null; echo $$?)
@@ -13,14 +12,15 @@ else
 endif
 
 COMMON    := config.h c4irpc/common.h
-CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
+CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include -Imbedtls/include
 MYFLAGS   := -std=gnu99 -pthread
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
 CFFIF     := $(shell pwd)/pyproject/cffi_fix:$(PATH)
 PY        := python
+MYCC      := clang
 
-export CFLAGS   := $(DCFLAGS) $(MYFLAGS)
+SETCFLAGS := $(DCFLAGS) $(MYFLAGS)
 
 DOCC=$(wildcard c4irpc/*.c)
 DOCH=$(wildcard c4irpc/*.h) $(wildcard include/*.h)
@@ -36,17 +36,18 @@ all: pre-install pymods
 vi:
 	vi c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h
 
-lldb:
+lldb: all
 	lldb `pyenv which python` -- -m pytest -x
 
 doc-all: $(DOCRST) doc
 
-test-all: pre-install pymods test test-array coverage test-lib
+test-all: all test test-array coverage test-lib
 
-pre-install: libc4irp.a
-	CC="clang -Qunused-arguments" pip install --upgrade -r .requirements.txt -e .
+test_dep: all
 
-test-cov: clean pre-install pymods pytest test-array coverage
+pre-install: libc4irp.a install-edit
+
+test-cov: clean all pytest test-array coverage
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -56,15 +57,17 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-pymods: _c4irp_cffi.o
+pymods: _c4irp_cffi.o _c4irp_low_level.o
 
 _c4irp_cffi.o: libc4irp.a cffi/high_level.py
-	PATH=$(CFFIF) $(PY) cffi/high_level.py
+	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
+	   $(PY) cffi/high_level.py
 	rm _c4irp_cffi.c
 
-# _c4irp_low_level.o: libc4irp.a cffi/low_level.py
-#	PATH=$(CFFIF) $(PY) cffi/low_level.py
-#	rm _c4irp_low_level.c
+_c4irp_low_level.o: libc4irp.a cffi/low_level.py
+	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
+	   $(PY) cffi/low_level.py
+	rm _c4irp_low_level.c
 
 libuv/configure:
 	cd libuv && ./autogen.sh
@@ -91,10 +94,10 @@ mbedtls: mbedtls/library/libmbedtls.a
 %.c: %.h
 
 %.o: %.c $(COMMON) $(DOCH)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(MYCC) -c -o $@ $< $(SETCFLAGS)
 
 array_test: c4irpc/array_test.o
-	$(CC) -o $@ $< $(CFLAGS)
+	$(MYCC) -o $@ $< $(SETCFLAGS)
 
 libc4irp: libc4irp.a
 
@@ -102,7 +105,7 @@ libc4irp.a: $(OBJS) | libc4irp-depends
 	ar $(ARFLAGS) $@ $^
 
 libc4irp-depends:
-	@make CFLAGS="$(PCFLAGS)" libuv mbedtls
+	@make CFLAGS="$(CCFLAGS) -g" libuv mbedtls
 
 clean-all: clean clean-sub
 
