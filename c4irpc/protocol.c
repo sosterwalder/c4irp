@@ -159,7 +159,7 @@ _ch_on_new_connection(uv_stream_t *server, int status)
     else {
         uv_close((uv_handle_t*) client, NULL);
     }*/
-}
+} // NOCOV TODO remove
 // .. c:function::
 static void
 _ch_pr_free_receipts(ch_receipt_t* receipts)
@@ -178,8 +178,8 @@ _ch_pr_free_receipts(ch_receipt_t* receipts)
                 receipts
             );
             t != NULL;
-            t = sglib_ch_receipt_t_it_next(&it)
+            t = sglib_ch_receipt_t_it_next(&it) // NOCOV TODO remove
     ) {
-        free(t);
-    }
+        free(t); // NOCOV TODO remove
+    } // NOCOV TODO remove
 }
