@@ -35,6 +35,8 @@ Internal C API
    c4irpc/c4irp.c.rst
    c4irpc/protocol.h.rst
    c4irpc/protocol.c.rst
+   c4irpc/connection.h.rst
+   c4irpc/connection.c.rst
 
 Public Python API
 =================
@@ -43,3 +45,22 @@ Public Python API
    :maxdepth: 3
 
    c4irp.rst
+
+Tests in C
+==========
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+
+   c4irpc/connection_test.h.rst
+   c4irpc/connection_test.c.rst
+
+External Libs
+==============
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+
+   c4irpc/sglib.h.rst
