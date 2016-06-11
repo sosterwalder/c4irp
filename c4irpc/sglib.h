@@ -739,6 +739,7 @@
   type *iteratedVariable;\
   _cn_ = (tree);\
   _pathi_ = 0;\
+  (void)(iteratedVariable); \
   while (_cn_!=NULL) {\
     /* push down to leftmost innermost element */\
     while(_cn_!=NULL) {\
@@ -1444,6 +1445,8 @@ http://www.cis.ohio-state.edu/~gurari/course/cis680/cis680Ch11.html
 
 #define SGLIB___RBTREE_FIX_INSERTION_DISCREPANCY(type, tree, leftt, rightt, bits, RED, BLACK) {\
   type *t, *tl, *a, *b, *c, *ar, *bl, *br, *cl, *cr;\
+  (void)(bl); \
+  (void)(ar); \
   t = *tree;\
   tl = t->leftt;\
   if (t->rightt!=NULL && SGLIB___GET_VALUE(t->rightt->bits)==RED) {\
@@ -1483,6 +1486,7 @@ http://www.cis.ohio-state.edu/~gurari/course/cis680/cis680Ch11.html
 
 #define SGLIB___RBTREE_FIX_DELETION_DISCREPANCY(type, tree, leftt, rightt, bits, RED, BLACK, res) {\
   type  *t, *a, *b, *c, *d, *ar, *bl, *br, *cl, *cr, *dl, *dr;\
+  (void)(ar); \
   t = a = *tree;\
   assert(t!=NULL);\
   ar = a->rightt;\

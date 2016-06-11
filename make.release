@@ -4,7 +4,7 @@ COMMON         := config.h c4irpc/common.h
 export CFLAGS  := -O3 -s -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include -Imbedtls/include
 export LDFLAGS := -s
 
-SRCS=$(wildcard c4irpc/*.c)
+SRCS=$(filter-out $(wildcard c4irpc/*_test.c),$(wildcard c4irpc/*.c))
 OBJS=$(SRCS:.c=.o)
 
 all: libc4irp

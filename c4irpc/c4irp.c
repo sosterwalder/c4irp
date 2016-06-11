@@ -44,6 +44,7 @@ _ch_close_async_cb(uv_async_t* handle)
     ch_chirp_int_t* ichirp = chirp->_;
     tmp_err = ch_pr_stop(&ichirp->protocol);
     A(tmp_err == CH_SUCCESS, "Closing failed with error %d", tmp_err);
+    (void)(tmp_err);
     mbedtls_ctr_drbg_free(&ichirp->rng);
     mbedtls_entropy_free(&ichirp->entropy);
     uv_close((uv_handle_t*) &ichirp->close, NULL);

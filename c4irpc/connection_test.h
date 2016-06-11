@@ -21,4 +21,4 @@ ch_cn_conn_dict_test(
         int* y_mem
 );
 
-#endif //ch_connection_h
+#endif //ch_connection_test_h
