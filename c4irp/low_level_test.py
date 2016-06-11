@@ -15,7 +15,7 @@ from _c4irp_low_level import ffi, lib
     st.booleans()
 )
 def test_ch_cn_conn_dict(choice, address1, port1, address2, port2, force_eq):
-    """Test if sglib and the connection comperator behave as expected"""
+    """Test if sglib and the connection comperator behaves as expected"""
     af_inet1          = choice((2, 10))
     af_inet2          = choice((2, 10))
     if force_eq:
