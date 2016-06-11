@@ -39,7 +39,7 @@ vi:
 lldb: all
 	lldb `pyenv which python` -- -m pytest -x
 
-doc-all: $(DOCRST) doc
+doc-all: all $(DOCRST) doc
 
 test-all: all test test-array coverage test-lib
 
