@@ -16,6 +16,7 @@ CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include -Imbedtls/
 MYFLAGS   := -std=gnu99 -pthread
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
+LDFLAGS   := -L . -lmbedtls -lmbedx509 -lmbedcrypto
 CFFIF     := $(shell pwd)/pyproject/cffi_fix:$(PATH)
 PY        := python
 MYCC      := clang
@@ -84,6 +85,14 @@ mbedtls/library/libmbedtls.a:
 	make -C mbedtls
 
 mbedtls: mbedtls/library/libmbedtls.a
+
+programs: c4irpc/programs/ssl_client c4irpc/programs/ssl_server
+
+c4irpc/programs/ssl_client: mbedtls
+	$(MYCC) -o $@ $@.c $(CCFLAGS) -g $(LDFLAGS)
+	
+c4irpc/programs/ssl_server: mbedtls
+	$(MYCC) -o $@ $@.c $(CCFLAGS) -g $(LDFLAGS)
 
 %.c.rst: %.c
 	pyproject/c2rst $<

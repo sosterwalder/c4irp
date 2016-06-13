@@ -78,7 +78,7 @@ typedef struct {
 //        recv_exactly(buffer=msg.data, msg.data_len)
 //    }
 //
-// * Please use MAX_HANDLERS preallocated buffers of size 16 for header
+// * Please use MAX_HANDLERS preallocated buffers of size 32 for header
 // * Please use MAX_HANDLERS preallocated buffers of size 256 for actor
 // * Please use MAX_HANDLERS preallocated buffers of size 1024 for data
 //

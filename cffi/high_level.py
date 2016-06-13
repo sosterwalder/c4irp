@@ -7,7 +7,16 @@ ffi.set_source(
     """
     #include <c4irp.h>
     """,
-    libraries=["c4irp", "uv", "m", "rt", "pthread", "mbedcrypto"],
+    libraries=[
+        "c4irp",
+        "uv",
+        "m",
+        "rt",
+        "pthread",
+        "mbedcrypto",
+        "mbedx509",
+        "mbedcrypto",
+    ],
     library_dirs=["."],
     include_dirs=["include"],
 )
