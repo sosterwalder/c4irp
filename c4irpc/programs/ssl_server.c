@@ -87,6 +87,7 @@ static void my_debug( void *ctx, int level,
 int main( void )
 {
     int ret, len;
+    uint32_t flags;
     mbedtls_net_context listen_fd, client_fd;
     unsigned char buf[1024];
     const char *pers = "ssl_server";
@@ -206,6 +207,7 @@ int main( void )
                                    mbedtls_ssl_cache_set );
 #endif
 
+    mbedtls_ssl_conf_authmode( &conf, MBEDTLS_SSL_VERIFY_REQUIRED );
     mbedtls_ssl_conf_ca_chain( &conf, srvcert.next, NULL );
     if( ( ret = mbedtls_ssl_conf_own_cert( &conf, &srvcert, &pkey ) ) != 0 )
     {
@@ -268,6 +270,24 @@ reset:
     }
 
     mbedtls_printf( " ok\n" );
+    /*
+     * 5a. Verify the server certificate
+     */
+    mbedtls_printf( "  . Verifying peer X.509 certificate..." );
+
+    /* In real life, we probably want to bail out when ret != 0 */
+    if( ( flags = mbedtls_ssl_get_verify_result( &ssl ) ) != 0 )
+    {
+        char vrfy_buf[512];
+
+        mbedtls_printf( " failed\n" );
+
+        mbedtls_x509_crt_verify_info( vrfy_buf, sizeof( vrfy_buf ), "  ! ", flags );
+
+        mbedtls_printf( "%s\n", vrfy_buf );
+    }
+    else
+        mbedtls_printf( " ok\n" );
 
     /*
      * 6. Read the Request

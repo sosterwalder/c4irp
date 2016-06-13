@@ -87,7 +87,9 @@ int main( void )
     mbedtls_ctr_drbg_context ctr_drbg;
     mbedtls_ssl_context ssl;
     mbedtls_ssl_config conf;
-    mbedtls_x509_crt cacert;
+    mbedtls_x509_crt clicert;
+    mbedtls_pk_context pkey;
+    mbedtls_pk_init( &pkey );
 
 #if defined(MBEDTLS_DEBUG_C)
     mbedtls_debug_set_threshold( DEBUG_LEVEL );
@@ -99,7 +101,7 @@ int main( void )
     mbedtls_net_init( &server_fd );
     mbedtls_ssl_init( &ssl );
     mbedtls_ssl_config_init( &conf );
-    mbedtls_x509_crt_init( &cacert );
+    mbedtls_x509_crt_init( &clicert );
     mbedtls_ctr_drbg_init( &ctr_drbg );
 
     mbedtls_printf( "\n  . Seeding the random number generator..." );
@@ -119,20 +121,37 @@ int main( void )
     /*
      * 0. Initialize certificates
      */
-    mbedtls_printf( "  . Loading the CA root certificate ..." );
+    mbedtls_printf( "\n  . Loading the client cert. and key..." );
     fflush( stdout );
 
+    /*
+     * This demonstration program uses embedded test certificates.
+     * Instead, you may want to use mbedtls_x509_crt_parse_file() to read the
+     * server and CA certificates, as well as mbedtls_pk_parse_keyfile().
+     */
     ret = mbedtls_x509_crt_parse_file(
-        &cacert,
+        &clicert,
         "c4irp/cert.pem"
     );
-    if( ret < 0 )
+
+    if( ret != 0 )
     {
-        mbedtls_printf( " failed\n  !  mbedtls_x509_crt_parse returned -0x%x\n\n", -ret );
+        mbedtls_printf( " failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret );
         goto exit;
     }
 
-    mbedtls_printf( " ok (%d skipped)\n", ret );
+    ret = mbedtls_pk_parse_keyfile(
+        &pkey,
+        "c4irp/cert.pem",
+        NULL
+    );
+    if( ret != 0 )
+    {
+        mbedtls_printf( " failed\n  !  mbedtls_pk_parse_key returned %d\n\n", ret );
+        goto exit;
+    }
+
+    mbedtls_printf( " ok\n" );
 
     /*
      * 1. Start the connection
@@ -166,22 +185,19 @@ int main( void )
 
     mbedtls_printf( " ok\n" );
 
-    /* OPTIONAL is not optimal for security,
-     * but makes interop easier in this simplified example */
-    mbedtls_ssl_conf_authmode( &conf, MBEDTLS_SSL_VERIFY_OPTIONAL );
-    mbedtls_ssl_conf_ca_chain( &conf, &cacert, NULL );
+    mbedtls_ssl_conf_authmode( &conf, MBEDTLS_SSL_VERIFY_REQUIRED );
+    mbedtls_ssl_conf_ca_chain( &conf, &clicert, NULL );
+    if( ( ret = mbedtls_ssl_conf_own_cert( &conf, &clicert, &pkey ) ) != 0 )
+    {
+        mbedtls_printf( " failed\n  ! mbedtls_ssl_conf_own_cert returned %d\n\n", ret );
+        goto exit;
+    }
     mbedtls_ssl_conf_rng( &conf, mbedtls_ctr_drbg_random, &ctr_drbg );
     mbedtls_ssl_conf_dbg( &conf, my_debug, stdout );
 
     if( ( ret = mbedtls_ssl_setup( &ssl, &conf ) ) != 0 )
     {
         mbedtls_printf( " failed\n  ! mbedtls_ssl_setup returned %d\n\n", ret );
-        goto exit;
-    }
-
-    if( ( ret = mbedtls_ssl_set_hostname( &ssl, "mbed TLS Server 1" ) ) != 0 )
-    {
-        mbedtls_printf( " failed\n  ! mbedtls_ssl_set_hostname returned %d\n\n", ret );
         goto exit;
     }
 
@@ -298,7 +314,7 @@ exit:
 
     mbedtls_net_free( &server_fd );
 
-    mbedtls_x509_crt_free( &cacert );
+    mbedtls_x509_crt_free( &clicert );
     mbedtls_ssl_free( &ssl );
     mbedtls_ssl_config_free( &conf );
     mbedtls_ctr_drbg_free( &ctr_drbg );
