@@ -1,9 +1,16 @@
 """General low level tests"""
 
+import logging
+import subprocess
+
 from hypothesis import strategies as st
 from hypothesis import given
 
 from _c4irp_low_level import ffi, lib
+
+lg = logging.getLogger("c4irp")
+
+PIPE = subprocess.PIPE
 
 
 @given(
@@ -64,3 +71,25 @@ def test_ch_cn_conn_dict(choice, address1, port1, address2, port2, force_eq):
         assert cmp_[0] < 0
     if conn1_tup > conn2_tup:
         assert cmp_[0] > 0
+
+
+def test_helper_programs():
+    """Testing the ssl_server and ssl_client program"""
+    server = subprocess.Popen(
+        ["c4irpc/programs/ssl_server"],
+        stderr=PIPE,
+        stdout=PIPE,
+    )
+    client = subprocess.Popen(
+        ["c4irpc/programs/ssl_client"],
+        stderr=PIPE,
+        stdout=PIPE,
+    )
+    stdout, stderr = client.communicate()
+    lg.debug("SSL Client stdout: %s", stdout)
+    lg.debug("SSL Client stderr: %s", stderr)
+    stdout, stderr = server.communicate()
+    lg.debug("SSL Server stdout: %s", stdout)
+    lg.debug("SSL Server stderr: %s", stderr)
+    assert client.wait() == 0
+    assert server.wait() == 0

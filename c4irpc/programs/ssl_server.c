@@ -325,7 +325,7 @@ reset:
         if( ret == MBEDTLS_ERR_NET_CONN_RESET )
         {
             mbedtls_printf( " failed\n  ! peer closed the connection\n\n" );
-            goto reset;
+            goto exit;
         }
 
         if( ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE )
@@ -346,14 +346,14 @@ reset:
             ret != MBEDTLS_ERR_SSL_WANT_WRITE )
         {
             mbedtls_printf( " failed\n  ! mbedtls_ssl_close_notify returned %d\n\n", ret );
-            goto reset;
+            goto exit;
         }
     }
 
     mbedtls_printf( " ok\n" );
 
     ret = 0;
-    goto reset;
+    goto exit;
 
 exit:
 

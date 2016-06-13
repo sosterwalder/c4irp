@@ -32,7 +32,7 @@ COVOUT=$(SRCS:.c=.c.gcov)
 
 include pyproject/Makefile
 
-all: pre-install pymods
+all: pre-install pymods programs
 
 vi:
 	vim c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h c4irpc/programs/*.c
