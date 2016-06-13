@@ -1,4 +1,4 @@
-.PHONY: clean libc4irp sublibs libuv mbedtls test_ext doc c4irp
+.PHONY: clean libc4irp sublibs libuv mbedtls test_ext doc c4irp test_dep
 
 PROJECT     := c4irp
 
@@ -88,11 +88,11 @@ mbedtls: mbedtls/library/libmbedtls.a
 
 programs: c4irpc/programs/ssl_client c4irpc/programs/ssl_server
 
-c4irpc/programs/ssl_client: mbedtls
-	$(MYCC) -o $@ $@.c $(CCFLAGS) -g $(LDFLAGS)
+c4irpc/programs/ssl_client: c4irpc/programs/ssl_client.c | mbedtls
+	$(MYCC) -o $@ $< $(CCFLAGS) -g $(LDFLAGS)
 	
-c4irpc/programs/ssl_server: mbedtls
-	$(MYCC) -o $@ $@.c $(CCFLAGS) -g $(LDFLAGS)
+c4irpc/programs/ssl_server: c4irpc/programs/ssl_server.c | mbedtls
+	$(MYCC) -o $@ $< $(CCFLAGS) -g $(LDFLAGS)
 
 %.c.rst: %.c
 	pyproject/c2rst $<

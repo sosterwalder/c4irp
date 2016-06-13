@@ -43,12 +43,13 @@
 // .. code-block:: cpp
 
 typedef struct {
-    int  REUSE_TIME;
-    int  TIMEOUT;
-    int  PORT;
-    int  BACKLOG;
-    char BIND_V6[16];
-    char BIND_V4[4];
+    int   REUSE_TIME;
+    int   TIMEOUT;
+    int   PORT;
+    int   BACKLOG;
+    char  BIND_V6[16];
+    char  BIND_V4[4];
+    char* CERT_CHAIN_PEM;
 } ch_config_t;
 
 // .. c:type:: ch_log_cb_t
@@ -103,7 +104,7 @@ typedef struct ch_chirp_int ch_chirp_int_t;
 typedef struct {
     unsigned char   identity[16];
     uv_loop_t*      loop;
-    ch_config_t     config;
+    ch_config_t*    config;
     ch_log_cb_t     _log;
     int             _init;
     ch_chirp_int_t* _;
@@ -173,18 +174,18 @@ ch_run(uv_loop_t* loop, uv_run_mode mode)
 // .. c:function::
 extern
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop);
+ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop);
 //
 //    Intialiaze a chirp object. Memory is provided by caller. You must call
 //    :c:func:`ch_chirp_close` to cleanup the object.
 //
 //    :param ch_chirp_t* chirp: Out: Chirp object
-//    :param ch_config_t config: Chirp config
+//    :param ch_config_t* config: Chirp config
 //
 // .. c:function::
 extern
 ch_error_t
-ch_chirp_run(ch_config_t config, ch_chirp_t** chirp);
+ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp);
 //
 //    Initializes, runs and cleans everything. Everything being:
 //    TODO: Add message callback
@@ -198,7 +199,7 @@ ch_chirp_run(ch_config_t config, ch_chirp_t** chirp);
 //     chirp in a user defined thread. Use ch_chirp_close_ts to close it chirp
 //     in any other thread.
 //
-//    :param ch_config_t config: Chirp config
+//    :param ch_config_t* config: Chirp config
 //    :param ch_chirp_t** chirp: Out: Pointer to chirp object pointer. Ca be
 //                               NULL
 //

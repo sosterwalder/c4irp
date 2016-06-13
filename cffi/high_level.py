@@ -104,12 +104,13 @@ ch_msg_get_address(
 
 //c4irp.h
 typedef struct {
-    int  REUSE_TIME;
-    int  TIMEOUT;
-    int  PORT;
-    int  BACKLOG;
-    char BIND_V6[16];
-    char BIND_V4[4];
+    int   REUSE_TIME;
+    int   TIMEOUT;
+    int   PORT;
+    int   BACKLOG;
+    char  BIND_V6[16];
+    char  BIND_V4[4];
+    char* CERT_CHAIN_PEM;
 } ch_config_t;
 
 typedef void (*ch_log_cb_t)(char msg[]);
@@ -119,8 +120,8 @@ extern ch_config_t ch_config_defaults;
 
 typedef struct {
     unsigned char identity[16];
-    uv_loop_t* loop;
-    ch_config_t config;
+    uv_loop_t*    loop;
+    ch_config_t*  config;
     ...;
 } ch_chirp_t;
 
@@ -146,11 +147,11 @@ ch_run(uv_loop_t* loop, uv_run_mode mode);
 
 extern
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop);
+ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop);
 
 extern
 ch_error_t
-ch_chirp_run(ch_config_t config, ch_chirp_t**);
+ch_chirp_run(ch_config_t* config, ch_chirp_t**);
 
 extern
 ch_error_t

@@ -48,7 +48,7 @@ def basic_uv():
     loop = ffi.new("uv_loop_t*")
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
     error = lib.ch_chirp_init(
-        chirp, lib.ch_config_defaults, loop
+        chirp, ffi.addressof(lib.ch_config_defaults), loop
     )
     lib.ch_chirp_register_log_cb(chirp, lib.python_log_cb)
     yield error
@@ -78,7 +78,7 @@ def init_bad_port(port):
     config.PORT = port
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
     assert lib.ch_chirp_init(
-        chirp, config[0], loop
+        chirp, config, loop
     ) == lib.CH_VALUE_ERROR
 
 
@@ -90,7 +90,7 @@ def test_chirp_run():
 
     def run():
         res.append(lib.ch_chirp_run(
-            lib.ch_config_defaults, chirp_p
+            ffi.addressof(lib.ch_config_defaults), chirp_p
         ))
 
     thread = threading.Thread(target=run)
@@ -117,9 +117,21 @@ def test_chirp_object_basic():
     chirp.close()
 
 
-def init_chirp():
+def test_chirp_server_handshake():
+    """Test if the chirp server handshake works using a test programm"""
+    c = {
+        'PORT': 4433,
+    }
+    chirp = init_chirp(c)
+    chirp.close()
+
+
+def init_chirp(c=None):
     """Initialize chirp for basic tests"""
-    chirp = c4irp.ChirpPool()
+    if c is None:
+        chirp = c4irp.ChirpPool()
+    else:
+        chirp = c4irp.ChirpPool(c)
     chirp._chirp.identity = b"\0" * 16
     chirp._chirp.loop = ffi.NULL
     assert chirp._chirp.loop == ffi.NULL

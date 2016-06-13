@@ -22,12 +22,13 @@
 // .. code-block:: cpp
 //
 ch_config_t ch_config_defaults = {
-    .REUSE_TIME = 30,
-    .TIMEOUT    = 5,
-    .PORT       = 2998,
-    .BACKLOG    = 100,
-    .BIND_V6    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    .BIND_V4    = {0, 0, 0, 0},
+    .REUSE_TIME     = 30,
+    .TIMEOUT        = 5,
+    .PORT           = 2998,
+    .BACKLOG        = 100,
+    .BIND_V6        = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    .BIND_V4        = {0, 0, 0, 0},
+    .CERT_CHAIN_PEM = NULL,
 };
 
 // .. c:function::
@@ -57,7 +58,7 @@ _ch_close_async_cb(uv_async_t* handle)
 
 // .. c:function::
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
+ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
 //    :noindex:
 //
 //    see: :c:func:`ch_chirp_init`
@@ -98,7 +99,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 
     protocol->identity = chirp->identity;
     protocol->loop     = chirp->loop;
-    protocol->config   = &chirp->config;
+    protocol->config   = chirp->config;
     protocol->entropy  = &ichirp->entropy;
     protocol->rng      = &ichirp->rng;
     tmp_err            = ch_pr_start(protocol);
@@ -111,7 +112,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 
 // .. c:function::
 ch_error_t
-ch_chirp_run(ch_config_t config, ch_chirp_t** chirp_out)
+ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
 //    :noindex:
 //
 //    see: :c:func:`ch_chirp_run`
