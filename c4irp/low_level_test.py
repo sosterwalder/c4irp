@@ -1,14 +1,13 @@
 """General low level tests"""
 
-import logging
 import subprocess
+import time
 
 from hypothesis import strategies as st
 from hypothesis import given
 
 from _c4irp_low_level import ffi, lib
-
-lg = logging.getLogger("c4irp")
+from .common import collect_processes
 
 PIPE = subprocess.PIPE
 
@@ -80,16 +79,20 @@ def test_helper_programs():
         stderr=PIPE,
         stdout=PIPE,
     )
+    time.sleep(0.1)
     client = subprocess.Popen(
         ["c4irpc/programs/ssl_client"],
         stderr=PIPE,
         stdout=PIPE,
     )
-    stdout, stderr = client.communicate()
-    lg.debug("SSL Client stdout: %s", stdout)
-    lg.debug("SSL Client stderr: %s", stderr)
-    stdout, stderr = server.communicate()
-    lg.debug("SSL Server stdout: %s", stdout)
-    lg.debug("SSL Server stderr: %s", stderr)
-    assert client.wait() == 0
-    assert server.wait() == 0
+    try:
+        client.wait(timeout=1)
+    except subprocess.TimeoutExpired:
+        pass
+    try:
+        server.wait(timeout=1)
+    except subprocess.TimeoutExpired:
+        pass
+    collect_processes([client, server])
+    assert client.returncode == 0
+    assert server.returncode == 0

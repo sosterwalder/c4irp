@@ -248,7 +248,7 @@ int main( void )
      */
     mbedtls_printf( "  < Read from server:" );
     fflush( stdout );
-
+    int has_read = 0;
     do
     {
         len = sizeof( buf ) - 1;
@@ -258,8 +258,12 @@ int main( void )
         if( ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE )
             continue;
 
-        if( ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY )
+        if( ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY ) {
+            if(has_read) {
+                ret = 0;
+            }
             break;
+        }
 
         if( ret < 0 )
         {
@@ -275,6 +279,7 @@ int main( void )
 
         len = ret;
         mbedtls_printf( " %d bytes read\n\n%s", len, (char *) buf );
+        has_read = 1;
     }
     while( 1 );
 
