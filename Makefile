@@ -35,7 +35,7 @@ include pyproject/Makefile
 all: pre-install pymods
 
 vi:
-	vi c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h
+	vim c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h c4irpc/programs/*.c
 
 lldb: all
 	lldb `pyenv which python` -- -m pytest -x

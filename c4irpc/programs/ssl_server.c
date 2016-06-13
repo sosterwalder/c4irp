@@ -70,10 +70,7 @@ int main( void )
 #include "mbedtls/ssl_cache.h"
 #endif
 
-#define HTTP_RESPONSE \
-    "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n" \
-    "<h2>mbed TLS Test Server</h2>\r\n" \
-    "<p>Successful connection using: %s</p>\r\n"
+#define RESPONSE "Yo, dwag!"
 
 #define DEBUG_LEVEL 0
 
@@ -131,24 +128,22 @@ int main( void )
      * Instead, you may want to use mbedtls_x509_crt_parse_file() to read the
      * server and CA certificates, as well as mbedtls_pk_parse_keyfile().
      */
-    ret = mbedtls_x509_crt_parse( &srvcert, (const unsigned char *) mbedtls_test_srv_crt,
-                          mbedtls_test_srv_crt_len );
+    ret = mbedtls_x509_crt_parse_file(
+        &srvcert,
+        "c4irp/cert.pem"
+    );
+
     if( ret != 0 )
     {
         mbedtls_printf( " failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret );
         goto exit;
     }
 
-    ret = mbedtls_x509_crt_parse( &srvcert, (const unsigned char *) mbedtls_test_cas_pem,
-                          mbedtls_test_cas_pem_len );
-    if( ret != 0 )
-    {
-        mbedtls_printf( " failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret );
-        goto exit;
-    }
-
-    ret =  mbedtls_pk_parse_key( &pkey, (const unsigned char *) mbedtls_test_srv_key,
-                         mbedtls_test_srv_key_len, NULL, 0 );
+    ret = mbedtls_pk_parse_keyfile(
+        &pkey,
+        "c4irp/cert.pem",
+        NULL
+    );
     if( ret != 0 )
     {
         mbedtls_printf( " failed\n  !  mbedtls_pk_parse_key returned %d\n\n", ret );
@@ -160,7 +155,7 @@ int main( void )
     /*
      * 2. Setup the listening TCP socket
      */
-    mbedtls_printf( "  . Bind on https://localhost:4433/ ..." );
+    mbedtls_printf( "  . Bind on localhost:4433 ..." );
     fflush( stdout );
 
     if( ( ret = mbedtls_net_bind( &listen_fd, NULL, "4433", MBEDTLS_NET_PROTO_TCP ) ) != 0 )
@@ -275,7 +270,7 @@ reset:
     mbedtls_printf( " ok\n" );
 
     /*
-     * 6. Read the HTTP Request
+     * 6. Read the Request
      */
     mbedtls_printf( "  < Read from client:" );
     fflush( stdout );
@@ -318,13 +313,12 @@ reset:
     while( 1 );
 
     /*
-     * 7. Write the 200 Response
+     * 7. Write the Response
      */
     mbedtls_printf( "  > Write to client:" );
     fflush( stdout );
 
-    len = sprintf( (char *) buf, HTTP_RESPONSE,
-                   mbedtls_ssl_get_ciphersuite( &ssl ) );
+    len = sprintf( (char *) buf, RESPONSE );
 
     while( ( ret = mbedtls_ssl_write( &ssl, buf, len ) ) <= 0 )
     {

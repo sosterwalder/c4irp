@@ -61,7 +61,7 @@ int main( void )
 
 #define SERVER_PORT "4433"
 #define SERVER_NAME "localhost"
-#define GET_REQUEST "GET / HTTP/1.0\r\n\r\n"
+#define REQUEST "Hi"
 
 #define DEBUG_LEVEL 1
 
@@ -122,8 +122,10 @@ int main( void )
     mbedtls_printf( "  . Loading the CA root certificate ..." );
     fflush( stdout );
 
-    ret = mbedtls_x509_crt_parse( &cacert, (const unsigned char *) mbedtls_test_cas_pem,
-                          mbedtls_test_cas_pem_len );
+    ret = mbedtls_x509_crt_parse_file(
+        &cacert,
+        "c4irp/cert.pem"
+    );
     if( ret < 0 )
     {
         mbedtls_printf( " failed\n  !  mbedtls_x509_crt_parse returned -0x%x\n\n", -ret );
@@ -227,7 +229,7 @@ int main( void )
     mbedtls_printf( "  > Write to server:" );
     fflush( stdout );
 
-    len = sprintf( (char *) buf, GET_REQUEST );
+    len = sprintf( (char *) buf, REQUEST );
 
     while( ( ret = mbedtls_ssl_write( &ssl, buf, len ) ) <= 0 )
     {
@@ -242,7 +244,7 @@ int main( void )
     mbedtls_printf( " %d bytes written\n\n%s", len, (char *) buf );
 
     /*
-     * 7. Read the HTTP response
+     * 7. Read the response
      */
     mbedtls_printf( "  < Read from server:" );
     fflush( stdout );
