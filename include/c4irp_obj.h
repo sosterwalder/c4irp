@@ -101,7 +101,7 @@ typedef struct ch_chirp_int ch_chirp_int_t;
 //
 // .. code-block:: cpp
 
-typedef struct {
+typedef struct ch_chirp {
     unsigned char   identity[16];
     uv_loop_t*      loop;
     ch_config_t*    config;

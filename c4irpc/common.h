@@ -55,7 +55,7 @@ _ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
 //
 {
     A(len % 4 == 0, "len must be multiple of four");
-#if RAND_MAX < 1073741824 || INT_MAX < 1073741824 
+#if RAND_MAX < 1073741824 || INT_MAX < 1073741824
     /* WTF, fallback platform */
     for(size_t i = 0; i < len; i++) {
         bytes[i] = ((unsigned int) rand()) % 256;
@@ -73,5 +73,6 @@ _ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
 // .. code-block:: cpp
 
 #define CH_CHIRP_MAGIC 42429
+#define CH_GET_CHIRP(handle) ch_chirp_t* chirp = (ch_chirp_t*) handle->data
 
 #endif //ch_common_h

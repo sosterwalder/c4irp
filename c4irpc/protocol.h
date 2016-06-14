@@ -76,16 +76,16 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
 //
 // .. code-block:: cpp
 
-typedef struct {
-    unsigned char*            identity;
-    uv_loop_t*                loop;
-    ch_config_t*              config;
+struct  ch_chirp;
+
+typedef struct ch_protocol {
     struct sockaddr_in        addrv4;
     struct sockaddr_in6       addrv6;
     uv_tcp_t                  serverv4;
     uv_tcp_t                  serverv6;
     ch_receipt_t*             receipts;
     ch_receipt_t*             late_receipts;
+    struct ch_chirp*          chirp;
 } ch_protocol_t;
 
 // .. c:function::

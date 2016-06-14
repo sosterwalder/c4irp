@@ -82,9 +82,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
         return CH_UV_ERROR; // NOCOV
     }
 
-    protocol->identity = chirp->identity;
-    protocol->loop     = chirp->loop;
-    protocol->config   = chirp->config;
+    protocol->chirp    = chirp;
     tmp_err            = ch_pr_start(protocol);
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;
