@@ -45,11 +45,17 @@ Please contact me for alternative licenses.
 Copyright
 =========
 
-of source included in this repository
+* © 2016-∞ Jean-Louis Fuchs
 
-* evt-tls Devchandra M. Leishangthem (dlmeetei at gmail dot com)
+* © 2016-∞ Adfinis-SyGroup AG
+
+source as a reference:
+
+* evt-tls © Devchandra M. Leishangthem (dlmeetei at gmail dot com)
   https://github.com/deleisha/evt-tls
 
   - Based on revision: b69164203b481b11dbeb9153fc4eee8a7c3586d3
+
+source used in this reposoitory
 
 * libuv see https://github.com/libuv/libuv
