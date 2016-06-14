@@ -32,7 +32,7 @@ Development
 
 .. code-block:: bash
 
-   apt-get install build-essential automake autoconf cmake clang llvm
+   apt-get install build-essential automake autoconf cmake clang llvm libssl-dev
    make test-all
 
 License
