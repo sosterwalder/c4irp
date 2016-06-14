@@ -50,4 +50,6 @@ of source included in this repository
 * evt-tls Devchandra M. Leishangthem (dlmeetei at gmail dot com)
   https://github.com/deleisha/evt-tls
 
+  - Based on revision: b69164203b481b11dbeb9153fc4eee8a7c3586d3
+
 * libuv see https://github.com/libuv/libuv
