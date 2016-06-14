@@ -132,11 +132,11 @@ def init_chirp(c=None):
         chirp = c4irp.ChirpPool()
     else:
         chirp = c4irp.ChirpPool(c)
-    chirp._chirp.identity = b"\0" * 16
+    chirp._chirp.identity = [0] * 16
     chirp._chirp.loop = ffi.NULL
     assert chirp._chirp.loop == ffi.NULL
     chirp.start()
-    assert chirp._chirp.identity != b"\0" * 16
+    assert ffi.string(chirp._chirp.identity) != b''
     assert chirp._chirp.loop != ffi.NULL
     return chirp
 

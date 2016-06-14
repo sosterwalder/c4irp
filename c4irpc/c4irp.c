@@ -11,6 +11,7 @@
 #include "protocol.h"
 
 #include <uv.h>
+
 #include <limits.h>
 #include <stdlib.h>
 
@@ -73,7 +74,10 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
     ichirp->auto_start      = 0;
     chirp->_log             = NULL;
 
-    // TODO identity
+    // rand
+    srand(time(NULL));
+    _ch_random_ints_to_bytes(chirp->identity, 16);
+
     if(uv_async_init(chirp->loop, &ichirp->close, &_ch_close_async_cb) < 0) {
         return CH_UV_ERROR; // NOCOV
     }
