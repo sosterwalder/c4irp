@@ -41,3 +41,13 @@ License
 GNU AFFERO GENERAL PUBLIC LICENSE
 
 Please contact me for alternative licenses.
+
+Copyright
+=========
+
+of source included in this repository
+
+* evt-tls Devchandra M. Leishangthem (dlmeetei at gmail dot com)
+  https://github.com/deleisha/evt-tls
+
+* libuv see https://github.com/libuv/libuv
