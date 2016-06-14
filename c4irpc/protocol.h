@@ -11,8 +11,6 @@
 #include "../include/c4irp_obj.h"
 #include "sglib.h"
 
-#include <mbedtls/ctr_drbg.h>
-#include <mbedtls/entropy.h>
 #include <uv.h>
 #include <string.h>
 
@@ -22,7 +20,7 @@
 //  
 //    .. c:member:: unsigned char receipt[16]
 //
-//    the receipt generated using mbedtls_ctr_drbg_random
+//    the receipt generated using TODO
 //
 // .. code-block:: cpp
 
@@ -76,14 +74,6 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
 //
 //       reference to the libuv tcp server
 //
-//    .. c:member:: mbedtls_entropy_context entropy
-//
-//       our entropy source provided by mbedtls
-//
-//    .. c:member:: mbedtls_ctr_drbg_context rng
-//
-//       non-cryptographic random number generator
-//
 // .. code-block:: cpp
 
 typedef struct {
@@ -94,8 +84,6 @@ typedef struct {
     struct sockaddr_in6       addrv6;
     uv_tcp_t                  serverv4;
     uv_tcp_t                  serverv6;
-    mbedtls_entropy_context*  entropy;
-    mbedtls_ctr_drbg_context* rng;
     ch_receipt_t*             receipts;
     ch_receipt_t*             late_receipts;
 } ch_protocol_t;

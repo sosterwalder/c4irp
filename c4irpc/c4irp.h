@@ -10,9 +10,6 @@
 #include "../include/c4irp_obj.h"
 #include "protocol.h"
 
-#include <mbedtls/ctr_drbg.h>
-#include <mbedtls/entropy.h>
-
 // .. c:type:: ch_chirp_int_t
 //
 //    Chirp object.
@@ -27,25 +24,11 @@
 //       true if we have to close the libuv loop, otherwise the loop was
 //       supplied by the user
 //
-//    .. c:member:: mbedtls_entropy_context entropy
-//
-//       our entropy source provided by mbedtls
-//
-//    .. c:member:: mbedtls_ctr_drbg_context rng
-//
-//       non-cryptographic random number generator
-//
-//    .. c:member:: mbedtls_ctr_drbg_context rng
-//
-//       non-cryptographic random number generator
-//
 // .. code-block:: cpp
 //
 struct ch_chirp_int {
     int                      auto_start;
     uv_async_t               close;
-    mbedtls_entropy_context  entropy;
-    mbedtls_ctr_drbg_context rng;
     ch_protocol_t            protocol;
 };
 

@@ -41,38 +41,6 @@ _ch_uv_error_map(int error)
 }
 //
 // .. code-block:: cpp
-//
-// .. c:function::
-static
-inline
-ch_error_t
-_ch_tls_error_map(int error)
-//
-//    Map common mbedtls errors to c4irp errors.
-//
-//    :param int error: Mbedtls error
-//    :rtype: ch_error_t
-//
-// .. code-block:: cpp
-//
-{
-    switch(error) {
-        case(0):
-            return CH_SUCCESS;
-        default:
-            return CH_TLS_ERROR;
-    }
-}
-
-#define _CH_TLS_RAND_ERROR(error) do { \
-    if(error != CH_SUCCESS) { \
-        if(error == MBEDTLS_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED) { \
-            return CH_FATAL; /* NOCOV I won't try to force that */ \
-        } else { \
-            return CH_TLS_ERROR; /* NOCOV */ \
-        } \
-    } \
-} while(0)
 
 #define CH_CHIRP_MAGIC 42429
 

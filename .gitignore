@@ -26,5 +26,3 @@ __pycache__
 /.hypothesis/
 /.eggs
 /FINJA
-/c4irpc/programs/ssl_client
-/c4irpc/programs/ssl_server

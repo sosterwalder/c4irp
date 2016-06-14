@@ -1,7 +1,3 @@
 -Ilibuv/include
--Imbedtls/include/
 -lc4irp
 -luv
--lmbedtls
--lmbedcrypto
--lmbedx509

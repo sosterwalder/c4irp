@@ -1,4 +1,4 @@
-.PHONY: clean libc4irp sublibs libuv mbedtls test_ext doc c4irp test_dep
+.PHONY: clean libc4irp sublibs libuv test_ext doc c4irp test_dep
 
 PROJECT     := c4irp
 
@@ -12,11 +12,10 @@ else
 endif
 
 COMMON    := config.h c4irpc/common.h
-CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include -Imbedtls/include
+CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
 MYFLAGS   := -std=gnu99 -pthread
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
-LDFLAGS   := -L . -lmbedtls -lmbedx509 -lmbedcrypto
 CFFIF     := $(shell pwd)/pyproject/cffi_fix:$(PATH)
 PY        := python
 MYCC      := clang
@@ -32,10 +31,10 @@ COVOUT=$(SRCS:.c=.c.gcov)
 
 include pyproject/Makefile
 
-all: pre-install pymods programs
+all: pre-install pymods
 
 vi:
-	vim c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h c4irpc/programs/*.c
+	vim c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h
 
 lldb: all
 	lldb `pyenv which python` -- -m pytest -x
@@ -81,19 +80,6 @@ libuv/.libs/libuv.a: libuv/Makefile
 
 libuv: libuv/.libs/libuv.a
 
-mbedtls/library/libmbedtls.a:
-	make -C mbedtls
-
-mbedtls: mbedtls/library/libmbedtls.a
-
-programs: c4irpc/programs/ssl_client c4irpc/programs/ssl_server
-
-c4irpc/programs/ssl_client: c4irpc/programs/ssl_client.c | mbedtls
-	$(MYCC) -o $@ $< $(CCFLAGS) -g $(LDFLAGS)
-	
-c4irpc/programs/ssl_server: c4irpc/programs/ssl_server.c | mbedtls
-	$(MYCC) -o $@ $< $(CCFLAGS) -g $(LDFLAGS)
-
 %.c.rst: %.c
 	pyproject/c2rst $<
 
@@ -114,7 +100,7 @@ libc4irp.a: $(OBJS) | libc4irp-depends
 	ar $(ARFLAGS) $@ $^
 
 libc4irp-depends:
-	@make CFLAGS="$(CCFLAGS) -g" libuv mbedtls
+	@make CFLAGS="$(CCFLAGS) -g" libuv
 
 clean-all: clean clean-sub
 
@@ -123,7 +109,6 @@ clean:
 
 clean-sub:
 	cd libuv && git clean -xdf
-	cd mbedtls && git clean -xdf
 
 test-array: array_test
 	./array_test 1 2>&1
@@ -131,7 +116,6 @@ test-array: array_test
 	./array_test -1 2>&1 | grep Bufferoverflow
 
 test-lib:
-	make -C mbedtls check
 	make -C libuv CFLAGS="$(PCFLAGS)" check
 
 

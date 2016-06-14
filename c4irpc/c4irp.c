@@ -46,8 +46,6 @@ _ch_close_async_cb(uv_async_t* handle)
     tmp_err = ch_pr_stop(&ichirp->protocol);
     A(tmp_err == CH_SUCCESS, "Closing failed with error %d", tmp_err);
     (void)(tmp_err);
-    mbedtls_ctr_drbg_free(&ichirp->rng);
-    mbedtls_entropy_free(&ichirp->entropy);
     uv_close((uv_handle_t*) &ichirp->close, NULL);
     if(ichirp->auto_start) {
         uv_stop(chirp->loop);
@@ -75,24 +73,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
     ichirp->auto_start      = 0;
     chirp->_log             = NULL;
 
-    // RNG
-
-    // TODO error handling
-    mbedtls_entropy_init(&ichirp->entropy);
-    mbedtls_ctr_drbg_init(&ichirp->rng);
-    tmp_err = mbedtls_ctr_drbg_seed(
-        &ichirp->rng,
-        mbedtls_entropy_func,
-        &ichirp->entropy,
-        NULL,
-        0
-    );
-    _CH_TLS_RAND_ERROR(tmp_err);
-    // We don't want reseed (peformance) and we don't need ressed
-    // (no cryptographic use)
-    mbedtls_ctr_drbg_set_reseed_interval(&ichirp->rng, INT_MAX);
-    tmp_err = mbedtls_ctr_drbg_random(&ichirp->rng, chirp->identity, 16);
-    _CH_TLS_RAND_ERROR(tmp_err);
+    // TODO identity
     if(uv_async_init(chirp->loop, &ichirp->close, &_ch_close_async_cb) < 0) {
         return CH_UV_ERROR; // NOCOV
     }
@@ -100,8 +81,6 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
     protocol->identity = chirp->identity;
     protocol->loop     = chirp->loop;
     protocol->config   = chirp->config;
-    protocol->entropy  = &ichirp->entropy;
-    protocol->rng      = &ichirp->rng;
     tmp_err            = ch_pr_start(protocol);
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;

@@ -99,11 +99,7 @@ ch_pr_start(ch_protocol_t* protocol)
     struct sglib_ch_receipt_t_iterator it;
     for(int i = 0; i < 10; ++i) {
         t = malloc(sizeof(ch_receipt_t));
-        mbedtls_ctr_drbg_random(
-            protocol->rng,
-            t->receipt,
-            16
-        );
+        // TODO fill t->receipt
         sglib_ch_receipt_t_add(&protocol->receipts, t);
     }
     for(
