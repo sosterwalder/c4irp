@@ -31,23 +31,24 @@ COVOUT=$(SRCS:.c=.c.gcov)
 
 include pyproject/Makefile
 
-all: pre-install pymods
+all: pre-install pymods  ## Build for development (make setup.py or make.release for production)
 
-vi:
+vi:  ## Start a vim editing the imporant files
 	vim c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h doc/ref/*
 
-lldb: all
+lldb: all  ## Build and run py.test in lldb
+	echo lldb `pyenv which python` -- -m pytest -x
 	lldb `pyenv which python` -- -m pytest -x
 
-doc-all: all $(DOCRST) doc
+doc-all: all $(DOCRST) doc  ## Build using c2rst and then generate docs
 
-test-all: all test test-array coverage test-lib
+test-all: all test test-array coverage test-lib  ## Build and then test
 
 test_dep: all
 
 pre-install: libc4irp.a install-edit
 
-test-cov: clean all pytest test-array coverage
+test-cov: clean all pytest test-array coverage  ## Clean, build and test (so coverage is correct)
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -102,13 +103,8 @@ libc4irp.a: $(OBJS) | libc4irp-depends
 libc4irp-depends:
 	@make CFLAGS="$(CCFLAGS) -g" libuv
 
-clean-all: clean clean-sub
-
-clean:
+clean:  ## Clean only c4irp not submodules
 	git clean -xdf
-
-clean-sub:
-	cd libuv && git clean -xdf
 
 test-array: array_test
 	./array_test 1 2>&1
