@@ -114,6 +114,12 @@ _ch_pr_free_receipts(ch_receipt_t* receipts);
 //
 //    Free all remaining items in a receipts set
 //
+// .. c:function::
+static void
+_ch_pr_on_new_connection(uv_stream_t *server, int status);
+//
+//  Callback from libuv on new connection
+//
 // .. code-block:: cpp
 
 #endif //ch_protocol_h

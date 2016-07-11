@@ -32,12 +32,4 @@ struct ch_chirp_int {
     ch_protocol_t            protocol;
 };
 
-// .. c:function::
-static void
-_ch_on_new_connection(uv_stream_t *server, int status);
-//
-//  Callback from libuv on new connection
-//
-// .. code-block:: cpp
-
 #endif //ch_c4irp_h
