@@ -12,7 +12,7 @@ __pycache__
 /app_total.info
 /array_test
 /config.h
-/libc4irp.a
+/libchirp.a
 /.cache
 /.coverage
 /.cache
@@ -21,7 +21,7 @@ __pycache__
 /c4irp/*.c
 /*.info
 /doc/_build
-/c4irpc/*.rst
+/src/*.rst
 /include/*.rst
 /.hypothesis/
 /.eggs

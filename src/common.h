@@ -82,7 +82,6 @@ _ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
 #define CH_GET_CHIRP(handle) \
 ch_chirp_t* chirp = (ch_chirp_t*) handle->data; \
 A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*")
-// Fail fast, best I know :(
-
+/* Fail fast, best I know :( */
 
 #endif //ch_common_h

@@ -30,6 +30,8 @@ ch_config_t ch_config_defaults = {
     .BIND_V6        = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     .BIND_V4        = {0, 0, 0, 0},
     .CERT_CHAIN_PEM = NULL,
+    .ALLOC_CB       = NULL,
+    .FREE_CB        = NULL,
 };
 
 // .. c:function::

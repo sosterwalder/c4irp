@@ -11,6 +11,43 @@
 
 #include <uv.h>
 
+// .. c:type:: ch_alloc_cb
+//
+//    Callback used by chirp to request memory. It can be set in ch_config_t.
+//
+//    .. c:member:: size_t suggested_size
+//
+//       The size the user should allocate if possible
+//
+//    .. c:member:: size_t required_size
+//
+//       The size the user has to allocate
+//
+//    .. c:member:: size_t required_size
+//
+//       Out: The size the user has allocated
+//
+//    Libuv wants a buffer of 65536 bytes per stream. It will work with less
+//    though.  So we decided that 1k is the absolute minimum see
+//    LIB_UV_MIN_BUFFER in config.h. Please provide the suggested_size, except
+//    if you're on very restricted embedded system.
+//
+// .. code-block:: cpp
+//
+typedef void* (*ch_alloc_cb)(
+        size_t suggested_size,
+        size_t required_size,
+        size_t* provided_size
+);
+
+// .. c:type:: ch_free_cb
+//
+//    Callback used by chirp to free memory. It can be set in ch_config_t.
+//
+// .. code-block:: cpp
+//
+typedef void (*ch_free_cb)(void* buf);
+
 // .. c:type:: ch_config_t
 //
 //    Chirp configuration.
@@ -40,16 +77,28 @@
 //
 //       Override IPv4 bind address.
 //
+//    .. c:member:: ch_alloc_cb ALLOC_CB
+//
+//       Callback used by chirp to request memory. If NULL: the system malloc
+//       function is used.
+//
+//    .. c:member:: ch_free_cb FREE_CB
+//
+//       Callback used by chirp to free memory. If NULL: the system free
+//       function is used.
+//
 // .. code-block:: cpp
 
 typedef struct {
-    int   REUSE_TIME;
-    int   TIMEOUT;
-    int   PORT;
-    int   BACKLOG;
-    char  BIND_V6[16];
-    char  BIND_V4[4];
-    char* CERT_CHAIN_PEM;
+    int          REUSE_TIME;
+    int          TIMEOUT;
+    int          PORT;
+    int          BACKLOG;
+    char         BIND_V6[16];
+    char         BIND_V4[4];
+    char*        CERT_CHAIN_PEM;
+    ch_alloc_cb  ALLOC_CB;
+    ch_free_cb   FREE_CB;
 } ch_config_t;
 
 // .. c:type:: ch_log_cb_t
