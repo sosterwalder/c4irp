@@ -11,6 +11,7 @@
 
 #include <uv.h>
 
+#include <assert.h>
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
@@ -56,23 +57,32 @@ _ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
 {
     A(len % 4 == 0, "len must be multiple of four");
 #if RAND_MAX < 1073741824 || INT_MAX < 1073741824
+#ifdef CH_ACCEPT_STRANGE_PLATFORM
     /* WTF, fallback platform */
     for(size_t i = 0; i < len; i++) {
         bytes[i] = ((unsigned int) rand()) % 256;
     }
-#else
+#else // ACCEPT_STRANGE_PLATFORM
+#error Unexpected RAND_MAX / INT_MAX, define CH_ACCEPT_STRANGE_PLATFORM
+#endif // ACCEPT_STRANGE_PLATFORM
+#else // RAND_MAX < 1073741824 || INT_MAX < 1073741824
     /* Tested: this is 4 times faster*/
     int tmp_rand;
     for(size_t i = 0; i < len; i += 4) {
         tmp_rand = rand();
         memcpy(bytes + i, &tmp_rand, 4);
     }
-#endif
+#endif // RAND_MAX < 1073741824 || INT_MAX < 1073741824
 }
 //
 // .. code-block:: cpp
 
 #define CH_CHIRP_MAGIC 42429
-#define CH_GET_CHIRP(handle) ch_chirp_t* chirp = (ch_chirp_t*) handle->data
+
+#define CH_GET_CHIRP(handle) \
+ch_chirp_t* chirp = (ch_chirp_t*) handle->data; \
+A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*")
+// Fail fast, best I know :(
+
 
 #endif //ch_common_h

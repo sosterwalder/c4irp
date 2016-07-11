@@ -13,6 +13,8 @@
 
 #include <string.h>
 
+#include <uv.h>
+
 // .. c:type:: ch_connection_t
 //
 //    Connection dictionary implemented as rbtree.
@@ -28,6 +30,7 @@ typedef struct ch_connection {
     uint8_t               ip_protocol;
     uint8_t               address[16];
     int32_t               port;
+    uv_tcp_t              client;
     char                  color_field;
     struct ch_connection* left;
     struct ch_connection* right;
