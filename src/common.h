@@ -22,7 +22,7 @@ inline
 ch_error_t
 _ch_uv_error_map(int error)
 //
-//    Map common libuv errors to c4irp errors.
+//    Map common libuv errors to chirp errors.
 //
 //    :param int error: Libuv error
 //    :rtype: ch_error_t

@@ -8,7 +8,7 @@
 #ifdef LOG_TO_STDERR
 #define L(chirp, ...) fprintf(stderr, ##__VA_ARGS__)
 #else  //LOG_TO_STDERR
-#include "include/c4irp_obj.h"
+#include "include/chirp_obj.h"
 #define L(chirp, message, ...) do { \
     if(chirp->_log != NULL) { \
         char buf[1024]; \

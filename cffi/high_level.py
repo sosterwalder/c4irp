@@ -3,12 +3,12 @@ from cffi import FFI
 ffi = FFI()
 
 ffi.set_source(
-    "_c4irp_cffi",
+    "_chirp_cffi",
     """
-    #include <c4irp.h>
+    #include <chirp.h>
     """,
     libraries=[
-        "c4irp",
+        "chirp",
         "uv",
         "m",
         "rt",
@@ -99,7 +99,7 @@ ch_msg_get_address(
     ch_text_address_t* address
 );
 
-//c4irp.h
+//chirp.h
 typedef struct {
     int   REUSE_TIME;
     int   TIMEOUT;

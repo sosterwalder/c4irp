@@ -4,8 +4,8 @@
 //
 // .. code-block:: cpp
 
-#ifndef ch_inc_c4irp_obj_h
-#define ch_inc_c4irp_obj_h
+#ifndef ch_inc_chirp_obj_h
+#define ch_inc_chirp_obj_h
 
 #include "error.h"
 
@@ -64,7 +64,7 @@ typedef void (*ch_log_cb_t)(char msg[]);
 // .. c:var:: ch_config_defaults
 //    :noindex:
 //
-//    Default config of c4irp.
+//    Default config of chirp.
 //
 //    see: :c:type:`ch_config_defaults`
 //
@@ -190,7 +190,7 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp);
 //    Initializes, runs and cleans everything. Everything being:
 //    TODO: Add message callback
 //
-//      * c4irp object
+//      * chirp object
 //      * uv-loop
 //      * uv-sockets
 //      * callbacks
@@ -217,4 +217,4 @@ ch_chirp_close_ts(ch_chirp_t* chirp);
 //
 // .. code-block:: cpp
 
-#endif //ch_inc_c4irp_obj_h
+#endif //ch_inc_chirp_obj_h

@@ -3,12 +3,12 @@ from cffi import FFI
 ffi = FFI()
 
 ffi.set_source(
-    "_c4irp_low_level",
+    "_chirp_low_level",
     """
-    #include "../c4irpc/connection_test.h"
+    #include "../src/connection_test.h"
     """,
     libraries=[
-        "c4irp",
+        "chirp",
         "uv",
         "m",
         "rt",

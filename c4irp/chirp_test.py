@@ -7,7 +7,7 @@ from hypothesis import strategies as st
 from hypothesis import given
 
 import c4irp
-from _c4irp_cffi import ffi, lib
+from _chirp_cffi import ffi, lib
 
 config_st = st.fixed_dictionaries({
     "REUSE_TIME"   : st.integers(2, 3600),
@@ -18,7 +18,7 @@ config_st = st.fixed_dictionaries({
     "DEBUG"        : st.booleans(),
     "MAX_HANDLERS" : st.integers(1, 100),
     # TODO in python chirp MAX_HANDLERS arent validated complete
-    # add this to cccirp and c4irp
+    # add this to cccirp and chirp
     "REQUIRE_ACK"  : st.booleans(),
     "FLOW_CONTROL" : st.booleans(),
     "RESOLVE"      : st.booleans(),
@@ -29,7 +29,7 @@ config_st = st.fixed_dictionaries({
 
 
 def test_init_free():
-    """Test if we can initialize and free c4irp"""
+    """Test if we can initialize and free chirp"""
     with basic_uv() as error:
         assert error == lib.CH_SUCCESS
 

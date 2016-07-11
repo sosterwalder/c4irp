@@ -8,7 +8,7 @@
 
 #include "common.h"
 #include "message.h"
-#include "c4irp.h"
+#include "chirp.h"
 
 #include <uv.h>
 

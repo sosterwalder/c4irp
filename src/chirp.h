@@ -4,10 +4,10 @@
 //
 // .. code-block:: cpp
 
-#ifndef ch_c4irp_h
-#define ch_c4irp_h
+#ifndef ch_chirp_h
+#define ch_chirp_h
 
-#include "../include/c4irp_obj.h"
+#include "../include/chirp_obj.h"
 #include "protocol.h"
 
 // .. c:type:: ch_chirp_int_t
@@ -17,7 +17,7 @@
 //
 //    .. c:member:: uv_async_t close
 //
-//       async handler to close c4irp on the main-loop
+//       async handler to close chirp on the main-loop
 //
 //    .. c:member:: int auto_start
 //
@@ -32,4 +32,4 @@ struct ch_chirp_int {
     ch_protocol_t            protocol;
 };
 
-#endif //ch_c4irp_h
+#endif //ch_chirp_h

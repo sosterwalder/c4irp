@@ -8,7 +8,7 @@
 #define ch_protocol_h
 
 #include "../include/error.h"
-#include "../include/c4irp_obj.h"
+#include "../include/chirp_obj.h"
 #include "connection.h"
 #include "sglib.h"
 

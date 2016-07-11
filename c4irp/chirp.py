@@ -1,16 +1,16 @@
-"""C4irp bindings"""
+"""Chirp bindings"""
 import concurrent.futures as fut
 import os
 import sys
 import threading
 
-from _c4irp_cffi import ffi, lib
+from _chirp_cffi import ffi, lib
 
 from . import common, const
 
 
 class ChirpPool(object):
-    """TODO Documentation -> async to pool, ccchirp to c4irp
+    """TODO Documentation -> async to pool, ccchirp to hhirp
 
     Chirp is message passing with fully automatic connection setup and
     cleanup. Just create a Chirp() object, await obj.start(), create a Message

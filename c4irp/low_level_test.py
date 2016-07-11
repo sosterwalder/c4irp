@@ -5,7 +5,7 @@ import subprocess
 from hypothesis import strategies as st
 from hypothesis import given
 
-from _c4irp_low_level import ffi, lib
+from _chirp_low_level import ffi, lib
 # from .common import collect_processes
 
 PIPE = subprocess.PIPE
@@ -74,13 +74,13 @@ def test_ch_cn_conn_dict(choice, address1, port1, address2, port2, force_eq):
 # def test_helper_programs():
 #     """Testing the ssl_server and ssl_client program"""
 #     server = subprocess.Popen(
-#         ["c4irpc/programs/ssl_server"],
+#         ["src/programs/ssl_server"],
 #         stderr=PIPE,
 #         stdout=PIPE,
 #     )
 #     time.sleep(0.1)
 #     client = subprocess.Popen(
-#         ["c4irpc/programs/ssl_client"],
+#         ["src/programs/ssl_client"],
 #         stderr=PIPE,
 #         stdout=PIPE,
 #     )

@@ -6,7 +6,7 @@
 
 #include "../config.h"
 #include "common.h"
-#include "c4irp.h"
+#include "chirp.h"
 #include "message.h"  // TODO remove?
 #include "protocol.h"
 
@@ -18,7 +18,7 @@
 //
 // .. c:var:: ch_config_defaults
 //
-//    Default config of c4irp.
+//    Default config of chirp.
 //
 // .. code-block:: cpp
 //
@@ -50,7 +50,7 @@ _ch_close_async_cb(uv_async_t* handle)
     uv_close((uv_handle_t*) &ichirp->close, NULL);
     if(ichirp->auto_start) {
         uv_stop(chirp->loop);
-        L(chirp, "UV-Loop %p stopped by c4irp", chirp->loop);
+        L(chirp, "UV-Loop %p stopped by chirp", chirp->loop);
     }
     L(chirp, "Closed chirp %p", chirp);
 }
@@ -117,7 +117,7 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
         return tmp_err;  // NOCOV covered in ch_chirp_init tests
     }
     chirp._->auto_start = 1;
-    L((&chirp), "UV-Loop %p run by c4irp", &loop);
+    L((&chirp), "UV-Loop %p run by chirp", &loop);
     tmp_err = _ch_uv_error_map(ch_run(&loop, UV_RUN_DEFAULT));
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;  // NOCOV only breaking things will trigger this
