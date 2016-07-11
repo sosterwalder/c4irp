@@ -34,7 +34,7 @@ include pyproject/Makefile
 all: pre-install pymods  ## Build for development (make setup.py or make.release for production)
 
 vi:  ## Start a vim editing the imporant files
-	vim c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h doc/ref/*
+	vim TODO.rst c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h doc/ref/*
 
 lldb: all  ## Build and run py.test in lldb
 	echo lldb `pyenv which python` -- -m pytest -x
