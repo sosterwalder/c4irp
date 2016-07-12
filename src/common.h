@@ -15,6 +15,51 @@
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
+
+// Logging and assert macros
+// =========================
+//
+// The logging macro L(chirp, message, ...) behaves like printf and allows to
+// log to a custom callback. Usually used to log into pythons logging facility.
+//
+// The assert macro A(condition, message, ...) behaves like printf and allows to
+// print a message with the assertion
+//
+// .. code-block: cpp
+#ifndef NDEBUG
+#include <stdio.h>
+#ifdef LOG_TO_STDERR
+#define L(chirp, ...) fprintf(stderr, ##__VA_ARGS__)
+#else  //LOG_TO_STDERR
+#include "../include/chirp_obj.h"
+#define L(chirp, message, ...) do { \
+    if(chirp->_log != NULL) { \
+        char buf[1024]; \
+        snprintf( \
+            buf, \
+            1024, \
+            "%s:%d " message, \
+            __FILE__, \
+            __LINE__, \
+            ##__VA_ARGS__ \
+        ); \
+        chirp->_log(buf); \
+    } \
+} while(0)
+#endif
+#define A(condition, ...) do { \
+    if(!(condition)) { \
+        fprintf(stderr, ##__VA_ARGS__); \
+        fprintf(stderr, "\n"); \
+        assert(condition); \
+    } \
+} while(0)
+#else //NDEBUG
+#define L(chrip, message, ...) (void)(chirp); (void)(message)
+#define A(condition, ...) (void)(condition)
+#endif
+
+
 //
 // .. c:function::
 static
