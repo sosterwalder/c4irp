@@ -31,6 +31,16 @@
 //
 //       The chirp port was already in use
 //
+//    .. c:member:: CH_FATAL
+//
+//       # TODO list cases
+//
+//       * We do not have a entropy source
+//
+//    .. c:member:: CH_TLS_ERROR
+//
+//       General TLS error
+//
 // .. code-block:: cpp
 //
 typedef enum {
@@ -39,6 +49,8 @@ typedef enum {
     CH_UV_ERROR       = 2,
     CH_PROTOCOL_ERROR = 3,
     CH_EADDRINUSE     = 4,
+    CH_FATAL          = 5,
+    CH_TLS_ERROR      = 6,
 } ch_error_t;
 
 #endif //ch_inc_error_h

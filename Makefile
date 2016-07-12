@@ -1,7 +1,6 @@
-.PHONY: clean libc4irp sublibs libuv mbedtls test_ext doc c4irp
+.PHONY: clean libchirp sublibs libuv test_ext doc c4irp test_dep
 
 PROJECT     := c4irp
-export CC   := clang
 
 PYPY      := $(shell python --version 2>&1 | grep PyPy > /dev/null 2> /dev/null; echo $$?)
 NEWCOV    := $(shell llvm-cov --help 2>&1 | grep -E "USAGE:.*SOURCEFILE" > /dev/null 2> /dev/null; echo $$?)
@@ -12,41 +11,44 @@ else
 	COVERAGE  := --coverage
 endif
 
-COMMON    := config.h c4irpc/common.h
+COMMON    := config.h src/common.h
 CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
 MYFLAGS   := -std=gnu99 -pthread
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
 CFFIF     := $(shell pwd)/pyproject/cffi_fix:$(PATH)
 PY        := python
+MYCC      := clang
 
-export CFLAGS   := $(DCFLAGS) $(MYFLAGS)
+SETCFLAGS := $(DCFLAGS) $(MYFLAGS)
 
-DOCC=$(wildcard c4irpc/*.c)
-DOCH=$(wildcard c4irpc/*.h) $(wildcard include/*.h)
+DOCC=$(wildcard src/*.c)
+DOCH=$(wildcard src/*.h) $(wildcard include/*.h)
 DOCRST=$(DOCC:.c=.c.rst) $(DOCH:.h=.h.rst)
-SRCS=$(wildcard c4irpc/*.c)
+SRCS=$(wildcard src/*.c)
 OBJS=$(SRCS:.c=.o)
 COVOUT=$(SRCS:.c=.c.gcov)
 
 include pyproject/Makefile
 
-all: pre-install pymods
+all: pre-install pymods  ## Build for development (make setup.py or make.release for production)
 
-vi:
-	vi c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h
+vi:  ## Start a vim editing the imporant files
+	vim TODO.rst src/*.c src/*.h c4irp/*.py cffi/*.py include/*.h doc/ref/* config.defs.h
 
-lldb:
+lldb: all  ## Build and run py.test in lldb
+	echo lldb `pyenv which python` -- -m pytest -x
 	lldb `pyenv which python` -- -m pytest -x
 
-doc-all: $(DOCRST) doc
+doc-all: all $(DOCRST) doc  ## Build using c2rst and then generate docs
 
-test-all: pre-install pymods test test-array coverage test-lib
+test-all: all test test-array coverage test-lib  ## Build and then test
 
-pre-install: libc4irp.a
-	CC="clang -Qunused-arguments" pip install --upgrade -r .requirements.txt -e .
+test_dep: all
 
-test-cov: clean pre-install pymods pytest test-array coverage
+pre-install: libchirp.a install-edit
+
+test-cov: clean all pytest test-array coverage  ## Clean, build and test (so coverage is correct)
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -56,15 +58,17 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-pymods: _c4irp_cffi.o
+pymods: _chirp_cffi.o _chirp_low_level.o
 
-_c4irp_cffi.o: libc4irp.a cffi/high_level.py
-	PATH=$(CFFIF) $(PY) cffi/high_level.py
-	rm _c4irp_cffi.c
+_chirp_cffi.o: libchirp.a cffi/high_level.py
+	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
+	   $(PY) cffi/high_level.py
+	rm _chirp_cffi.c
 
-# _c4irp_low_level.o: libc4irp.a cffi/low_level.py
-#	PATH=$(CFFIF) $(PY) cffi/low_level.py
-#	rm _c4irp_low_level.c
+_chirp_low_level.o: libchirp.a cffi/low_level.py
+	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
+	   $(PY) cffi/low_level.py
+	rm _chirp_low_level.c
 
 libuv/configure:
 	cd libuv && ./autogen.sh
@@ -77,11 +81,6 @@ libuv/.libs/libuv.a: libuv/Makefile
 
 libuv: libuv/.libs/libuv.a
 
-mbedtls/library/libmbedtls.a:
-	make -C mbedtls
-
-mbedtls: mbedtls/library/libmbedtls.a
-
 %.c.rst: %.c
 	pyproject/c2rst $<
 
@@ -91,27 +90,21 @@ mbedtls: mbedtls/library/libmbedtls.a
 %.c: %.h
 
 %.o: %.c $(COMMON) $(DOCH)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(MYCC) -c -o $@ $< $(SETCFLAGS)
 
-array_test: c4irpc/array_test.o
-	$(CC) -o $@ $< $(CFLAGS)
+array_test: src/array_test.o
+	$(MYCC) -o $@ $< $(SETCFLAGS)
 
-libc4irp: libc4irp.a
+libchirp: libchirp.a
 
-libc4irp.a: $(OBJS) | libc4irp-depends
+libchirp.a: $(OBJS) | libchirp-depends
 	ar $(ARFLAGS) $@ $^
 
-libc4irp-depends:
-	@make CFLAGS="$(PCFLAGS)" libuv mbedtls
+libchirp-depends:
+	@make CFLAGS="$(CCFLAGS) -g" libuv
 
-clean-all: clean clean-sub
-
-clean:
+clean:  ## Clean only chirp not submodules
 	git clean -xdf
-
-clean-sub:
-	cd libuv && git clean -xdf
-	cd mbedtls && git clean -xdf
 
 test-array: array_test
 	./array_test 1 2>&1
@@ -119,7 +112,6 @@ test-array: array_test
 	./array_test -1 2>&1 | grep Bufferoverflow
 
 test-lib:
-	make -C mbedtls check
 	make -C libuv CFLAGS="$(PCFLAGS)" check
 
 
@@ -133,7 +125,7 @@ endif
 ifeq ($(NEWCOV),0)
 %.c.gcov: %.c
 	llvm-cov $<
-	mv *.c.gcov c4irpc/
+	mv *.c.gcov src/
 	!(grep -v "// NOCOV" $@ | grep -E "\s+#####:")
 else
 %.c.gcov: %.c

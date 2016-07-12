@@ -1,4 +1,4 @@
-from _c4irp_cffi import ffi, lib
+from _chirp_cffi import ffi, lib
 
 
 def test_low_level_new():

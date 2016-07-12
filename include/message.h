@@ -18,7 +18,9 @@
 // .. c:type:: ch_text_address_t
 //
 //    Type to be used with :c:func:`ch_msg_get_address`
-
+//
+// .. code-block:: cpp
+//
 typedef struct {
     char data[INET6_ADDRSTRLEN];
 } ch_text_address_t;
@@ -33,7 +35,7 @@ typedef struct {
 //       address of the recipient if the message is going to be sent.
 //
 // .. code-block:: cpp
-//
+
 typedef struct {
     // Network data, has to be sent in network order
     char     identity[16];
@@ -76,7 +78,7 @@ typedef struct {
 //        recv_exactly(buffer=msg.data, msg.data_len)
 //    }
 //
-// * Please use MAX_HANDLERS preallocated buffers of size 16 for header
+// * Please use MAX_HANDLERS preallocated buffers of size 32 for header
 // * Please use MAX_HANDLERS preallocated buffers of size 256 for actor
 // * Please use MAX_HANDLERS preallocated buffers of size 1024 for data
 //
