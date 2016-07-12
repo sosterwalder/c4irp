@@ -13,7 +13,7 @@
 // .. c:type:: ch_chirp_int_t
 //
 //    Chirp object.
-//  
+//
 //
 //    .. c:member:: uv_async_t close
 //

@@ -18,7 +18,7 @@
 // .. c:type:: ch_connection_t
 //
 //    Connection dictionary implemented as rbtree.
-//  
+//
 //    .. c:member:: uint8_t[16] address
 //
 //       IPv4/6 address of the sender if the message was received.  IPv4/6

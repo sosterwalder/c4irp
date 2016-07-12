@@ -18,7 +18,7 @@
 // .. c:type:: ch_receipt_t
 //
 //    Receipt set implemented as rbtree.
-//  
+//
 //    .. c:member:: unsigned char receipt[16]
 //
 //    the receipt generated using TODO

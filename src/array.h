@@ -7,13 +7,13 @@
 // .. code-block:: cpp
 //
 //     CA_PROTOTYPE(type)
-// 
+//
 // If you call CA_PROTOTYPE(int) you get the type:
 //
 // .. code-block:: cpp
 //
 //     ca_int_t
-// 
+//
 // and the functions:
 //
 // .. code-block:: cpp
@@ -27,22 +27,22 @@
 //    ca_free_int(array)
 //
 // Frees the array
-// 
+//
 // The macro CA(type, array, index) uses the ca_##type##_p function to
 // magically access the array. You can use this macro like:
-// 
+//
 // .. code-block:: cpp
 //
 //    printf("%d", CA(int, a, 3));
-// 
+//
 // or
-// 
+//
 // .. code-block:: cpp
 //
 //    CA(int, a, 3) = 2;
-// 
+//
 // If NDEBUG is set all overhead will be optimized away.
-// 
+//
 // .. code-block:: cpp
 
 #ifndef ca_check_array_h
