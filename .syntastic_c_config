@@ -1,1 +1,4 @@
 -Ilibuv/include
+-L.
+-lc4irp
+-luv

@@ -19,10 +19,6 @@ use_spaces = true
 
 [Cfiles]
 files = src/**/*.c
-bears = SpaceConsistencyBear,SpaceConsistencyBear
-use_spaces = True
-
-[Cheaders]
-files = src/**/*.c
-bears = SpaceConsistencyBear,SpaceConsistencyBear
-use_spaces = True
+bears = SpaceConsistencyBear,ClangBear,CPPCheckBear
+use_spaces = true
+clang_cli_options = -Ilibuv/include
