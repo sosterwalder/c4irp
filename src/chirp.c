@@ -107,6 +107,9 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
     uv_loop_t  loop;
     ch_error_t tmp_err;
     if(chirp_out != NULL) {
+        /* This works and is not TOO bad because the function blocks. TODO: Has
+         * anymore a better idea? */
+        // Ignore CPPCheckBear*
         *chirp_out = &chirp;
     }
 
