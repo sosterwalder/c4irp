@@ -25,7 +25,8 @@
 // The assert macro A(condition, message, ...) behaves like printf and allows to
 // print a message with the assertion
 //
-// .. code-block: cpp
+// .. code-block:: cpp
+
 #ifndef NDEBUG
 #include <stdio.h>
 #ifdef LOG_TO_STDERR
