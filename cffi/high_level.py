@@ -109,7 +109,7 @@ typedef void (*ch_free_cb)(void* buf);
 
 typedef struct {
     int          REUSE_TIME;
-    int          TIMEOUT;
+    float        TIMEOUT;
     int          PORT;
     int          BACKLOG;
     char         BIND_V6[16];

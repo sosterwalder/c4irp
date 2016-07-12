@@ -1,4 +1,4 @@
-"""Chirp bindings"""
+"""Chirp bindings."""
 import concurrent.futures as fut
 import os
 import sys
@@ -10,7 +10,7 @@ from . import common, const
 
 
 class ChirpPool(object):
-    """TODO Documentation -> async to pool, ccchirp to hhirp
+    """TODO Documentation -> async to pool, ccchirp to chirp.
 
     Chirp is message passing with fully automatic connection setup and
     cleanup. Just create a Chirp() object, await obj.start(), create a Message
@@ -41,6 +41,7 @@ class ChirpPool(object):
     :param config: Config as either a object or a dictionary.
     :type  config: :py:class:`object` or :py:class:`dict`
     """
+
     def __init__(
             self,
             config = None,
@@ -65,6 +66,7 @@ class ChirpPool(object):
         lib.ch_chirp_register_log_cb(self._chirp, lib.python_log_cb)
 
         def run():
+            """Run chirp in a thread."""
             lib.ch_run(self._loop, lib.UV_RUN_DEFAULT)
             lib.ch_loop_close(self._loop)
 
@@ -81,7 +83,7 @@ class ChirpPool(object):
         self._pool.shutdown()
 
     def _fill_c_config(self):
-        """Fill in the c_config from the config"""
+        """Fill in the c_config from the config."""
         c_conf = self._c_config
         conf   = self._config
         folder = __file__.split(os.path.sep)[:-1]
@@ -111,7 +113,7 @@ class ChirpPool(object):
 if sys.version_info > (3, 4):
 
     class ChirpAsync(object):  # pragma: no cover TODO
-        """TODO
+        """TODO.
 
         Chirp is message passing with fully automatic connection setup and
         cleanup. Just create a Chirp() object, await obj.start(), create a
@@ -142,6 +144,7 @@ if sys.version_info > (3, 4):
         :param config: Config as either a object or a dictionary.
         :type  config: :py:class:`object` or :py:class:`dict`
         """
+
         def __init__(
                 self,
                 config = None,

@@ -1,10 +1,14 @@
-"""Constants for chirp. Config is a special case. Every class that uses Config
-takes config as an argument in the constructor, if config is not given it will
-use the default config defined here."""
+"""
+Constants for chirp.
+
+Config is a special case. Every class that uses Config takes config as an
+argument in the constructor, if config is not given it will use the default
+config defined here.
+"""
 
 
 def _consts_to_dict(object_):
-    """Converts a constants object to a dictionary."""
+    """Convert a constants object to a dictionary."""
     new = {}
     for const in dir(object_):
         if not const.startswith("_"):
@@ -13,7 +17,8 @@ def _consts_to_dict(object_):
 
 
 class IPProtocol(object):
-    """IP Protocol selection """
+    """IP Protocol selection."""
+
     IPV4 = 2 ** 0
     IPV6 = 2 ** 1
 
@@ -22,6 +27,7 @@ IP_PROTOCOL_DICT = _consts_to_dict(IPProtocol)
 
 class Config(object):
     """Default configuration of chirp."""
+
     REUSE_TIME    = 30
     """Time till a connection gets garbage collected in this time the
     connection will be reused."""

@@ -19,7 +19,7 @@ int
 main(
     int argc,
     char *argv[]
-) 
+)
 //
 //    The test function will trigger the bound check if called with 3+.
 //

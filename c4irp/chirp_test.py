@@ -1,4 +1,4 @@
-"""Testing the chirp object"""
+"""Testing the chirp object."""
 import threading
 import time
 from contextlib import contextmanager
@@ -29,13 +29,13 @@ config_st = st.fixed_dictionaries({
 
 
 def test_init_free():
-    """Test if we can initialize and free chirp"""
+    """Test if we can initialize and free chirp."""
     with basic_uv() as error:
         assert error == lib.CH_SUCCESS
 
 
 def test_init_bind_err():
-    """Test if we create a bind error"""
+    """Test if we create a bind error."""
     with basic_uv() as error:
         assert error == lib.CH_SUCCESS
         with basic_uv() as error2:
@@ -44,6 +44,7 @@ def test_init_bind_err():
 
 @contextmanager
 def basic_uv():
+    """Create a basic libuv context."""
     chirp = ffi.new("ch_chirp_t*")
     loop = ffi.new("uv_loop_t*")
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
@@ -59,17 +60,17 @@ def basic_uv():
 
 
 def test_init_bad_port_low():
-    """Test if init with bad port throws CH_VALUE_ERROR"""
+    """Test if init with bad port throws CH_VALUE_ERROR."""
     init_bad_port(-123)
 
 
 def test_init_bad_port_high():
-    """Test if init with bad port throws CH_VALUE_ERROR"""
+    """Test if init with bad port throws CH_VALUE_ERROR."""
     init_bad_port(65536)
 
 
 def init_bad_port(port):
-    """Test if init with bad port throws CH_VALUE_ERROR"""
+    """Test if init with bad port throws CH_VALUE_ERROR."""
     chirp = ffi.new("ch_chirp_t*")
     loop = ffi.new("uv_loop_t*")
     config = ffi.new("ch_config_t*")
@@ -83,12 +84,12 @@ def init_bad_port(port):
 
 
 def test_chirp_run():
-    """Test if the do everything ch_chirp_run method works"""
-
+    """Test if the do everything ch_chirp_run method works."""
     res = []
     chirp_p = ffi.new("ch_chirp_t**")
 
     def run():
+        """Run chirp in a thread."""
         res.append(lib.ch_chirp_run(
             ffi.addressof(lib.ch_config_defaults), chirp_p
         ))
@@ -103,22 +104,24 @@ def test_chirp_run():
 
 @given(config_st)
 def test_chirp_object_config(config):
-    """Test if initializing, using and closing the ChirpPool object works with
-    hypothesis generated config"""
+    """Test if initializing, using and closing the ChirpPool object works...
+
+    with hypothesis generated config.
+    """
     # TODO as validate is implemented this is going to need assume()s
-    chirp = init_chirp()
+    chirp = init_chirp(config)
     # TODO send a message to second (standard c chirp)
     chirp.close()
 
 
 def test_chirp_object_basic():
-    """Test if initializing and closing the ChirpPool object works"""
+    """Test if initializing and closing the ChirpPool object works."""
     chirp = init_chirp()
     chirp.close()
 
 
 def test_chirp_server_handshake():
-    """Test if the chirp server handshake works using a test programm"""
+    """Test if the chirp server handshake works using a test programm."""
     c = {
         'PORT': 4433,
     }
@@ -127,7 +130,7 @@ def test_chirp_server_handshake():
 
 
 def init_chirp(c=None):
-    """Initialize chirp for basic tests"""
+    """Initialize chirp for basic tests."""
     if c is None:
         chirp = c4irp.ChirpPool()
     else:

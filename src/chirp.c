@@ -35,7 +35,7 @@ ch_config_t ch_config_defaults = {
 };
 
 // .. c:function::
-void 
+void
 _ch_close_async_cb(uv_async_t* handle)
 //
 //    Internal callback to close chirp. Makes ch_chirp_close_ts thread-safe
