@@ -1,7 +1,7 @@
 """Common functions for chirp and depending modules."""
 
-import logging
 import itertools
+import logging
 import subprocess
 
 LG = logging.getLogger("c4irp")

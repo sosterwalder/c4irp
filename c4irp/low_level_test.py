@@ -6,6 +6,7 @@ from hypothesis import strategies as st
 from hypothesis import given
 
 from _chirp_low_level import ffi, lib
+
 # from .common import collect_processes
 
 PIPE = subprocess.PIPE

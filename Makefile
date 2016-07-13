@@ -44,7 +44,9 @@ doc-all: all $(DOCRST) doc  ## Build using c2rst and then generate docs
 
 test-all: all test test-array coverage test-lib  ## Build and then test
 
-test_dep: all coala
+test_dep: all
+
+test_ext: coala
 
 pre-install: libchirp.a install-edit
 
