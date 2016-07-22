@@ -31,6 +31,8 @@ COVOUT=$(SRCS:.c=.c.gcov)
 
 include pyproject/Makefile
 
+FAIL_UNDER := 95  # TODO: remove!!
+
 all: pre-install pymods  ## Build for development (make setup.py or make.release for production)
 
 vi:  ## Start a vim editing the imporant files
