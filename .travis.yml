@@ -18,4 +18,4 @@ before_install:
   - export PATH=$HOME/.pyenv/bin:$PATH
   - ./.scripts/fix-pypy2.sh
   - eval "$(pyenv init -)"
-  - sudo apt-get -y install clang llvm libc6-dev
+  - sudo apt-get -y install clang llvm libc6-dev cppcheck build-essential
