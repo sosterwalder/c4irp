@@ -128,6 +128,8 @@ def test_chirp_server_handshake():
     chirp = init_chirp(c)
     chirp.close()
 
+# TODO use pytest markers + get request
+
 
 def init_chirp(c=None):
     """Initialize chirp for basic tests."""
