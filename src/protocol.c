@@ -151,25 +151,25 @@ _ch_pr_on_new_connection(uv_stream_t* server, int status)
 // .. code-block:: cpp
 //
 {
-    CH_GET_CHIRP(server);
-    if (status < 0) {
-        L(chirp, "New connection error %s", uv_strerror(status));
-        return;
+    CH_GET_CHIRP(server); // NOCOV TODO
+    if (status < 0) { // NOCOV TODO
+        L(chirp, "New connection error %s", uv_strerror(status)); // NOCOV TODO
+        return; // NOCOV TODO
     }
 
-    ch_connection_t* conn = (ch_connection_t*) ch_chirp_alloc(
+    ch_connection_t* conn = (ch_connection_t*) ch_chirp_alloc( // NOCOV TODO
         chirp,
         sizeof(ch_connection_t)
-    );
-    uv_tcp_t* client = &conn->client;
-    uv_tcp_init(server->loop, client);
-    if (uv_accept(server, (uv_stream_t*) client) == 0) {
-        uv_read_start((uv_stream_t*) client, NULL, NULL);
-    }
+    ); // NOCOV TODO
+    uv_tcp_t* client = &conn->client; // NOCOV TODO
+    uv_tcp_init(server->loop, client); // NOCOV TODO
+    if (uv_accept(server, (uv_stream_t*) client) == 0) { // NOCOV TODO
+        uv_read_start((uv_stream_t*) client, NULL, NULL); // NOCOV TODO
+    } // NOCOV TODO
     else {
         // TODO uv_close on cleanup and, on close and on remove close
-        uv_close((uv_handle_t*) client, NULL);
-        ch_chirp_free(chirp, conn);
+        uv_close((uv_handle_t*) client, NULL); // NOCOV TODO
+        ch_chirp_free(chirp, conn); // NOCOV TODO
     }
 } // NOCOV TODO remove
 // .. c:function::

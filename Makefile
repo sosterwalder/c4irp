@@ -54,7 +54,7 @@ test_ext: coala
 
 pre-install: libchirp.a install-edit
 
-test-cov: clean all pytest test-exec coverage  ## Clean, build and test (so coverage is correct)
+test-cov: clean all pytest coverage  ## Clean, build and test (so coverage is correct)
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -99,7 +99,7 @@ libuv: libuv/.libs/libuv.a
 	$(MYCC) -c -o $@ $< $(SETCFLAGS)
 
 %_etest: %_etest.c libchirp.a | libuv
-	$(MYCC) -o $@ $< libchirp.a libuv.a $(SETCFLAGS)
+	$(MYCC) -o $@ $@.o libchirp.a libuv.a $(SETCFLAGS)
 
 test-execs: $(TESTEXECS)
 
