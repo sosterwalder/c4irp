@@ -6,6 +6,7 @@
 //
 #include "connection_test.h"
 
+extern
 void
 test_ch_cn_conn_dict(
         ch_connection_t* x,

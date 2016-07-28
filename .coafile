@@ -19,13 +19,15 @@ use_spaces = true
 
 [Cfiles]
 files = src/**/*.c
-bears = SpaceConsistencyBear,ClangBear,CPPCheckBear,LineLengthBear,FilenameBear
+bears = SpaceConsistencyBear,ClangBear,LineLengthBear,FilenameBear
 use_spaces = true
 clang_cli_options = -Iinclude,-Ilibuv/include
+enable = warning,style,performance,portability,information,missingInclude
 
 [Cheaders]
 files = src/**/*.h
 ignore = **/sglib.h
-bears = SpaceConsistencyBear,CPPCheckBear,LineLengthBear,FilenameBear
+bears = SpaceConsistencyBear,LineLengthBear,FilenameBear
 use_spaces = true
 clang_cli_options = -Iinclude,-Ilibuv/include
+enable = warning,style,performance,portability,information,missingInclude

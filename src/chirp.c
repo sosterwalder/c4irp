@@ -145,7 +145,7 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
     if(chirp_out != NULL) {
         /* This works and is not TOO bad because the function blocks. TODO: Has
          * anymore a better idea? */
-        // Ignore CPPCheckBear*
+        // cppcheck-suppress autoVariables
         *chirp_out = &chirp;
     }
 

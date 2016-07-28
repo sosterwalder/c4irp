@@ -53,11 +53,10 @@ ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
 // .. code-block:: cpp
 //
 {
-    int tmp_cmp;
     if(x->ip_protocol != y->ip_protocol) {
         return x->ip_protocol - y->ip_protocol;
     } else {
-        tmp_cmp = memcmp(x->address, y->address, 16);
+        int tmp_cmp = memcmp(x->address, y->address, 16);
         if(tmp_cmp != 0) {
             return tmp_cmp;
         } else {
