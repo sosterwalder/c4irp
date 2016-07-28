@@ -12,10 +12,10 @@ branches:
 # command to install dependencies
 install: "pip install -r .requirements.txt"
 # command to run tests
-script: ./.scripts/test.sh
+script: sudo ./.scripts/test.sh
 before_install:
   - ./.scripts/fix-pypy1.sh
   - export PATH=$HOME/.pyenv/bin:$PATH
   - ./.scripts/fix-pypy2.sh
   - eval "$(pyenv init -)"
-  - sudo apt-get -y --install-suggests install --reinstall clang llvm cppcheck build-essential libc6-dev
+  - sudo apt-get -y install clang llvm cppcheck build-essential
