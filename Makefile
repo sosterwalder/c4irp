@@ -26,14 +26,16 @@ DOCC=$(wildcard src/*.c)
 DOCH=$(wildcard src/*.h) $(wildcard include/*.h)
 DOCRST=$(DOCC:.c=.c.rst) $(DOCH:.h=.h.rst)
 SRCS=$(wildcard src/*.c)
+TESTSRCS=$(wildcard src/*_etest.c)
 OBJS=$(SRCS:.c=.o)
+TESTEXECS=$(TESTSRCS:.c=)
 COVOUT=$(SRCS:.c=.c.gcov)
 
 include pyproject/Makefile
 
 FAIL_UNDER := 95  # TODO: remove!!
 
-all: pre-install pymods  ## Build for development (make setup.py or make.release for production)
+all: pre-install pymods test-execs  ## Build for development (make setup.py or make.release for production)
 
 vi:  ## Start a vim editing the imporant files
 	vim TODO.rst src/*.c src/*.h c4irp/*.py cffi/*.py include/*.h doc/ref/* config.defs.h
@@ -44,7 +46,7 @@ lldb: all  ## Build and run py.test in lldb
 
 doc-all: all $(DOCRST) doc  ## Build using c2rst and then generate docs
 
-test-all: all test test-array coverage test-lib  ## Build and then test
+test-all: all test coverage test-lib  ## Build and then test
 
 test_dep: all
 
@@ -52,7 +54,7 @@ test_ext: coala
 
 pre-install: libchirp.a install-edit
 
-test-cov: clean all pytest test-array coverage  ## Clean, build and test (so coverage is correct)
+test-cov: clean all pytest test-exec coverage  ## Clean, build and test (so coverage is correct)
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -96,8 +98,10 @@ libuv: libuv/.libs/libuv.a
 %.o: %.c $(COMMON) $(DOCH)
 	$(MYCC) -c -o $@ $< $(SETCFLAGS)
 
-array_test: src/array_test.o
+%_etest: %_etest.c $(COMMON) $(DOCH)
 	$(MYCC) -o $@ $< $(SETCFLAGS)
+
+test-execs: $(TESTEXECS)
 
 libchirp: libchirp.a
 
@@ -110,14 +114,8 @@ libchirp-depends:
 clean:  ## Clean only chirp not submodules
 	git clean -xdf
 
-test-array: array_test
-	./array_test 1 2>&1
-	./array_test 3 2>&1 | grep Bufferoverflow
-	./array_test -1 2>&1 | grep Bufferoverflow
-
 test-lib:
 	make -C libuv CFLAGS="$(PCFLAGS)" check
-
 
 ifeq ($(PYPY),0)
 coverage:
