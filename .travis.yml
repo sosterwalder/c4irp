@@ -20,3 +20,5 @@ before_install:
   - eval "$(pyenv init -)"
   - sudo apt-get -y install clang llvm cppcheck build-essential
   - cppcheck --version
+  - cat /etc/apt/sources.list
+  - cat /etc/apt/sources.list.d/*
