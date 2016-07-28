@@ -60,6 +60,12 @@
 #define A(condition, ...) (void)(condition)
 #endif
 
+#ifndef A
+#error Assert macro not defined
+#endif
+#ifndef L
+#error Log macro not defined
+#endif
 
 //
 // .. c:function::

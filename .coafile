@@ -22,10 +22,3 @@ files = src/**/*.c
 bears = SpaceConsistencyBear,ClangBear,CPPCheckBear,LineLengthBear,FilenameBear
 use_spaces = true
 clang_cli_options = -Iinclude,-Ilibuv/include
-
-[Cheaders]
-files = src/**/*.h
-ignore = **/sglib.h
-bears = SpaceConsistencyBear,ClangBear,CPPCheckBear,LineLengthBear,FilenameBear
-use_spaces = true
-clang_cli_options = -Iinclude,-Ilibuv/include
