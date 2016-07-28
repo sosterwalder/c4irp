@@ -58,6 +58,36 @@ _ch_close_async_cb(uv_async_t* handle)
 }
 
 // .. c:function::
+static
+void*
+ch_chirp_std_alloc(
+        size_t suggested_size,
+        size_t required_size,
+        size_t* provided_size
+)
+//
+//    Standard memory allocator used if no allocator is supplied by the user.
+//
+// .. code-block:: cpp
+//
+{
+    *provided_size = suggested_size;
+    return malloc(suggested_size);
+}
+// .. c:function::
+static
+void
+ch_chirp_std_free(void* buf)
+//
+//    Standard free if no free is supplied by the user.
+//
+// .. code-block:: cpp
+//
+{
+    free(buf);
+}
+
+// .. c:function::
 ch_error_t
 ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
 //    :noindex:
@@ -68,11 +98,17 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
 //
 {
     int                       tmp_err;
-    ch_chirp_int_t* ichirp  = malloc(sizeof(ch_chirp_int_t));
+    if(config->ALLOC_CB == NULL) {
+        config->ALLOC_CB = ch_chirp_std_alloc;
+    }
+    if(config->FREE_CB == NULL) {
+        config->FREE_CB = ch_chirp_std_free;
+    }
+    chirp->config           = config;
+    ch_chirp_int_t* ichirp  = ch_chirp_alloc(chirp, sizeof(ch_chirp_int_t));
     ch_protocol_t* protocol = &ichirp->protocol;
     chirp->_                = ichirp;
     chirp->loop             = loop;
-    chirp->config           = config;
     ichirp->auto_start      = 0;
     chirp->_log             = NULL;
 

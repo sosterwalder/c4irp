@@ -110,7 +110,7 @@ _ch_on_new_connection(uv_stream_t *server, int status);
 //
 // .. c:function::
 static void
-_ch_pr_free_receipts(ch_receipt_t* receipts);
+_ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts);
 //
 //    Free all remaining items in a receipts set
 //

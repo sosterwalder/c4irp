@@ -23,7 +23,7 @@
 //
 //       The size the user has to allocate
 //
-//    .. c:member:: size_t required_size
+//    .. c:member:: size_t provided_size
 //
 //       Out: The size the user has allocated
 //

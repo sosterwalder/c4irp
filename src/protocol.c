@@ -106,7 +106,7 @@ ch_pr_start(ch_protocol_t* protocol)
     /*ch_receipt_t* t;
     struct sglib_ch_receipt_t_iterator it;
     for(int i = 0; i < 10; ++i) {
-        t = malloc(sizeof(ch_receipt_t));
+        t = ch_chirp_alloc(chirp, sizeof(ch_receipt_t));
         // TODO fill t->receipt
         sglib_ch_receipt_t_add(&protocol->receipts, t);
     }
@@ -133,10 +133,11 @@ ch_pr_stop(ch_protocol_t* protocol)
 //
 {
     // TODO close remaining connections
+    ch_chirp_t* chirp = protocol->chirp;
     uv_close((uv_handle_t*) &protocol->serverv4, NULL);
     uv_close((uv_handle_t*) &protocol->serverv6, NULL);
-    _ch_pr_free_receipts(protocol->receipts);
-    _ch_pr_free_receipts(protocol->late_receipts);
+    _ch_pr_free_receipts(chirp, protocol->receipts);
+    _ch_pr_free_receipts(chirp, protocol->late_receipts);
     return CH_SUCCESS;
 }
 
@@ -156,7 +157,8 @@ _ch_pr_on_new_connection(uv_stream_t* server, int status)
         return;
     }
 
-    ch_connection_t* conn = (ch_connection_t*) malloc(
+    ch_connection_t* conn = (ch_connection_t*) ch_chirp_alloc(
+        chirp,
         sizeof(ch_connection_t)
     );
     uv_tcp_t* client = &conn->client;
@@ -167,12 +169,12 @@ _ch_pr_on_new_connection(uv_stream_t* server, int status)
     else {
         // TODO uv_close on cleanup and, on close and on remove close
         uv_close((uv_handle_t*) client, NULL);
-        free(conn);
+        ch_chirp_free(chirp, conn);
     }
 } // NOCOV TODO remove
 // .. c:function::
 static void
-_ch_pr_free_receipts(ch_receipt_t* receipts)
+_ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts)
 //    :noindex:
 //
 //    see: :c:func:`_ch_pr_free_receipts`
@@ -190,6 +192,6 @@ _ch_pr_free_receipts(ch_receipt_t* receipts)
             t != NULL;
             t = sglib_ch_receipt_t_it_next(&it) // NOCOV TODO remove
     ) {
-        free(t); // NOCOV TODO remove
+        ch_chirp_free(chirp, t); // NOCOV TODO remove
     } // NOCOV TODO remove
 }
