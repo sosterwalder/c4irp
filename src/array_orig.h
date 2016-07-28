@@ -48,8 +48,6 @@
 #ifndef ca_check_array_h
 #define ca_check_array_h
 
-#include "chirp.h"
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,12 +71,10 @@ ca_##type##_t;                                     \
                                                    \
 static inline ca_##type##_t                        \
 ca_new_##type(                                     \
-ch_chirp_t* chirp,                                 \
-size_t size                                        \
+    size_t size                                    \
 ) {                                                \
     ca_##type##_t array;                           \
-    array.data = (type*) ch_chirp_alloc(           \
-        chirp,                                     \
+    array.data = (type*) malloc(                   \
         size * sizeof(type)                        \
     );                                             \
     array.len = size;                              \
@@ -98,10 +94,9 @@ ca_from_pointer_##type(                            \
                                                    \
 static inline void                                 \
 ca_free_##type(                                    \
-    ch_chirp_t* chirp,                             \
     ca_##type##_t array                            \
 ) {                                                \
-    ch_chirp_free(chirp, array.data);              \
+    free(array.data);                              \
 }                                                  \
                                                    \
 static inline type*                                \
@@ -133,21 +128,16 @@ typedef type* ca_##type##_t;                       \
                                                    \
 static inline type*                                \
 ca_new_##type(                                     \
-    ch_chirp_t* chirp,                             \
     size_t size                                    \
 ) {                                                \
-    return (type*) ch_chirp_alloc(                 \
-        chirp,                                     \
-        size * sizeof(type)                        \
-    );                                             \
+    return (type*) malloc(size * sizeof(type));    \
 }                                                  \
                                                    \
 static inline void                                 \
 ca_free_##type(                                    \
-    ch_chirp_t* chirp,                             \
     type* array                                    \
 ) {                                                \
-    ch_chirp_free(chirp, array);                   \
+    free(array);                                   \
 }                                                  \
                                                    \
 static inline ca_##type##_t                        \

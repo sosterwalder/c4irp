@@ -9,6 +9,7 @@
 
 #include "../include/chirp_obj.h"
 #include "protocol.h"
+#include "common.h"
 
 // .. c:type:: ch_chirp_int_t
 //
