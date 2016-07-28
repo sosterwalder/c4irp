@@ -19,3 +19,4 @@ before_install:
   - ./.scripts/fix-pypy2.sh
   - eval "$(pyenv init -)"
   - sudo apt-get -y install clang llvm cppcheck build-essential
+  - cppcheck --version
