@@ -7,10 +7,12 @@ alloc = sh.Command("src/alloc_etest")
 
 
 def test_alloc_good():
+    """Test if normal alloc doesn't fail."""
     alloc(0)
 
 
 def test_alloc_bad():
+    """Test if a bad alloc causes an assert to fail."""
     try:
         alloc(1)
     except sh.SignalException_6 as e:
@@ -18,6 +20,7 @@ def test_alloc_bad():
 
 
 def test_array_overflow():
+    """Test if a buffer overflow causes an assert to fail."""
     try:
         array(3)
     except sh.SignalException_6 as e:
@@ -25,6 +28,7 @@ def test_array_overflow():
 
 
 def test_array_underflow():
+    """Test if a buffer underflow causes an assert to fail."""
     try:
         array(-1)
     except sh.SignalException_6 as e:
@@ -32,4 +36,5 @@ def test_array_underflow():
 
 
 def test_array_ok():
+    """Test if normal array access doesn't fail."""
     array(1)
