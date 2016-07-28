@@ -1,4 +1,5 @@
 """Running test executables."""
+# Start ignoring PyLintBear*E1101*
 
 import sh
 
@@ -38,3 +39,4 @@ def test_array_underflow():
 def test_array_ok():
     """Test if normal array access doesn't fail."""
     array(1)
+# Stop ignoring

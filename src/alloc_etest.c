@@ -21,7 +21,7 @@ bad_alloc(
 // .. code-block:: cpp
 //
 {
-    *provided_size = suggested_size - 1; // NOCOV not testable since it segfaults
+    *provided_size = suggested_size - 1; // NOCOV not testable since it segf
     return malloc(*provided_size); // NOCOV not testable since it segfaults
 }
 
