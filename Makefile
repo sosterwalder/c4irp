@@ -98,8 +98,8 @@ libuv: libuv/.libs/libuv.a
 %.o: %.c $(COMMON) $(DOCH)
 	$(MYCC) -c -o $@ $< $(SETCFLAGS)
 
-%_etest: %_etest.c $(COMMON) $(DOCH)
-	$(MYCC) -o $@ $< $(SETCFLAGS)
+%_etest: %_etest.c libchirp.a | libuv
+	$(MYCC) -o $@ $< libchirp.a libuv.a $(SETCFLAGS)
 
 test-execs: $(TESTEXECS)
 
