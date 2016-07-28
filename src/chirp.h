@@ -55,7 +55,10 @@ ch_chirp_alloc_var(
         required_size,
         provided_size
     );
-    A(*provided_size >= required_size, "Not enough memory provided by ALLOC_CB");
+    A(
+        *provided_size >= required_size,
+        "Not enough memory provided by ALLOC_CB"
+    );
     return handle;
 }
 
