@@ -3,8 +3,16 @@
 import itertools
 import logging
 import subprocess
+import six
 
 LG = logging.getLogger("c4irp")
+
+# Pyhton2 doesn't have ProcessLookupError, we just use some not to generic
+# exception instead
+if six.PY2:
+    MyProcessLookupError = subprocess.CalledProcessError
+else:
+    MyProcessLookupError = ProcessLookupError  # noqa
 
 
 class TransparentStrRepr(str):
@@ -23,7 +31,7 @@ def collect_processes(procs):
         if proc.returncode is None:
             try:
                 proc.kill()
-            except ProcessLookupError:  # pragma: no cover
+            except MyProcessLookupError:  # pragma: no cover
                 pass
         LG.debug(
             "Proc %s returncode: %s",
