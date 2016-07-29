@@ -1,0 +1,31 @@
+before_script:
+  - source /etc/profile
+  - git submodule update --init --recursive
+
+stages:
+  - doc
+  - test
+
+doc:
+  stage: doc
+  script:
+    - pyenv local 3.5.2
+    - make doc-all
+
+test27:
+  stage: test
+  script:
+    - pyenv local 2.7.12
+    - make test-all
+
+test34:
+  stage: test
+  script:
+    - pyenv local 3.4.5
+    - make test-all
+
+test35:
+  stage: test
+  script:
+    - pyenv local 3.5.2
+    - make test-all
