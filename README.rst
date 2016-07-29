@@ -20,7 +20,7 @@ It is part of Concreteclouds_ and the C99 implementation of Chirp_.
 
 `Read the Docs`_
 
-.. _`Read the Docs`: http://checkmemaster.ignorelist.com/c4irp
+.. _`Read the Docs`: https://docs.adfinis-sygroup.ch/public/chirp/
 
 .. [1] Coverage enforced by tests (on travis)
 
