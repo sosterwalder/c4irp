@@ -48,7 +48,7 @@ doc-all: all $(DOCRST) doc  ## Build using c2rst and then generate docs
 
 test-all: all cpp-check test coverage test-lib  ## Build and then test
 
-cpp-check:
+cpp-check:  ## Run cppcheck on the project
 	cppcheck -v --std=c99 -Iinclude -Ilibuv/include --config-exclude=libuv/include -D_SGLIB__h_ --error-exitcode=1 --inline-suppr --enable=warning,style,performance,portability,information,missingInclude src/
 
 test_dep: all
@@ -62,12 +62,12 @@ test-cov: clean all pytest coverage  ## Clean, build and test (so coverage is co
 config.h: config.defs.h
 	cp config.defs.h config.h
 
-genhtml:
+genhtml:  ## Generate html coverage report
 	mkdir -p lcov_tmp
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-pymods: _chirp_cffi.o _chirp_low_level.o
+pymods: _chirp_cffi.o _chirp_low_level.o  ## Build the python modules
 
 _chirp_cffi.o: libchirp.a cffi/high_level.py
 	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
@@ -117,7 +117,7 @@ libchirp-depends:
 clean:  ## Clean only chirp not submodules
 	git clean -xdf
 
-test-lib:
+test-lib:  ## Test dependency libs
 	make -C libuv CFLAGS="$(PCFLAGS)" check
 
 ifeq ($(PYPY),0)
