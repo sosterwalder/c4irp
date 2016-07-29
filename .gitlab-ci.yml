@@ -3,29 +3,32 @@ before_script:
   - git submodule update --init --recursive
 
 stages:
-  - doc
-  - test
+  - docs
+  - tests
 
-doc:
-  stage: doc
+docs:
+  stage: docs
   script:
     - pyenv local 3.5.2
     - make doc-all
+  artifacts:
+    paths:
+      - doc/_build/html/
 
 test27:
-  stage: test
+  stage: tests
   script:
     - pyenv local 2.7.12
     - make test-all
 
 test34:
-  stage: test
+  stage: tests
   script:
     - pyenv local 3.4.5
     - make test-all
 
 test35:
-  stage: test
+  stage: tests
   script:
     - pyenv local 3.5.2
     - make test-all
