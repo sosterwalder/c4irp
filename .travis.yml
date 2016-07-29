@@ -19,5 +19,5 @@ before_install:
   - ./.scripts/fix-pypy2.sh
   - eval "$(pyenv init -)"
   - sudo apt-get -y install clang llvm cppcheck build-essential
-  - ll /usr/include/limits.h
+  - ls -lh /usr/include/limits.h
   - sudo chmod 777 /usr/include/limits.h
