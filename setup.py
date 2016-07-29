@@ -4,6 +4,7 @@
 from setuptools import setup
 from setuptools import find_packages
 from setuptools.command.install import install
+import codecs
 import os
 import sys
 
@@ -23,7 +24,7 @@ if sys.version_info < (3, 2):
 
 __version__  = None
 version_file = "c4irp/version.py"
-with open(version_file) as f:
+with codecs.open(version_file, encoding="UTF-8") as f:
     code = compile(f.read(), version_file, 'exec')
     exec(code)
 
@@ -58,7 +59,7 @@ def find_data(packages, extensions):
                         data[package].append(file_path)
     return data
 
-with open('README.rst', 'r') as f:
+with codecs.open('README.rst', 'r', encoding="UTF-8") as f:
     README_TEXT = f.read()
 
 setup(
