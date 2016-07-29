@@ -13,10 +13,10 @@ Public C API
 .. toctree::
    :maxdepth: 2
 
-   inc/c4irp.h.rst
+   inc/chirp.h.rst
    inc/message.h.rst
    inc/error.h.rst
-   inc/c4irp_obj.h.rst
+   inc/chirp_obj.h.rst
    inc/const.h.rst
 
 Internal C API
@@ -26,17 +26,17 @@ Internal C API
    :maxdepth: 2
    :includehidden:
 
-   c4irpc/array.h.rst
-   c4irpc/array_test.c.rst
-   c4irpc/common.h.rst
-   c4irpc/message.h.rst
-   c4irpc/message.c.rst
-   c4irpc/c4irp.h.rst
-   c4irpc/c4irp.c.rst
-   c4irpc/protocol.h.rst
-   c4irpc/protocol.c.rst
-   c4irpc/connection.h.rst
-   c4irpc/connection.c.rst
+   src/array.h.rst
+   src/array_test.c.rst
+   src/common.h.rst
+   src/message.h.rst
+   src/message.c.rst
+   src/chirp.h.rst
+   src/chirp.c.rst
+   src/protocol.h.rst
+   src/protocol.c.rst
+   src/connection.h.rst
+   src/connection.c.rst
 
 Public Python API
 =================
@@ -53,8 +53,8 @@ Tests in C
    :maxdepth: 2
    :includehidden:
 
-   c4irpc/connection_test.h.rst
-   c4irpc/connection_test.c.rst
+   src/connection_test.h.rst
+   src/connection_test.c.rst
 
 External Libs
 ==============
@@ -63,4 +63,4 @@ External Libs
    :maxdepth: 2
    :includehidden:
 
-   c4irpc/sglib.h.rst
+   src/sglib.h.rst

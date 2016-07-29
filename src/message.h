@@ -1,7 +1,7 @@
 // ==============
 // Message header
 // ==============
-// 
+//
 // .. code-block:: cpp
 //
 #ifndef ch_msg_message_h

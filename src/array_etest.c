@@ -19,7 +19,7 @@ int
 main(
     int argc,
     char *argv[]
-) 
+)
 //
 //    The test function will trigger the bound check if called with 3+.
 //
@@ -31,10 +31,15 @@ main(
 {
     int index = strtol(argv[1], NULL, 10);
     int ret;
+    ch_config_t config = ch_config_defaults;
+    ch_chirp_t chirp;
+    uv_loop_t loop;
+    ch_loop_init(&loop);
+    ch_chirp_init(&chirp, &config, &loop);
     ca_int_t a;
-    a = ca_new_int(3);
+    a = ca_new_int(&chirp, 3);
     CA(int, a, index) = 0;
     ret = CA(int, a, index);
-    ca_free_int(a);
+    ca_free_int(&chirp, a);
     return ret;
 }

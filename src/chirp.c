@@ -6,32 +6,36 @@
 
 #include "../config.h"
 #include "common.h"
-#include "c4irp.h"
+#include "chirp.h"
 #include "message.h"  // TODO remove?
 #include "protocol.h"
 
 #include <uv.h>
+
 #include <limits.h>
 #include <stdlib.h>
 
 //
 // .. c:var:: ch_config_defaults
 //
-//    Default config of c4irp.
+//    Default config of chirp.
 //
 // .. code-block:: cpp
 //
 ch_config_t ch_config_defaults = {
-    .REUSE_TIME = 30,
-    .TIMEOUT    = 5,
-    .PORT       = 2998,
-    .BACKLOG    = 100,
-    .BIND_V6    = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    .BIND_V4    = {0, 0, 0, 0},
+    .REUSE_TIME     = 30,
+    .TIMEOUT        = 5,
+    .PORT           = 2998,
+    .BACKLOG        = 100,
+    .BIND_V6        = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    .BIND_V4        = {0, 0, 0, 0},
+    .CERT_CHAIN_PEM = NULL,
+    .ALLOC_CB       = NULL,
+    .FREE_CB        = NULL,
 };
 
 // .. c:function::
-void 
+void
 _ch_close_async_cb(uv_async_t* handle)
 //
 //    Internal callback to close chirp. Makes ch_chirp_close_ts thread-safe
@@ -45,19 +49,47 @@ _ch_close_async_cb(uv_async_t* handle)
     tmp_err = ch_pr_stop(&ichirp->protocol);
     A(tmp_err == CH_SUCCESS, "Closing failed with error %d", tmp_err);
     (void)(tmp_err);
-    mbedtls_ctr_drbg_free(&ichirp->rng);
-    mbedtls_entropy_free(&ichirp->entropy);
     uv_close((uv_handle_t*) &ichirp->close, NULL);
     if(ichirp->auto_start) {
         uv_stop(chirp->loop);
-        L(chirp, "UV-Loop %p stopped by c4irp", chirp->loop);
+        L(chirp, "UV-Loop %p stopped by chirp", chirp->loop);
     }
     L(chirp, "Closed chirp %p", chirp);
 }
 
 // .. c:function::
+static
+void*
+ch_chirp_std_alloc(
+        size_t suggested_size,
+        size_t required_size,
+        size_t* provided_size
+)
+//
+//    Standard memory allocator used if no allocator is supplied by the user.
+//
+// .. code-block:: cpp
+//
+{
+    *provided_size = suggested_size;
+    return malloc(suggested_size);
+}
+// .. c:function::
+static
+void
+ch_chirp_std_free(void* buf)
+//
+//    Standard free if no free is supplied by the user.
+//
+// .. code-block:: cpp
+//
+{
+    free(buf);
+}
+
+// .. c:function::
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
+ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
 //    :noindex:
 //
 //    see: :c:func:`ch_chirp_init`
@@ -66,41 +98,29 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 //
 {
     int                       tmp_err;
-    ch_chirp_int_t* ichirp  = malloc(sizeof(ch_chirp_int_t));
+    if(config->ALLOC_CB == NULL) {
+        config->ALLOC_CB = ch_chirp_std_alloc;
+    }
+    if(config->FREE_CB == NULL) {
+        config->FREE_CB = ch_chirp_std_free;
+    }
+    chirp->config           = config;
+    ch_chirp_int_t* ichirp  = ch_chirp_alloc(chirp, sizeof(ch_chirp_int_t));
     ch_protocol_t* protocol = &ichirp->protocol;
     chirp->_                = ichirp;
     chirp->loop             = loop;
-    chirp->config           = config;
     ichirp->auto_start      = 0;
     chirp->_log             = NULL;
 
-    // RNG
+    // rand
+    srand(time(NULL));
+    _ch_random_ints_to_bytes(chirp->identity, 16);
 
-    // TODO error handling
-    mbedtls_entropy_init(&ichirp->entropy);
-    mbedtls_ctr_drbg_init(&ichirp->rng);
-    tmp_err = mbedtls_ctr_drbg_seed(
-        &ichirp->rng,
-        mbedtls_entropy_func,
-        &ichirp->entropy,
-        NULL,
-        0
-    );
-    _CH_TLS_RAND_ERROR(tmp_err);
-    // We don't want reseed (peformance) and we don't need ressed
-    // (no cryptographic use)
-    mbedtls_ctr_drbg_set_reseed_interval(&ichirp->rng, INT_MAX);
-    tmp_err = mbedtls_ctr_drbg_random(&ichirp->rng, chirp->identity, 16);
-    _CH_TLS_RAND_ERROR(tmp_err);
     if(uv_async_init(chirp->loop, &ichirp->close, &_ch_close_async_cb) < 0) {
         return CH_UV_ERROR; // NOCOV
     }
 
-    protocol->identity = chirp->identity;
-    protocol->loop     = chirp->loop;
-    protocol->config   = &chirp->config;
-    protocol->entropy  = &ichirp->entropy;
-    protocol->rng      = &ichirp->rng;
+    protocol->chirp    = chirp;
     tmp_err            = ch_pr_start(protocol);
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;
@@ -111,7 +131,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop)
 
 // .. c:function::
 ch_error_t
-ch_chirp_run(ch_config_t config, ch_chirp_t** chirp_out)
+ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
 //    :noindex:
 //
 //    see: :c:func:`ch_chirp_run`
@@ -123,6 +143,9 @@ ch_chirp_run(ch_config_t config, ch_chirp_t** chirp_out)
     uv_loop_t  loop;
     ch_error_t tmp_err;
     if(chirp_out != NULL) {
+        /* This works and is not TOO bad because the function blocks. TODO: Has
+         * anymore a better idea? */
+        // cppcheck-suppress autoVariables
         *chirp_out = &chirp;
     }
 
@@ -135,7 +158,7 @@ ch_chirp_run(ch_config_t config, ch_chirp_t** chirp_out)
         return tmp_err;  // NOCOV covered in ch_chirp_init tests
     }
     chirp._->auto_start = 1;
-    L((&chirp), "UV-Loop %p run by c4irp", &loop);
+    L((&chirp), "UV-Loop %p run by chirp", &loop);
     tmp_err = _ch_uv_error_map(ch_run(&loop, UV_RUN_DEFAULT));
     if(tmp_err != CH_SUCCESS) {
         return tmp_err;  // NOCOV only breaking things will trigger this

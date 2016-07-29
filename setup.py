@@ -67,7 +67,7 @@ setup(
     cffi_modules=["cffi/high_level.py:ffi"],
     packages = find_packages(),
     package_data=find_data(
-        find_packages(), []
+        find_packages(), ["pem"]
     ),
     entry_points = {
         'console_scripts': [

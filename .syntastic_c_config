@@ -1,2 +1,4 @@
 -Ilibuv/include
--Imbedtls/include/
+-L.
+-lc4irp
+-luv

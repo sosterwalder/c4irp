@@ -1,4 +1,4 @@
-.PHONY: clean libc4irp sublibs libuv mbedtls test_ext doc c4irp
+.PHONY: clean libchirp sublibs libuv test_ext doc c4irp test_dep
 
 PROJECT     := c4irp
 
@@ -11,8 +11,8 @@ else
 	COVERAGE  := --coverage
 endif
 
-COMMON    := config.h c4irpc/common.h
-CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include -Imbedtls/include
+COMMON    := config.h src/common.h
+CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
 MYFLAGS   := -std=gnu99 -pthread
 DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
 PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
@@ -22,32 +22,47 @@ MYCC      := clang
 
 SETCFLAGS := $(DCFLAGS) $(MYFLAGS)
 
-DOCC=$(wildcard c4irpc/*.c)
-DOCH=$(wildcard c4irpc/*.h) $(wildcard include/*.h)
+DOCC=$(wildcard src/*.c)
+DOCH=$(wildcard src/*.h) $(wildcard include/*.h)
 DOCRST=$(DOCC:.c=.c.rst) $(DOCH:.h=.h.rst)
-SRCS=$(wildcard c4irpc/*.c)
+SRCS=$(wildcard src/*.c)
+TESTSRCS=$(wildcard src/*_etest.c)
 OBJS=$(SRCS:.c=.o)
+TESTEXECS=$(TESTSRCS:.c=)
 COVOUT=$(SRCS:.c=.c.gcov)
 
 include pyproject/Makefile
 
-all: pre-install pymods
+FAIL_UNDER := 95  # TODO: remove!!
 
-vi:
-	vi c4irpc/*.c c4irpc/*.h c4irp/*.py cffi/*.py include/*.h
+all: pre-install pymods test-execs  ## Build for development (make setup.py or make.release for production)
 
-lldb: all
+vi:  ## Start a vim editing the imporant files
+	vim TODO.rst src/*.c src/*.h c4irp/*.py cffi/*.py include/*.h doc/ref/* config.defs.h
+
+lldb: all  ## Build and run py.test in lldb
+	echo lldb `pyenv which python` -- -m pytest -x
 	lldb `pyenv which python` -- -m pytest -x
 
-doc-all: $(DOCRST) doc
+doc-all: all $(DOCRST) doc  ## Build using c2rst and then generate docs
 
-test-all: all test test-array coverage test-lib
+test-all: all cpp-check test coverage test-lib  ## Build and then test
+
+ifeq ($(TRAVIS),true)
+cpp-check:
+	cppcheck -v --std=c99 -Iinclude -D_SGLIB__h_ --error-exitcode=1 --inline-suppr --enable=warning,style,performance,portability,information,missingInclude src/
+else
+cpp-check:
+	cppcheck -v --std=c99 -Iinclude -Ilibuv/include --config-exclude=libuv/include -D_SGLIB__h_ --error-exitcode=1 --inline-suppr --enable=warning,style,performance,portability,information,missingInclude src/
+endif
 
 test_dep: all
 
-pre-install: libc4irp.a install-edit
+test_ext: coala
 
-test-cov: clean all pytest test-array coverage
+pre-install: libchirp.a install-edit
+
+test-cov: clean all pytest coverage  ## Clean, build and test (so coverage is correct)
 
 config.h: config.defs.h
 	cp config.defs.h config.h
@@ -57,17 +72,17 @@ genhtml:
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
 
-pymods: _c4irp_cffi.o _c4irp_low_level.o
+pymods: _chirp_cffi.o _chirp_low_level.o
 
-_c4irp_cffi.o: libc4irp.a cffi/high_level.py
+_chirp_cffi.o: libchirp.a cffi/high_level.py
 	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
 	   $(PY) cffi/high_level.py
-	rm _c4irp_cffi.c
+	rm _chirp_cffi.c
 
-_c4irp_low_level.o: libc4irp.a cffi/low_level.py
+_chirp_low_level.o: libchirp.a cffi/low_level.py
 	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
 	   $(PY) cffi/low_level.py
-	rm _c4irp_low_level.c
+	rm _chirp_low_level.c
 
 libuv/configure:
 	cd libuv && ./autogen.sh
@@ -80,11 +95,6 @@ libuv/.libs/libuv.a: libuv/Makefile
 
 libuv: libuv/.libs/libuv.a
 
-mbedtls/library/libmbedtls.a:
-	make -C mbedtls
-
-mbedtls: mbedtls/library/libmbedtls.a
-
 %.c.rst: %.c
 	pyproject/c2rst $<
 
@@ -96,35 +106,24 @@ mbedtls: mbedtls/library/libmbedtls.a
 %.o: %.c $(COMMON) $(DOCH)
 	$(MYCC) -c -o $@ $< $(SETCFLAGS)
 
-array_test: c4irpc/array_test.o
-	$(MYCC) -o $@ $< $(SETCFLAGS)
+%_etest: %_etest.c libchirp.a | libuv
+	$(MYCC) -o $@ $@.o libchirp.a libuv.a $(SETCFLAGS)
 
-libc4irp: libc4irp.a
+test-execs: $(TESTEXECS)
 
-libc4irp.a: $(OBJS) | libc4irp-depends
+libchirp: libchirp.a
+
+libchirp.a: $(OBJS) | libchirp-depends
 	ar $(ARFLAGS) $@ $^
 
-libc4irp-depends:
-	@make CFLAGS="$(CCFLAGS) -g" libuv mbedtls
+libchirp-depends:
+	@make CFLAGS="$(CCFLAGS) -g" libuv
 
-clean-all: clean clean-sub
-
-clean:
+clean:  ## Clean only chirp not submodules
 	git clean -xdf
 
-clean-sub:
-	cd libuv && git clean -xdf
-	cd mbedtls && git clean -xdf
-
-test-array: array_test
-	./array_test 1 2>&1
-	./array_test 3 2>&1 | grep Bufferoverflow
-	./array_test -1 2>&1 | grep Bufferoverflow
-
 test-lib:
-	make -C mbedtls check
 	make -C libuv CFLAGS="$(PCFLAGS)" check
-
 
 ifeq ($(PYPY),0)
 coverage:
@@ -136,7 +135,7 @@ endif
 ifeq ($(NEWCOV),0)
 %.c.gcov: %.c
 	llvm-cov $<
-	mv *.c.gcov c4irpc/
+	mv *.c.gcov src/
 	!(grep -v "// NOCOV" $@ | grep -E "\s+#####:")
 else
 %.c.gcov: %.c

@@ -1,7 +1,7 @@
 // =======
 // Message
 // =======
-// 
+//
 // .. code-block:: cpp
 
 #include "message.h"

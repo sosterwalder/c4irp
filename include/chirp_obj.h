@@ -4,12 +4,49 @@
 //
 // .. code-block:: cpp
 
-#ifndef ch_inc_c4irp_obj_h
-#define ch_inc_c4irp_obj_h
+#ifndef ch_inc_chirp_obj_h
+#define ch_inc_chirp_obj_h
 
 #include "error.h"
 
 #include <uv.h>
+
+// .. c:type:: ch_alloc_cb
+//
+//    Callback used by chirp to request memory. It can be set in ch_config_t.
+//
+//    .. c:member:: size_t suggested_size
+//
+//       The size the user should allocate if possible
+//
+//    .. c:member:: size_t required_size
+//
+//       The size the user has to allocate
+//
+//    .. c:member:: size_t provided_size
+//
+//       Out: The size the user has allocated
+//
+//    Libuv wants a buffer of 65536 bytes per stream. It will work with less
+//    though.  So we decided that 1k is the absolute minimum see
+//    LIB_UV_MIN_BUFFER in config.h. Please provide the suggested_size, except
+//    if you're on very restricted embedded system.
+//
+// .. code-block:: cpp
+//
+typedef void* (*ch_alloc_cb)(
+        size_t suggested_size,
+        size_t required_size,
+        size_t* provided_size
+);
+
+// .. c:type:: ch_free_cb
+//
+//    Callback used by chirp to free memory. It can be set in ch_config_t.
+//
+// .. code-block:: cpp
+//
+typedef void (*ch_free_cb)(void* buf);
 
 // .. c:type:: ch_config_t
 //
@@ -40,15 +77,28 @@
 //
 //       Override IPv4 bind address.
 //
+//    .. c:member:: ch_alloc_cb ALLOC_CB
+//
+//       Callback used by chirp to request memory. If NULL: the system malloc
+//       function is used.
+//
+//    .. c:member:: ch_free_cb FREE_CB
+//
+//       Callback used by chirp to free memory. If NULL: the system free
+//       function is used.
+//
 // .. code-block:: cpp
 
 typedef struct {
-    int  REUSE_TIME;
-    int  TIMEOUT;
-    int  PORT;
-    int  BACKLOG;
-    char BIND_V6[16];
-    char BIND_V4[4];
+    int          REUSE_TIME;
+    float        TIMEOUT;
+    int          PORT;
+    int          BACKLOG;
+    char         BIND_V6[16];
+    char         BIND_V4[4];
+    char*        CERT_CHAIN_PEM;
+    ch_alloc_cb  ALLOC_CB;
+    ch_free_cb   FREE_CB;
 } ch_config_t;
 
 // .. c:type:: ch_log_cb_t
@@ -63,7 +113,7 @@ typedef void (*ch_log_cb_t)(char msg[]);
 // .. c:var:: ch_config_defaults
 //    :noindex:
 //
-//    Default config of c4irp.
+//    Default config of chirp.
 //
 //    see: :c:type:`ch_config_defaults`
 //
@@ -100,10 +150,10 @@ typedef struct ch_chirp_int ch_chirp_int_t;
 //
 // .. code-block:: cpp
 
-typedef struct {
+typedef struct ch_chirp {
     unsigned char   identity[16];
     uv_loop_t*      loop;
-    ch_config_t     config;
+    ch_config_t*    config;
     ch_log_cb_t     _log;
     int             _init;
     ch_chirp_int_t* _;
@@ -173,23 +223,23 @@ ch_run(uv_loop_t* loop, uv_run_mode mode)
 // .. c:function::
 extern
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop);
+ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop);
 //
 //    Intialiaze a chirp object. Memory is provided by caller. You must call
 //    :c:func:`ch_chirp_close` to cleanup the object.
 //
 //    :param ch_chirp_t* chirp: Out: Chirp object
-//    :param ch_config_t config: Chirp config
+//    :param ch_config_t* config: Chirp config
 //
 // .. c:function::
 extern
 ch_error_t
-ch_chirp_run(ch_config_t config, ch_chirp_t** chirp);
+ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp);
 //
 //    Initializes, runs and cleans everything. Everything being:
 //    TODO: Add message callback
 //
-//      * c4irp object
+//      * chirp object
 //      * uv-loop
 //      * uv-sockets
 //      * callbacks
@@ -198,7 +248,7 @@ ch_chirp_run(ch_config_t config, ch_chirp_t** chirp);
 //     chirp in a user defined thread. Use ch_chirp_close_ts to close it chirp
 //     in any other thread.
 //
-//    :param ch_config_t config: Chirp config
+//    :param ch_config_t* config: Chirp config
 //    :param ch_chirp_t** chirp: Out: Pointer to chirp object pointer. Ca be
 //                               NULL
 //
@@ -216,4 +266,4 @@ ch_chirp_close_ts(ch_chirp_t* chirp);
 //
 // .. code-block:: cpp
 
-#endif //ch_inc_c4irp_obj_h
+#endif //ch_inc_chirp_obj_h

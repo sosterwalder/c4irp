@@ -3,11 +3,17 @@ from cffi import FFI
 ffi = FFI()
 
 ffi.set_source(
-    "_c4irp_cffi",
+    "_chirp_cffi",
     """
-    #include <c4irp.h>
+    #include <chirp.h>
     """,
-    libraries=["c4irp", "uv", "m", "rt", "pthread", "mbedcrypto"],
+    libraries=[
+        "chirp",
+        "uv",
+        "m",
+        "rt",
+        "pthread",
+    ],
     library_dirs=["."],
     include_dirs=["include"],
 )
@@ -93,14 +99,24 @@ ch_msg_get_address(
     ch_text_address_t* address
 );
 
-//c4irp.h
+//chirp.h
+typedef void* (*ch_alloc_cb)(
+        size_t suggested_size,
+        size_t required_size,
+        size_t* provided_size
+);
+typedef void (*ch_free_cb)(void* buf);
+
 typedef struct {
-    int  REUSE_TIME;
-    int  TIMEOUT;
-    int  PORT;
-    int  BACKLOG;
-    char BIND_V6[16];
-    char BIND_V4[4];
+    int          REUSE_TIME;
+    float        TIMEOUT;
+    int          PORT;
+    int          BACKLOG;
+    char         BIND_V6[16];
+    char         BIND_V4[4];
+    char*        CERT_CHAIN_PEM;
+    ch_alloc_cb  ALLOC_CB;
+    ch_free_cb   FREE_CB;
 } ch_config_t;
 
 typedef void (*ch_log_cb_t)(char msg[]);
@@ -110,8 +126,8 @@ extern ch_config_t ch_config_defaults;
 
 typedef struct {
     unsigned char identity[16];
-    uv_loop_t* loop;
-    ch_config_t config;
+    uv_loop_t*    loop;
+    ch_config_t*  config;
     ...;
 } ch_chirp_t;
 
@@ -137,11 +153,11 @@ ch_run(uv_loop_t* loop, uv_run_mode mode);
 
 extern
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t config, uv_loop_t* loop);
+ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop);
 
 extern
 ch_error_t
-ch_chirp_run(ch_config_t config, ch_chirp_t**);
+ch_chirp_run(ch_config_t* config, ch_chirp_t**);
 
 extern
 ch_error_t

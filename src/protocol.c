@@ -8,7 +8,10 @@
 
 #include "common.h"
 #include "message.h"
-#include "c4irp.h"
+#include "chirp.h"
+
+#include <uv.h>
+
 #include <stdlib.h>
 
 SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
@@ -29,14 +32,17 @@ ch_pr_start(ch_protocol_t* protocol)
 // .. code-block:: cpp
 //
 {
-    int                      tmp_err;
-    ch_text_address_t        tmp_addr;
-    ch_config_t* config = protocol->config;
+    int                   tmp_err;
+    ch_text_address_t     tmp_addr;
+    ch_chirp_t*           chirp;
+    chirp               = protocol->chirp;
+    ch_config_t* config = chirp->config;
     // IPv4
     if(config->PORT < -1 || config->PORT > ((1<<16) - 1)) {
         return CH_VALUE_ERROR;
     }
-    uv_tcp_init(protocol->loop, &protocol->serverv4);
+    uv_tcp_init(chirp->loop, &protocol->serverv4);
+    protocol->serverv4.data = chirp;
     if(uv_inet_ntop(
             AF_INET, config->BIND_V4, tmp_addr.data, sizeof(ch_text_address_t)
     ) < 0) {
@@ -60,13 +66,14 @@ ch_pr_start(ch_protocol_t* protocol)
     if(uv_listen(
             (uv_stream_t*) &protocol->serverv4,
             config->BACKLOG,
-            _ch_on_new_connection
+            _ch_pr_on_new_connection
     ) < 0) {
         return CH_EADDRINUSE;
     }
 
     // IPv6, as the dual stack feature doesn't work everywhere we bind both
-    uv_tcp_init(protocol->loop, &protocol->serverv6);
+    uv_tcp_init(chirp->loop, &protocol->serverv6);
+    protocol->serverv6.data = chirp;
     if(uv_inet_ntop(
             AF_INET6, config->BIND_V6, tmp_addr.data, sizeof(ch_text_address_t)
     ) < 0) {
@@ -89,21 +96,18 @@ ch_pr_start(ch_protocol_t* protocol)
     if(uv_listen(
             (uv_stream_t*) &protocol->serverv6,
             config->BACKLOG,
-            _ch_on_new_connection
+            _ch_pr_on_new_connection
     ) < 0) {
         return CH_EADDRINUSE; // NOCOV errors happend for IPV4
     }
     protocol->receipts = NULL;
     protocol->late_receipts = NULL;
+    protocol->connections = NULL;
     /*ch_receipt_t* t;
     struct sglib_ch_receipt_t_iterator it;
     for(int i = 0; i < 10; ++i) {
-        t = malloc(sizeof(ch_receipt_t));
-        mbedtls_ctr_drbg_random(
-            protocol->rng,
-            t->receipt,
-            16
-        );
+        t = ch_chirp_alloc(chirp, sizeof(ch_receipt_t));
+        // TODO fill t->receipt
         sglib_ch_receipt_t_add(&protocol->receipts, t);
     }
     for(
@@ -128,41 +132,49 @@ ch_pr_stop(ch_protocol_t* protocol)
 // .. code-block:: cpp
 //
 {
+    // TODO close remaining connections
+    ch_chirp_t* chirp = protocol->chirp;
     uv_close((uv_handle_t*) &protocol->serverv4, NULL);
     uv_close((uv_handle_t*) &protocol->serverv6, NULL);
-    _ch_pr_free_receipts(protocol->receipts);
-    _ch_pr_free_receipts(protocol->late_receipts);
+    _ch_pr_free_receipts(chirp, protocol->receipts);
+    _ch_pr_free_receipts(chirp, protocol->late_receipts);
     return CH_SUCCESS;
 }
 
 // .. c:function::
 static void
-_ch_on_new_connection(uv_stream_t *server, int status)
+_ch_pr_on_new_connection(uv_stream_t* server, int status)
 //    :noindex:
 //
-//    see: :c:func:`_ch_on_new_connection`
+//    see: :c:func:`_ch_pr_on_new_connection`
 //
 // .. code-block:: cpp
 //
 {
-    /*if (status < 0) {
-        fprintf(stderr, "New connection error %s\n", uv_strerror(status));
-        // error!
-        return;
+    CH_GET_CHIRP(server); // NOCOV TODO
+    if (status < 0) { // NOCOV TODO
+        L(chirp, "New connection error %s", uv_strerror(status)); // NOCOV TODO
+        return; // NOCOV TODO
     }
 
-    uv_tcp_t *client = (uv_tcp_t*) malloc(sizeof(uv_tcp_t));
-    uv_tcp_init(loop, client);
-    if (uv_accept(server, (uv_stream_t*) client) == 0) {
-        uv_read_start((uv_stream_t*) client, alloc_buffer, echo_read);
-    }
+    ch_connection_t* conn = (ch_connection_t*) ch_chirp_alloc( // NOCOV TODO
+        chirp,
+        sizeof(ch_connection_t)
+    ); // NOCOV TODO
+    uv_tcp_t* client = &conn->client; // NOCOV TODO
+    uv_tcp_init(server->loop, client); // NOCOV TODO
+    if (uv_accept(server, (uv_stream_t*) client) == 0) { // NOCOV TODO
+        uv_read_start((uv_stream_t*) client, NULL, NULL); // NOCOV TODO
+    } // NOCOV TODO
     else {
-        uv_close((uv_handle_t*) client, NULL);
-    }*/
+        // TODO uv_close on cleanup and, on close and on remove close
+        uv_close((uv_handle_t*) client, NULL); // NOCOV TODO
+        ch_chirp_free(chirp, conn); // NOCOV TODO
+    }
 } // NOCOV TODO remove
 // .. c:function::
 static void
-_ch_pr_free_receipts(ch_receipt_t* receipts)
+_ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts)
 //    :noindex:
 //
 //    see: :c:func:`_ch_pr_free_receipts`
@@ -180,6 +192,6 @@ _ch_pr_free_receipts(ch_receipt_t* receipts)
             t != NULL;
             t = sglib_ch_receipt_t_it_next(&it) // NOCOV TODO remove
     ) {
-        free(t); // NOCOV TODO remove
+        ch_chirp_free(chirp, t); // NOCOV TODO remove
     } // NOCOV TODO remove
 }

@@ -13,10 +13,12 @@
 
 #include <string.h>
 
+#include <uv.h>
+
 // .. c:type:: ch_connection_t
 //
 //    Connection dictionary implemented as rbtree.
-//  
+//
 //    .. c:member:: uint8_t[16] address
 //
 //       IPv4/6 address of the sender if the message was received.  IPv4/6
@@ -28,6 +30,7 @@ typedef struct ch_connection {
     uint8_t               ip_protocol;
     uint8_t               address[16];
     int32_t               port;
+    uv_tcp_t              client;
     char                  color_field;
     struct ch_connection* left;
     struct ch_connection* right;
@@ -50,11 +53,10 @@ ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
 // .. code-block:: cpp
 //
 {
-    int tmp_cmp;
     if(x->ip_protocol != y->ip_protocol) {
         return x->ip_protocol - y->ip_protocol;
     } else {
-        tmp_cmp = memcmp(x->address, y->address, 16);
+        int tmp_cmp = memcmp(x->address, y->address, 16);
         if(tmp_cmp != 0) {
             return tmp_cmp;
         } else {

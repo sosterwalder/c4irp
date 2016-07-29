@@ -8,21 +8,20 @@
 #define ch_protocol_h
 
 #include "../include/error.h"
-#include "../include/c4irp_obj.h"
+#include "../include/chirp_obj.h"
+#include "connection.h"
 #include "sglib.h"
 
-#include <mbedtls/ctr_drbg.h>
-#include <mbedtls/entropy.h>
 #include <uv.h>
 #include <string.h>
 
 // .. c:type:: ch_receipt_t
 //
 //    Receipt set implemented as rbtree.
-//  
+//
 //    .. c:member:: unsigned char receipt[16]
 //
-//    the receipt generated using mbedtls_ctr_drbg_random
+//    the receipt generated using TODO
 //
 // .. code-block:: cpp
 
@@ -76,28 +75,19 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
 //
 //       reference to the libuv tcp server
 //
-//    .. c:member:: mbedtls_entropy_context entropy
-//
-//       our entropy source provided by mbedtls
-//
-//    .. c:member:: mbedtls_ctr_drbg_context rng
-//
-//       non-cryptographic random number generator
-//
 // .. code-block:: cpp
 
-typedef struct {
-    unsigned char*            identity;
-    uv_loop_t*                loop;
-    ch_config_t*              config;
+struct  ch_chirp;
+
+typedef struct ch_protocol {
     struct sockaddr_in        addrv4;
     struct sockaddr_in6       addrv6;
     uv_tcp_t                  serverv4;
     uv_tcp_t                  serverv6;
-    mbedtls_entropy_context*  entropy;
-    mbedtls_ctr_drbg_context* rng;
+    ch_connection_t*          connections;
     ch_receipt_t*             receipts;
     ch_receipt_t*             late_receipts;
+    struct ch_chirp*          chirp;
 } ch_protocol_t;
 
 // .. c:function::
@@ -120,9 +110,15 @@ _ch_on_new_connection(uv_stream_t *server, int status);
 //
 // .. c:function::
 static void
-_ch_pr_free_receipts(ch_receipt_t* receipts);
+_ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts);
 //
 //    Free all remaining items in a receipts set
+//
+// .. c:function::
+static void
+_ch_pr_on_new_connection(uv_stream_t *server, int status);
+//
+//  Callback from libuv on new connection
 //
 // .. code-block:: cpp
 
