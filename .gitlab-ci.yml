@@ -12,6 +12,7 @@ docs:
     - pyenv local 3.5.2
     - make doc-all
   artifacts:
+    expire_in: 1 week
     paths:
       - doc/_build/html/
 
