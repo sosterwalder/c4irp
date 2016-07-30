@@ -11,14 +11,18 @@ else
 	COVERAGE  := --coverage
 endif
 
-COMMON    := config.h src/common.h
-CCFLAGS   := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
-MYFLAGS   := -std=gnu99 -pthread
-DCFLAGS   := $(CCFLAGS) -g $(COVERAGE)
-PCFLAGS   := $(CCFLAGS) -O3 -DNDEBUG
-CFFIF     := $(shell pwd)/pyproject/cffi_fix:$(PATH)
-PY        := python
-MYCC      := clang
+COMMON  := config.h src/common.h
+CCFLAGS := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
+MYFLAGS := -std=gnu99
+DCFLAGS := $(CCFLAGS) -g $(COVERAGE)
+PCFLAGS := $(CCFLAGS) -O3 -DNDEBUG
+CFFIF   := $(shell pwd)/pyproject/cffi_fix:$(PATH)
+PY      := python
+MYCC    := clang
+
+ifneq ($(UNAME_S),Darwin)
+	MYFLAGS += -pthread
+endif
 
 SETCFLAGS := $(DCFLAGS) $(MYFLAGS)
 
