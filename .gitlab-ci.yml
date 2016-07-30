@@ -20,16 +20,22 @@ test27:
   stage: tests
   script:
     - pyenv local 2.7.12
-    - make test-all
+    - make test-nolib
 
 test34:
   stage: tests
   script:
     - pyenv local 3.4.5
-    - make test-all
+    - make test-nolib
 
 test35:
   stage: tests
   script:
     - pyenv local 3.5.2
-    - make test-all
+    - make test-nolib
+
+testlib:
+  stage: tests
+  script:
+    - pyenv local 3.5.2
+    - make test-lib
