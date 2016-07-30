@@ -3,5 +3,8 @@ environment:
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
 build: off
+install:
+  - copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
+
 test_script:
   - "%CMD_IN_ENV% make test-all"
