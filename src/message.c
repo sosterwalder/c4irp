@@ -9,7 +9,11 @@
 #include <uv.h>
 
 #include <string.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#else // _WIN32
 #include <arpa/inet.h>
+#endif // _WIN32
 
 // .. c:function::
 ch_error_t

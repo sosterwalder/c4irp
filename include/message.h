@@ -13,7 +13,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef _WIN32
+#include <winsock2.h>
+#else // _WIN32
 #include <arpa/inet.h>
+#endif // _WIN32
 
 // .. c:type:: ch_text_address_t
 //
