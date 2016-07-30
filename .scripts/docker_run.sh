@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 source /etc/profile
-pyenv local 3.5.2
+pyenv local $PYTHON_ENV_VER
 make test-all
