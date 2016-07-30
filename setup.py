@@ -10,10 +10,7 @@ import sys
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 os.environ["CFLAGS"] = (
-    "-O3 -s -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include"
-)
-os.environ["LDLAGS"] = (
-    "-s"
+    "-O3 -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include"
 )
 
 requires = [
