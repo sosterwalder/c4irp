@@ -119,7 +119,7 @@ libchirp-depends:
 clean:  ## Clean only chirp not submodules
 	git clean -xdf
 
-test-lib:  ## Test dependency libs
+test-lib: | libuv  ## Test dependency libs
 	make -C libuv CFLAGS="$(PCFLAGS)" check
 
 ifeq ($(PYPY),0)
