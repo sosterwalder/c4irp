@@ -22,8 +22,8 @@ matrix:
 services:
   - docker
 
-install:
-  - ./.scripts/binstall_run.sh
+before_install:
+  - docker pull adfinissygroup/chirp-jessie
 
 script:
   - ./.scripts/travis_run.sh 
