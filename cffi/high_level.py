@@ -1,19 +1,24 @@
 from cffi import FFI
+from sys import platform
 
 ffi = FFI()
+
+libs = [
+    "chirp",
+    "uv",
+    "m",
+    "pthread",
+]
+
+if platform != "darwin":
+    libs.append("rt")
 
 ffi.set_source(
     "_chirp_cffi",
     """
     #include <chirp.h>
     """,
-    libraries=[
-        "chirp",
-        "uv",
-        "m",
-        "rt",
-        "pthread",
-    ],
+    libraries=libs,
     library_dirs=["."],
     include_dirs=["include"],
 )

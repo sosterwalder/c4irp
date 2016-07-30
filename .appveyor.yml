@@ -7,6 +7,7 @@ install:
   - "\"C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Bin\\SetEnv.cmd\" /x64 /release"
   - set PATH=c:\\MinGW\\bin;%PATH%
   - copy c:\\MinGW\\bin\\mingw32-make.exe c:\\MinGW\\bin\\make.exe
+  - git submodule update --init --recursive
 
 test_script:
   - make test-all
