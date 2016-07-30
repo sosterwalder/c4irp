@@ -20,8 +20,11 @@ CFFIF   := $(shell pwd)/pyproject/cffi_fix:$(PATH)
 PY      := python
 MYCC    := clang
 
-ifneq ($(UNAME_S),Darwin)
-	MYFLAGS += -pthread
+ifneq ($(OS),Windows_NT)
+	UNAME_S := $(shell uname -s)
+	ifneq ($(UNAME_S),Darwin)
+		MYFLAGS += -pthread
+	endif
 endif
 
 SETCFLAGS := $(DCFLAGS) $(MYFLAGS)
