@@ -14,6 +14,9 @@ RULES
 
 * Embrace libuv styles and use it for c4irp API
 * Literate programming
+* Reader and write may not be linked by a lock. Since the send function waits
+  for an ACK, this means a second send may start when the first message is sent
+  out but the ACK has not be received yet (means batching is possible)
 * Local messages are sent to scheduler directly
 * Localhost connections bypass TLS and don't use cleanup
 
