@@ -2,20 +2,28 @@ sudo: required
 
 language: generic
 
-env:
-  matrix:
-    - BUILDTYPE=3.5.2
-    - BUILDTYPE=2.7.12
-    - BUILDTYPE=3.4.5
-    - BUILDTYPE=pypy-5.3.1
-    - BUILDTYPE=lib
-    - BUILDTYPE=doc
+matrix:
+  include:
+    - os: linux
+      env: BUILDTYPE=3.5.2
+    - os: linux
+      env: BUILDTYPE=2.7.12
+    - os: linux
+      env: BUILDTYPE=3.4.5
+    - os: linux
+      env: BUILDTYPE=pypy-5.3.1
+    - os: linux
+      env: BUILDTYPE=lib
+    - os: linux
+      env: BUILDTYPE=doc
+    - os: osx
+      env: BUILDTYPE=osx
 
 services:
   - docker
 
 before_install:
-  - docker pull adfinissygroup/chirp-jessie
+  - ./.scripts/binstall_run.sh
 
 script:
   - ./.scripts/travis_run.sh 
