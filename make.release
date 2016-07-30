@@ -1,8 +1,7 @@
 .PHONY: clean libchirp libuv
 
 COMMON         := config.h src/common.h
-export CFLAGS  := -std=gnu99 -O3 -s -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
-export LDFLAGS := -s
+export CFLAGS  := -std=gnu99 -O3 -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
 
 SRCS=$(filter-out $(wildcard src/*_test.c),$(wildcard src/*.c))
 OBJS=$(SRCS:.c=.o)
@@ -20,6 +19,7 @@ libuv/Makefile: libuv/configure
 
 libuv/.libs/libuv.a: libuv/Makefile
 	make -C libuv
+	strip --strip-debug $@
 
 libuv: libuv/.libs/libuv.a
 
@@ -27,6 +27,7 @@ libchirp: libchirp.a
 
 libchirp.a: $(OBJS) | libchirp-depends
 	ar $(ARFLAGS) $@ $^
+	strip --strip-debug $^
 
 libchirp-depends: | libuv
 

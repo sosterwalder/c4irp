@@ -2,7 +2,6 @@
 
 if [ "$BUILDTYPE" == "osx" ]; then
     brew install libffi
-    pip install -U cffi
     make test-all
 else
     docker run -v $PWD:/outside adfinissygroup/chirp-jessie /bin/sh \
