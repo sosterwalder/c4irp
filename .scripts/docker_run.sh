@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -e
 BUILDTYPE="$1"
 
 source /etc/profile
@@ -10,6 +11,9 @@ elif [ "$BUILDTYPE" == "doc" ]; then
     make doc-all
 elif [ "$BUILDTYPE" == "osx" ]; then
     make test-all
+elif [ "$BUILDTYPE" == "bdist" ]; then
+    make -f make.release
+    python setup.py bdist
 else
     pyenv local $BUILDTYPE
     make test-nolib

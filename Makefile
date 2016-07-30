@@ -126,6 +126,11 @@ libchirp-depends:
 clean:  ## Clean only chirp not submodules
 	git clean -xdf
 
+dist-clean:
+	echo "Cleaning using git"; \
+	git clean -xdf -e .vagrant -e FINJA; \
+	git submodule foreach --recursive 'git clean -xdf -e .vagrant -e FINJA'; \
+
 test-lib: | libuv  ## Test dependency libs
 	make -C libuv CFLAGS="$(PCFLAGS)" check
 

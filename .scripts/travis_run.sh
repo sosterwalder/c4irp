@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 if [ "$BUILDTYPE" == "osx" ]; then
     brew install libffi cppcheck
     sudo make test-all
