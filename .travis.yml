@@ -4,30 +4,30 @@ language: generic
 
 matrix:
   include:
-    #    - os: linux
-    #      env: BUILDTYPE=3.5.2
-    #      services: docker
-    #      before_install: docker pull adfinissygroup/chirp-jessie
-    #    - os: linux
-    #      env: BUILDTYPE=2.7.12
-    #      services: docker
-    #      before_install: docker pull adfinissygroup/chirp-jessie
-    #    - os: linux
-    #      env: BUILDTYPE=3.4.5
-    #      services: docker
-    #      before_install: docker pull adfinissygroup/chirp-jessie
-    #    - os: linux
-    #      env: BUILDTYPE=pypy-5.3.1
-    #      services: docker
-    #      before_install: docker pull adfinissygroup/chirp-jessie
-    #    - os: linux
-    #      env: BUILDTYPE=lib
-    #      services: docker
-    #      before_install: docker pull adfinissygroup/chirp-jessie
-    #    - os: linux
-    #      env: BUILDTYPE=doc
-    #      services: docker
-    #      before_install: docker pull adfinissygroup/chirp-jessie
+    - os: linux
+      env: BUILDTYPE=3.5.2
+      services: docker
+      before_install: docker pull adfinissygroup/chirp-jessie
+    - os: linux
+      env: BUILDTYPE=2.7.12
+      services: docker
+      before_install: docker pull adfinissygroup/chirp-jessie
+    - os: linux
+      env: BUILDTYPE=3.4.5
+      services: docker
+      before_install: docker pull adfinissygroup/chirp-jessie
+    - os: linux
+      env: BUILDTYPE=pypy-5.3.1
+      services: docker
+      before_install: docker pull adfinissygroup/chirp-jessie
+    - os: linux
+      env: BUILDTYPE=lib
+      services: docker
+      before_install: docker pull adfinissygroup/chirp-jessie
+    - os: linux
+      env: BUILDTYPE=doc
+      services: docker
+      before_install: docker pull adfinissygroup/chirp-jessie
     - os: osx
       env: BUILDTYPE=osx
 
