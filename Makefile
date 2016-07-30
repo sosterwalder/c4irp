@@ -46,7 +46,9 @@ lldb: all  ## Build and run py.test in lldb
 
 doc-all: all $(DOCRST) doc  ## Build using c2rst and then generate docs
 
-test-all: all cpp-check test coverage test-lib  ## Build and then test
+test-all: all cpp-check test coverage test-lib  ## Build and test everything
+
+test-nolib: all cpp-check test coverage  ## Build and test without external libs
 
 cpp-check:  ## Run cppcheck on the project
 	cppcheck -v --std=c99 -Iinclude -Ilibuv/include --config-exclude=libuv/include -D_SGLIB__h_ --error-exitcode=1 --inline-suppr --enable=warning,style,performance,portability,information,missingInclude src/

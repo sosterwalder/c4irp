@@ -4,10 +4,12 @@ language: generic
 
 env:
   matrix:
-    - PYTHON_ENV_VER=3.5.2
-    - PYTHON_ENV_VER=2.7.12
-    - PYTHON_ENV_VER=3.4.5
-    - PYTHON_ENV_VER=pypy-5.3.1
+    - BUILDTYPE=3.5.2
+    - BUILDTYPE=2.7.12
+    - BUILDTYPE=3.4.5
+    - BUILDTYPE=pypy-5.3.1
+    - BUILDTYPE=lib
+    - BUILDTYPE=doc
 
 services:
   - docker
