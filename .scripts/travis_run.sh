@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ "$BUILDTYPE" == "osx" ]; then
-    brew install libffi
+    brew install libffi cppcheck
     sudo make test-all
 else
     docker run -v $PWD:/outside adfinissygroup/chirp-jessie /bin/sh \
