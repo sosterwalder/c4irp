@@ -32,8 +32,14 @@ matrix:
       env: BUILDTYPE=bdist
       services: docker
       before_install: docker pull adfinissygroup/chirp-jessie
+    - os: linux
+      env: BUILDTYPE=release
+      services: docker
+      before_install: docker pull adfinissygroup/chirp-jessie
     - os: osx
-      env: BUILDTYPE=osx
+      env: BUILDTYPE=osx-test
+    - os: osx
+      env: BUILDTYPE=osx-release
 
 script:
   - ./.scripts/travis_run.sh 

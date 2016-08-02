@@ -12,24 +12,23 @@ else
 endif
 
 COMMON  := config.h src/common.h
-CCFLAGS := -Wall -Werror -Wno-unused-function -Ilibuv/include
-MYFLAGS := -std=gnu99
+MYCFLAGS := -Wall -Werror -Wno-unused-function -Ilibuv/include -std=gnu99
 
 ifneq ($(OS),Windows_NT)
-	CCFLAGS += -fPIC
+	MYCFLAGS += -fPIC
 	UNAME_S := $(shell uname -s)
 	ifneq ($(UNAME_S),Darwin)
-		MYFLAGS += -pthread
+		MYCFLAGS += -pthread
 	endif
 endif
 
-DCFLAGS := $(CCFLAGS) -g $(COVERAGE)
-PCFLAGS := $(CCFLAGS) -O3 -DNDEBUG
+DCFLAGS := $(MYCFLAGS) -g $(COVERAGE)
+PCFLAGS := $(MYCFLAGS) -O3 -DNDEBUG
 CFFIF   := $(shell pwd)/pyproject/cffi_fix:$(PATH)
 PY      := python
 MYCC    := clang
 
-SETCFLAGS := $(DCFLAGS) $(MYFLAGS)
+SETCFLAGS := $(DCFLAGS)
 
 DOCC=$(wildcard src/*.c)
 DOCH=$(wildcard src/*.h) $(wildcard include/*.h)
@@ -101,14 +100,14 @@ libuv/Makefile: libuv/configure
 ifeq ($(OS),Windows_NT)
 	echo Not needed on windows
 else
-	cd libuv && ./configure
+	cd libuv && CFLAGS="$(MYCFLAGS) -g" ./configure
 endif
 
 libuv/.libs/libuv.a: libuv/Makefile
 ifeq ($(OS),Windows_NT)
 	make -f Makefile.mingw -C libuv
 else
-	make -C libuv
+	CFLAGS="$(MYCFLAGS) -g" make -C libuv
 endif
 
 
@@ -132,11 +131,8 @@ test-execs: $(TESTEXECS)
 
 libchirp: libchirp.a
 
-libchirp.a: $(OBJS) | libchirp-depends
+libchirp.a: $(OBJS) | libuv
 	ar $(ARFLAGS) $@ $^
-
-libchirp-depends:
-	@make CFLAGS="$(CCFLAGS) -g" libuv
 
 clean:  ## Clean only chirp not submodules
 	git clean -xdf

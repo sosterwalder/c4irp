@@ -9,8 +9,21 @@ import os
 import sys
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
-os.environ["CFLAGS"] = (
-    "-O3 -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include"
+CFLAGS = [
+    "-O3",
+    "-DNDEBUG",
+    "-Wall",
+    "-Werror",
+    "-Wno-unused-function",
+    "-Ilibuv/include",
+]
+
+if sys.platform != "win32":
+    CFLAGS.append("-fPIC")
+
+
+os.environ["SETUPCFLAGS"] = (
+    " ".join(CFLAGS)
 )
 
 requires = [

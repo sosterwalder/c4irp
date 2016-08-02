@@ -14,6 +14,8 @@ elif [ "$BUILDTYPE" == "osx" ]; then
 elif [ "$BUILDTYPE" == "bdist" ]; then
     make -f make.release
     python setup.py bdist
+elif [ "$BUILDTYPE" == "release" ]; then
+    python setup.py install
 else
     pyenv local $BUILDTYPE
     make test-nolib

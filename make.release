@@ -2,12 +2,10 @@
 
 COMMON         := config.h src/common.h
 
-CFLAGS  := -std=gnu99 -O3 -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
+MYCFLAGS  := -std=gnu99 -O3 -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
 ifneq ($(OS),Windows_NT)
-	CCFLAGS += -fPIC
+	MYCFLAGS += -fPIC
 endif
-
-export CFLAGS
 
 SRCS=$(filter-out $(wildcard src/*_test.c),$(wildcard src/*.c))
 OBJS=$(SRCS:.c=.o)
@@ -28,14 +26,14 @@ libuv/Makefile: libuv/configure
 ifeq ($(OS),Windows_NT)
 	echo Not needed on windows
 else
-	cd libuv && ./configure
+	cd libuv && CFLAGS="$(MYCFLAGS)" ./configure
 endif
 
 libuv/.libs/libuv.a: libuv/Makefile
 ifeq ($(OS),Windows_NT)
 	make -f Makefile.mingw -C libuv
 else
-	make -C libuv
+	CFLAGS="$(MYCFLAGS)" make -C libuv
 endif
 	strip --strip-debug $@
 
@@ -56,5 +54,5 @@ clean:
 %.c: %.h
 
 %.o: %.c $(COMMON)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(MYCFLAGS)
 

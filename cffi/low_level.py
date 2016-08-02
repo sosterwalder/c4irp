@@ -1,5 +1,6 @@
 from cffi import FFI
-from sys import platform
+import os
+import sys
 
 ffi = FFI()
 
@@ -10,8 +11,11 @@ libs = [
     "pthread",
 ]
 
-if platform != "darwin":
+if sys.platform != "darwin":
     libs.append("rt")
+
+if "SETUPCFLAGS" in os.environ:
+    os.environ["CFLAGS"] = os.environ["SETUPCFLAGS"]
 
 ffi.set_source(
     "_chirp_low_level",
