@@ -12,14 +12,10 @@ else
 endif
 
 COMMON  := config.h src/common.h
-MYCFLAGS := -Wall -Werror -Wno-unused-function -Ilibuv/include -std=gnu99
-
-ifneq ($(OS),Windows_NT)
-	MYCFLAGS += -fPIC
-	UNAME_S := $(shell uname -s)
-	ifneq ($(UNAME_S),Darwin)
-		MYCFLAGS += -pthread
-	endif
+MYCFLAGS := -Wall -Werror -Wno-unused-function -Ilibuv/include -std=gnu99 -fPIC
+UNAME_S := $(shell uname -s)
+ifneq ($(UNAME_S),Darwin)
+	MYCFLAGS += -pthread
 endif
 
 DCFLAGS := $(MYCFLAGS) -g $(COVERAGE)
@@ -90,25 +86,13 @@ _chirp_low_level.o: libchirp.a cffi/low_level.py
 	rm _chirp_low_level.c
 
 libuv/configure:
-ifeq ($(OS),Windows_NT)
-	echo Not needed on windows
-else
 	cd libuv && ./autogen.sh
-endif
 
 libuv/Makefile: libuv/configure
-ifeq ($(OS),Windows_NT)
-	echo Not needed on windows
-else
 	cd libuv && CFLAGS="$(MYCFLAGS) -g" ./configure
-endif
 
 libuv/.libs/libuv.a: libuv/Makefile
-ifeq ($(OS),Windows_NT)
-	make -f Makefile.mingw -C libuv
-else
 	CFLAGS="$(MYCFLAGS) -g" make -C libuv
-endif
 
 
 libuv: libuv/.libs/libuv.a
@@ -143,11 +127,7 @@ dist-clean:
 	git submodule foreach --recursive 'git clean -xdf -e .vagrant -e FINJA'; \
 
 test-lib: | libuv  ## Test dependency libs
-ifeq ($(OS),Windows_NT)
-	echo Ignored on windows
-else
 	make -C libuv CFLAGS="$(PCFLAGS)" check
-endif
 
 ifeq ($(PYPY),0)
 coverage:

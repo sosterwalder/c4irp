@@ -40,17 +40,13 @@ Development
 Windows
 -------
 
-* Install msys2_
-
 .. code-block:: bash
 
-   set PATH=c:\\msys64\\usr\\bin;%PATH%
-   set PATH=c:\\msys64\\mingw64\\bin;%PATH%
-   pacman -S make
-   pacman -S mingw-w64-x86_64-clang
-   make test-all
+   makefile.bat
 
-.. _msys2: https://msys2.github.io/
+   # or
+
+   makefile.bat release
 
 License
 =======
