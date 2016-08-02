@@ -12,20 +12,22 @@ else
 endif
 
 COMMON  := config.h src/common.h
-CCFLAGS := -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
+CCFLAGS := -Wall -Werror -Wno-unused-function -Ilibuv/include
 MYFLAGS := -std=gnu99
-DCFLAGS := $(CCFLAGS) -g $(COVERAGE)
-PCFLAGS := $(CCFLAGS) -O3 -DNDEBUG
-CFFIF   := $(shell pwd)/pyproject/cffi_fix:$(PATH)
-PY      := python
-MYCC    := clang
 
 ifneq ($(OS),Windows_NT)
+	CCFLAGS += -fPIC
 	UNAME_S := $(shell uname -s)
 	ifneq ($(UNAME_S),Darwin)
 		MYFLAGS += -pthread
 	endif
 endif
+
+DCFLAGS := $(CCFLAGS) -g $(COVERAGE)
+PCFLAGS := $(CCFLAGS) -O3 -DNDEBUG
+CFFIF   := $(shell pwd)/pyproject/cffi_fix:$(PATH)
+PY      := python
+MYCC    := clang
 
 SETCFLAGS := $(DCFLAGS) $(MYFLAGS)
 
@@ -105,7 +107,10 @@ endif
 libuv/.libs/libuv.a: libuv/Makefile
 ifeq ($(OS),Windows_NT)
 	make -f Makefile.mingw -C libuv
+else
+	make -C libuv
 endif
+
 
 libuv: libuv/.libs/libuv.a
 

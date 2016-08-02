@@ -35,6 +35,21 @@ Development
    apt-get install build-essential automake autoconf cmake clang llvm libssl-dev libssl1.0.0-dbg
    make test-all
 
+Windows
+-------
+
+* Install msys2_
+
+.. code-block:: bash
+
+   set PATH=c:\\msys64\\usr\\bin;%PATH%
+   set PATH=c:\\msys64\\mingw64\\bin;%PATH%
+   pacman -S make
+   pacman -S mingw-w64-x86_64-clang
+   make test-all
+
+.. _msys2: https://msys2.github.io/
+
 License
 =======
 

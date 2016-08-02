@@ -1,7 +1,13 @@
 .PHONY: clean libchirp libuv
 
 COMMON         := config.h src/common.h
-export CFLAGS  := -std=gnu99 -O3 -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
+
+CFLAGS  := -std=gnu99 -O3 -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include
+ifneq ($(OS),Windows_NT)
+	CCFLAGS += -fPIC
+endif
+
+export CFLAGS
 
 SRCS=$(filter-out $(wildcard src/*_test.c),$(wildcard src/*.c))
 OBJS=$(SRCS:.c=.o)
@@ -12,13 +18,25 @@ config.h: | config.defs.h
 	cp config.defs.h config.h
 
 libuv/configure:
+ifeq ($(OS),Windows_NT)
+	echo Not needed on windows
+else
 	cd libuv && ./autogen.sh
+endif
 
 libuv/Makefile: libuv/configure
+ifeq ($(OS),Windows_NT)
+	echo Not needed on windows
+else
 	cd libuv && ./configure
+endif
 
 libuv/.libs/libuv.a: libuv/Makefile
+ifeq ($(OS),Windows_NT)
+	make -f Makefile.mingw -C libuv
+else
 	make -C libuv
+endif
 	strip --strip-debug $@
 
 libuv: libuv/.libs/libuv.a
