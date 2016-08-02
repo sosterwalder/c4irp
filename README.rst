@@ -40,6 +40,8 @@ Development
 Windows
 -------
 
+* Install Python 2 (sorry libuv dictates this)
+
 .. code-block:: bash
 
    makefile.bat

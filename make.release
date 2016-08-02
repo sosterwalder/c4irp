@@ -22,9 +22,9 @@ libuv/Makefile: libuv/configure
 libuv/.libs/libuv.a: libuv/Makefile
 	CFLAGS="$(MYCFLAGS)" make -C libuv
 ifeq ($(UNAME_S),Darwin)
-	strip -S $^
+	strip -S $@
 else
-	strip --strip-debug $^
+	strip --strip-debug $@
 endif
 
 libuv: libuv/.libs/libuv.a
