@@ -15,6 +15,7 @@
 
 #ifdef _WIN32
 #include <winsock2.h>
+#include <win2tcpip.h>
 #else // _WIN32
 #include <arpa/inet.h>
 #endif // _WIN32
