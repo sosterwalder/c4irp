@@ -99,7 +99,9 @@ static
 void
 _ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
 //
-//    Fill in random ints efficiently len MUST be multiple of four
+//    Fill in random ints efficiently len MUST be multiple of four.
+//
+//    Thank you windows for making this really complicated.
 //
 //    :param char* bytes: The buffer to fill the bytes into
 //    :param size_t  len: The length of the buffer
@@ -108,7 +110,18 @@ _ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
 //
 {
     A(len % 4 == 0, "len must be multiple of four");
-#if RAND_MAX < 1073741824 || INT_MAX < 1073741824
+#ifdef _WIN32
+#if RAND_MAX < 16384 || INT_MAX < 16384 // 2**14
+#error Seriously broken compiler or platform
+#else // RAND_MAX < 16384 || INT_MAX < 16384
+    int tmp_rand;
+    for(size_t i = 0; i < len; i += 2) {
+        tmp_rand = rand();
+        memcpy(bytes + i, &tmp_rand, 2);
+    }
+#endif // RAND_MAX < 16384 || INT_MAX < 16384
+#else // _WIN32
+#if RAND_MAX < 1073741824 || INT_MAX < 1073741824 // 2**30
 #ifdef CH_ACCEPT_STRANGE_PLATFORM
     /* WTF, fallback platform */
     for(size_t i = 0; i < len; i++) {
@@ -119,12 +132,13 @@ _ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
 #endif // ACCEPT_STRANGE_PLATFORM
 #else // RAND_MAX < 1073741824 || INT_MAX < 1073741824
     /* Tested: this is 4 times faster*/
-    int tmp_rand;
-    for(size_t i = 0; i < len; i += 4) {
-        tmp_rand = rand();
-        memcpy(bytes + i, &tmp_rand, 4);
-    }
+int tmp_rand;
+for(size_t i = 0; i < len; i += 4) {
+    tmp_rand = rand();
+    memcpy(bytes + i, &tmp_rand, 4);
+}
 #endif // RAND_MAX < 1073741824 || INT_MAX < 1073741824
+#endif // _WIN32
 }
 //
 // .. code-block:: cpp
