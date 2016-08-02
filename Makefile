@@ -89,13 +89,23 @@ _chirp_low_level.o: libchirp.a cffi/low_level.py
 	rm _chirp_low_level.c
 
 libuv/configure:
+ifeq ($(OS),Windows_NT)
+	echo Not needed on windows
+else
 	cd libuv && ./autogen.sh
+endif
 
 libuv/Makefile: libuv/configure
+ifeq ($(OS),Windows_NT)
+	echo Not needed on windows
+else
 	cd libuv && ./configure
+endif
 
 libuv/.libs/libuv.a: libuv/Makefile
-	make -C libuv
+ifeq ($(OS),Windows_NT)
+	make -f Makefile.mingw -C libuv
+endif
 
 libuv: libuv/.libs/libuv.a
 
@@ -132,7 +142,11 @@ dist-clean:
 	git submodule foreach --recursive 'git clean -xdf -e .vagrant -e FINJA'; \
 
 test-lib: | libuv  ## Test dependency libs
+ifeq ($(OS),Windows_NT)
+	echo Ignored on windows
+else
 	make -C libuv CFLAGS="$(PCFLAGS)" check
+endif
 
 ifeq ($(PYPY),0)
 coverage:
