@@ -14,6 +14,7 @@
 
 #include <limits.h>
 #include <stdlib.h>
+#include <time.h>
 
 //
 // .. c:var:: ch_config_defaults
