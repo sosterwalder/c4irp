@@ -1,24 +1,7 @@
 from cffi import FFI
-import os
-import sys
+from chirp_cffi_common import libs
 
 ffi = FFI()
-
-libs = [
-    "chirp",
-    "uv",
-]
-
-if sys.platform != "win32":
-    libs.extend([
-        "m",
-        "pthread",
-    ])
-    if sys.platform != "darwin":
-        libs.append("rt")
-
-if "SETUPCFLAGS" in os.environ:
-    os.environ["CFLAGS"] = os.environ["SETUPCFLAGS"]
 
 ffi.set_source(
     "_chirp_cffi",
