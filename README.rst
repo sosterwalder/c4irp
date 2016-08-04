@@ -48,7 +48,7 @@ Windows
 
 .. code-block:: bash
 
-   makefile.cmd
+   makefile.cmd debug test
 
    # or
 
@@ -67,13 +67,6 @@ Copyright
 * © 2016-∞ Jean-Louis Fuchs
 
 * © 2016-∞ Adfinis-SyGroup AG
-
-source as a reference:
-
-* evt-tls © Devchandra M. Leishangthem (dlmeetei at gmail dot com)
-  https://github.com/deleisha/evt-tls
-
-  - Based on revision: b69164203b481b11dbeb9153fc4eee8a7c3586d3
 
 source used in this reposoitory
 

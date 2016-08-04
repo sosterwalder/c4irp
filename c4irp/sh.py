@@ -15,10 +15,10 @@ def command(command):
         stdout, stderr = proc.communicate()
         proc.wait()
         if proc.returncode:
-            raise CalledProcessError(
+            err = CalledProcessError(
                 returncode=proc.returncode,
                 cmd=" ".join(cmd),
                 output=stdout,
-                stderr=stderr,
             )
+            err.stderr = stderr
     return func
