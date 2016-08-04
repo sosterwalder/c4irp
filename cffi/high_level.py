@@ -24,7 +24,7 @@ ffi.set_source(
     """,
     libraries=libs,
     library_dirs=["."],
-    include_dirs=["include"],
+    include_dirs=["include", "libuv/include"],
 )
 
 

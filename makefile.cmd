@@ -66,11 +66,10 @@ exit /B 1
 
 :vs-found
 
-cmd
-
 pushd libuv
-call vcbuild.bat /test %debug% %vs_toolset% || exit /B 1
+call vcbuild.bat /test %config% %vs_toolset% || exit /B 1
 popd
+copy libuv\%config%\lib\libuv.lib uv.lib
 copy config.defs.h config.h
 python .scripts\win-build.py
 
