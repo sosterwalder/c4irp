@@ -1,15 +1,9 @@
 """General low level tests."""
 
-import subprocess
-
 from hypothesis import strategies as st
 from hypothesis import given
 
 from _chirp_low_level import ffi, lib
-
-# from .common import collect_processes
-
-PIPE = subprocess.PIPE
 
 
 @given(
@@ -70,29 +64,3 @@ def test_ch_cn_conn_dict(choice, address1, port1, address2, port2, force_eq):
         assert cmp_[0] < 0
     if conn1_tup > conn2_tup:
         assert cmp_[0] > 0
-
-# TODO do we need this?
-# def test_helper_programs():
-#     """Testing the ssl_server and ssl_client program"""
-#     server = subprocess.Popen(
-#         ["src/programs/ssl_server"],
-#         stderr=PIPE,
-#         stdout=PIPE,
-#     )
-#     time.sleep(0.1)
-#     client = subprocess.Popen(
-#         ["src/programs/ssl_client"],
-#         stderr=PIPE,
-#         stdout=PIPE,
-#     )
-#     try:
-#         client.wait(timeout=1)
-#     except subprocess.TimeoutExpired:
-#         pass
-#     try:
-#         server.wait(timeout=1)
-#     except subprocess.TimeoutExpired:
-#         pass
-#     collect_processes([client, server])
-#     assert client.returncode == 0
-#     assert server.returncode == 0
