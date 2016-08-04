@@ -7,7 +7,15 @@ libs = [
 ]
 
 if sys.platform == "win32":
-    libs.extend(["Ws2_32"])
+    libs.extend([
+        "advapi32",
+        "iphlpapi",
+        "psapi",
+        "shell32",
+        "user32",
+        "userenv",
+        "ws2_32"
+    ])
 else:
     libs.extend([
         "m",
