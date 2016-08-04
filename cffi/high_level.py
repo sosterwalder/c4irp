@@ -7,12 +7,15 @@ ffi = FFI()
 libs = [
     "chirp",
     "uv",
-    "m",
-    "pthread",
 ]
 
-if sys.platform != "darwin":
-    libs.append("rt")
+if sys.platform != "win32":
+    libs.extend([
+        "m",
+        "pthread",
+    ])
+    if sys.platform != "darwin":
+        libs.append("rt")
 
 if "SETUPCFLAGS" in os.environ:
     os.environ["CFLAGS"] = os.environ["SETUPCFLAGS"]
