@@ -9,7 +9,9 @@ libs = [
     "uv",
 ]
 
-if sys.platform != "win32":
+if sys.platform == "win32":
+    libs.extend(["Ws2_32"])
+else:
     libs.extend([
         "m",
         "pthread",
