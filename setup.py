@@ -39,7 +39,10 @@ with codecs.open(version_file, encoding="UTF-8") as f:
 class CustomInstallCommand(install):
     """CustomInstallCommand"""
     def run(self):
-        os.system('make -f make.release')
+        if sys.platform == "win32":
+            os.system("cmd /C makefile.cmd release")
+        else:
+            os.system('make -f make.release')
         install.run(self)
 
 

@@ -1,7 +1,6 @@
 set PATH=C:\Python27;C:\Python27\Scritps;%PATH%
 
-set CFLAGS=/c /nologo /Ox /W3 /GL /DNDEBUG /MD -Ilibuv\include
-
+set flags=
 set config=Debug
 set vs_toolset=x64
 
@@ -15,6 +14,11 @@ if /i "%1"=="x64"          set target_arch=x64&set msbuild_platform=x64&set vs_t
 shift
 goto next-arg
 :args-done
+
+if "%config%" == "Debug" set flags=/Od
+if "%config%" == "Release" set flags=/Ox /DNDEBUG
+
+set CFLAGS=/nologo /W3 /GL /MD %flags% -Ilibuv\include
 
 @rem Look for Visual Studio 2015
 if not defined VS140COMNTOOLS goto vc-set-2013

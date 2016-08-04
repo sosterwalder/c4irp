@@ -11,6 +11,9 @@ etests = set([x for x in sources if x.endswith("_etest")])
 tests = set([x for x in sources if x.endswith("_test")])
 objs = sources - etests
 
+if os.environ["config"] == "Release":
+    objs = objs - tests
+
 
 def exec_cmd(cmd):
     """Execute a compiler command"""
