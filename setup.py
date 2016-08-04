@@ -16,11 +16,8 @@ CFLAGS = [
     "-Werror",
     "-Wno-unused-function",
     "-Ilibuv/include",
+    "-fPIC",
 ]
-
-if sys.platform != "win32":
-    CFLAGS.append("-fPIC")
-
 
 os.environ["SETUPCFLAGS"] = (
     " ".join(CFLAGS)
@@ -75,7 +72,7 @@ with codecs.open('README.rst', 'r', encoding="UTF-8") as f:
 setup(
     name = "c4irp",
     version = __version__,
-    cffi_modules=["cffi/high_level.py:ffi"],
+    cffi_modules=["chirp_cffi/high_level.py:ffi"],
     packages = find_packages(),
     package_data=find_data(
         find_packages(), ["pem"]

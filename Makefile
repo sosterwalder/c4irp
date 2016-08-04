@@ -42,7 +42,7 @@ FAIL_UNDER := 95  # TODO: remove!!
 all: pre-install pymods test-execs  ## Build for development (make setup.py or make.release for production)
 
 vi:  ## Start a vim editing the imporant files
-	vim TODO.rst src/*.c src/*.h c4irp/*.py cffi/*.py include/*.h doc/ref/* config.defs.h
+	vim TODO.rst src/*.c src/*.h c4irp/*.py chirp_cffi/*.py include/*.h doc/ref/* config.defs.h
 
 lldb: all  ## Build and run py.test in lldb
 	echo lldb `pyenv which python` -- -m pytest -x
@@ -75,14 +75,14 @@ genhtml:  ## Generate html coverage report
 
 pymods: _chirp_cffi.o _chirp_low_level.o  ## Build the python modules
 
-_chirp_cffi.o: libchirp.a cffi/high_level.py
+_chirp_cffi.o: libchirp.a chirp_cffi/high_level.py
 	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
-	   $(PY) cffi/high_level.py
+	   $(PY) chirp_cffi/high_level.py
 	rm _chirp_cffi.c
 
-_chirp_low_level.o: libchirp.a cffi/low_level.py
+_chirp_low_level.o: libchirp.a chirp_cffi/low_level.py
 	CC="$(MYCC)" CFLAGS="$(SETCFLAGS)" PATH="$(CFFIF)" \
-	   $(PY) cffi/low_level.py
+	   $(PY) chirp_cffi/low_level.py
 	rm _chirp_low_level.c
 
 libuv/configure:

@@ -1,5 +1,5 @@
 from cffi import FFI
-from chirp_cffi_common import libs
+from chirp_cffi.cffi_common import libs
 
 ffi = FFI()
 
