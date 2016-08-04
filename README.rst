@@ -40,15 +40,19 @@ Development
 Windows
 -------
 
-* Install Python 2 (sorry libuv dictates this)
+* Install Python 2 (gyp needs this)
+
+* Install Visual Studio
+
+* Select Git for Windows in Visual Studio Installer or install it
 
 .. code-block:: bash
 
-   makefile.bat
+   makefile.cmd
 
    # or
 
-   makefile.bat release
+   makefile.cmd release
 
 License
 =======

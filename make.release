@@ -4,7 +4,8 @@ COMMON   := config.h src/common.h
 
 MYCFLAGS := -std=gnu99 -O3 -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include -fPIC
 
-SRCS=$(filter-out $(wildcard src/*_test.c),$(wildcard src/*.c))
+NOTEST=$(filter-out $(wildcard src/*_test.c),$(wildcard src/*.c))
+SRCS=$(filter-out $(wildcard src/*_etest.c),$(NOTEST))
 OBJS=$(SRCS:.c=.o)
 UNAME_S := $(shell uname -s)
 
