@@ -25,6 +25,7 @@ os.environ["SETUPCFLAGS"] = (
 
 requires = [
     "cffi",
+    "six",
 ]
 if sys.version_info < (3, 2):
     requires.append("futures")
