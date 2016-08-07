@@ -7,11 +7,9 @@
 #ifndef ch_inc_message_h
 #define ch_inc_message_h
 
+#include "common.h"
 #include "error.h"
 #include "const.h"
-
-#include <stdint.h>
-#include <stddef.h>
 
 #ifdef _WIN32
 #include <winsock2.h>

@@ -15,6 +15,16 @@
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h>
+#include <stdio.h>
+#ifdef _WIN32
+#if defined(_MSC_VER) && _MSC_VER < 1600
+#include "stdint-msvc2008.h"
+#define inline __inline
+#else // _MSCVER
+#include <stdint.h>
+#endif // _WIN32
+#endif
 
 // Logging and assert macros
 // =========================
@@ -28,7 +38,6 @@
 // .. code-block:: cpp
 
 #ifndef NDEBUG
-#include <stdio.h>
 #ifdef LOG_TO_STDERR
 #define L(chirp, ...) fprintf(stderr, ##__VA_ARGS__)
 #else  //LOG_TO_STDERR
