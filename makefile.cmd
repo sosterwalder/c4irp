@@ -1,4 +1,4 @@
-set PATH=C:\Python27;C:\Python27\Scritps;%PATH%
+set PATH=C:\Python27;C:\Python27\Scripts;%PATH%
 
 set flags=
 set config=Release
@@ -32,6 +32,8 @@ if "%test%"=="true" goto test-it
 goto the-end
 
 :test-it
+copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\vcvarsamd64.bat"
+copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\amd64\vcvarsamd64.bat"
 pip install cffi click freeze hypothesis hypothesis-pytest pytest pytest_catchlog pytest_cov pytest_mock testfixtures || exit /B 1
 python chirp_cffi/high_level.py || exit /B 1
 python chirp_cffi/low_level.py || exit /B 1

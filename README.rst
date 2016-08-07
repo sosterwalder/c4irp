@@ -42,17 +42,27 @@ Windows
 
 * Install Python 2 (gyp needs this)
 
-* Install Visual Studio
+* Install Visual Studio latest
 
-* Select Git for Windows in Visual Studio Installer or install it
+   * Select Git for Windows in Visual Studio Installer or install it
+
+* Install Visual Studio 2008 Express
+
+.. NOTE::
+
+   Python 2 needs all this, Python 3 is easier, but we need it anyways.
+   Python 2 also recommends to use this exact versions, since Windows is too much
+   work anyways. I just followed the instructions as close as possible.
+
+   Note also, its no real development setup, it always builds everything.
 
 .. code-block:: bash
 
-   makefile.cmd debug test
+   cmd /C "makefile.cmd debug test"
 
    # or
 
-   makefile.cmd release
+   cmd /C "makefile.cmd release"
 
 License
 =======

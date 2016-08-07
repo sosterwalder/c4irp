@@ -19,6 +19,7 @@ __pycache__
 /.coverage
 /.cache
 /.coverage
+/*.c
 /c4irp.egg-info/
 /c4irp/*.c
 /*.info
