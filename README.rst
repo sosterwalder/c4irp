@@ -46,7 +46,13 @@ Windows
 
    * Select Git for Windows in Visual Studio Installer or install it
 
-* Install Visual Studio 2008 Express
+* Install Visual Studio_ 2008 Express
+
+* Install Windows SDK_ for Windows Server 2008 and .NET Framework 3.5
+
+.. _Studio: http://download.microsoft.com/download/E/8/E/E8EEB394-7F42-4963-A2D8-29559B738298/VS2008ExpressWithSP1ENUX1504728.iso
+
+.. _SDK: http://www.microsoft.com/en-us/download/details.aspx?id=24826
 
 .. NOTE::
 

@@ -26,7 +26,7 @@ call "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat"
 set GYP_MSVS_VERSION=2008
 
 pushd libuv
-cmd /C "vcbuild.bat /test %config% %vs_toolset%" || exit /B 1
+cmd /C "vcbuild.bat nobuild %config% %vs_toolset%" || exit /B 1
 popd
 copy libuv\%config%\lib\libuv.lib uv.lib || exit /B 1
 cmd /C ".scripts\win-build.cmd" || exit /B 1
