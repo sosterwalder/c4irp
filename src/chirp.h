@@ -9,7 +9,6 @@
 
 #include "../include/chirp_obj.h"
 #include "protocol.h"
-#include "common.h"
 
 // .. c:type:: ch_chirp_int_t
 //
@@ -35,7 +34,7 @@ struct ch_chirp_int {
 
 // .. c:function::
 static
-inline
+ch_inline
 void*
 ch_chirp_alloc_var(
         ch_chirp_t* chirp,
@@ -65,7 +64,7 @@ ch_chirp_alloc_var(
 
 // .. c:function::
 static
-inline
+ch_inline
 void*
 ch_chirp_alloc(
         ch_chirp_t* chirp,
@@ -90,7 +89,7 @@ ch_chirp_alloc(
 
 // .. c:function::
 static
-inline
+ch_inline
 void
 ch_chirp_free(
         ch_chirp_t* chirp,

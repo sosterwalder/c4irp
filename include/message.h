@@ -8,8 +8,6 @@
 #define ch_inc_message_h
 
 #include "common.h"
-#include "error.h"
-#include "const.h"
 
 #ifdef _WIN32
 #include <winsock2.h>

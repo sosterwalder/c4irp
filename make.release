@@ -1,6 +1,6 @@
 .PHONY: clean libchirp libuv
 
-COMMON   := config.h src/common.h
+COMMON   := config.h include/common.h
 
 MYCFLAGS := -std=gnu99 -O3 -DNDEBUG -fPIC -Wall -Werror -Wno-unused-function -Ilibuv/include -fPIC
 

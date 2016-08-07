@@ -4,16 +4,8 @@
 //
 // .. code-block:: cpp
 
-#include "../config.h"
-#include "common.h"
 #include "chirp.h"
-#include "message.h"  // TODO remove?
-#include "protocol.h"
 
-#include <uv.h>
-
-#include <limits.h>
-#include <stdlib.h>
 #include <time.h>
 
 //

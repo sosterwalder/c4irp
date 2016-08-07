@@ -7,9 +7,7 @@
 #ifndef ch_inc_chirp_obj_h
 #define ch_inc_chirp_obj_h
 
-#include "error.h"
-
-#include <uv.h>
+#include "common.h"
 
 // .. c:type:: ch_alloc_cb
 //
@@ -161,7 +159,7 @@ typedef struct ch_chirp {
 
 // .. c:function::
 static
-inline
+ch_inline
 void
 ch_chirp_register_log_cb(ch_chirp_t* chirp, ch_log_cb_t log_cb)
 //
@@ -177,7 +175,7 @@ ch_chirp_register_log_cb(ch_chirp_t* chirp, ch_log_cb_t log_cb)
 }
 // .. c:function::
 static
-inline
+ch_inline
 int
 ch_loop_init(uv_loop_t* loop)
 //
@@ -191,7 +189,7 @@ ch_loop_init(uv_loop_t* loop)
     return uv_loop_init(loop);
 }
 static
-inline
+ch_inline
 int
 ch_loop_close(uv_loop_t* loop)
 //
@@ -206,7 +204,7 @@ ch_loop_close(uv_loop_t* loop)
 }
 // .. c:function::
 static
-inline
+ch_inline
 int
 ch_run(uv_loop_t* loop, uv_run_mode mode)
 //

@@ -50,9 +50,6 @@
 
 #include "chirp.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
 
 #ifndef NDEBUG
@@ -71,7 +68,7 @@ typedef struct {                                   \
 }                                                  \
 ca_##type##_t;                                     \
                                                    \
-static inline ca_##type##_t                        \
+static ch_inline ca_##type##_t                     \
 ca_new_##type(                                     \
 ch_chirp_t* chirp,                                 \
 size_t size                                        \
@@ -85,7 +82,7 @@ size_t size                                        \
     return array;                                  \
 }                                                  \
                                                    \
-static inline ca_##type##_t                        \
+static ch_inline ca_##type##_t                     \
 ca_from_pointer_##type(                            \
     type* data,                                    \
     size_t size                                    \
@@ -96,7 +93,7 @@ ca_from_pointer_##type(                            \
     return array;                                  \
 }                                                  \
                                                    \
-static inline void                                 \
+static ch_inline void                              \
 ca_free_##type(                                    \
     ch_chirp_t* chirp,                             \
     ca_##type##_t array                            \
@@ -104,7 +101,7 @@ ca_free_##type(                                    \
     ch_chirp_free(chirp, array.data);              \
 }                                                  \
                                                    \
-static inline type*                                \
+static ch_inline type*                             \
 ca_##type##_p(                                     \
     ca_##type##_t array,                           \
     size_t index,                                  \
@@ -131,7 +128,7 @@ ca_##type##_p(                                     \
 #define CA_PROTOTYPE(type)                         \
 typedef type* ca_##type##_t;                       \
                                                    \
-static inline type*                                \
+static ch_inline type*                             \
 ca_new_##type(                                     \
     ch_chirp_t* chirp,                             \
     size_t size                                    \
@@ -142,7 +139,7 @@ ca_new_##type(                                     \
     );                                             \
 }                                                  \
                                                    \
-static inline void                                 \
+static ch_inline void                              \
 ca_free_##type(                                    \
     ch_chirp_t* chirp,                             \
     type* array                                    \
@@ -150,7 +147,7 @@ ca_free_##type(                                    \
     ch_chirp_free(chirp, array);                   \
 }                                                  \
                                                    \
-static inline ca_##type##_t                        \
+static ch_inline ca_##type##_t                     \
 ca_from_pointer_##type(                            \
     type* data,                                    \
     size_t size                                    \
@@ -159,7 +156,7 @@ ca_from_pointer_##type(                            \
     return data;                                   \
 }                                                  \
                                                    \
-static inline type*                                \
+static ch_inline type*                             \
 ca_##type##_p(                                     \
     ca_##type##_t array,                           \
     size_t index,                                  \

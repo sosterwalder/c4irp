@@ -7,13 +7,9 @@
 #ifndef ch_protocol_h
 #define ch_protocol_h
 
-#include "../include/error.h"
 #include "../include/chirp_obj.h"
 #include "connection.h"
 #include "sglib.h"
-
-#include <uv.h>
-#include <string.h>
 
 // .. c:type:: ch_receipt_t
 //

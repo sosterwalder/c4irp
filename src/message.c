@@ -6,10 +6,6 @@
 
 #include "message.h"
 
-#include <uv.h>
-
-#include <string.h>
-
 // .. c:function::
 ch_error_t
 ch_msg_init(ch_message_t* message)

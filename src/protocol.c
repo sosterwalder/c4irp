@@ -5,14 +5,7 @@
 // .. code-block:: cpp
 //
 #include "protocol.h"
-
-#include "common.h"
-#include "message.h"
 #include "chirp.h"
-
-#include <uv.h>
-
-#include <stdlib.h>
 
 SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     ch_receipt_t,

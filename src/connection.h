@@ -36,12 +36,14 @@ typedef struct ch_connection {
     struct ch_connection* right;
 } ch_connection_t;
 
-static inline
+static
+ch_inline
 int
 ch_connection_cmp(ch_connection_t* x, ch_connection_t* y);
 
 // .. c:function::
-static inline
+static
+ch_inline
 int
 ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
 //

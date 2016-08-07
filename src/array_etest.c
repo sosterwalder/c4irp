@@ -6,8 +6,6 @@
 
 #include "array.h"
 
-#include <stdlib.h>
-
 // Create the prototype for a integer list.
 //
 // .. code-block:: cpp

@@ -5,7 +5,6 @@
 // .. code-block:: cpp
 
 #include "../include/chirp.h"
-#include <stdlib.h>
 
 // .. c:function::
 static

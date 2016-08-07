@@ -1,12 +1,16 @@
-// =============
+// ===========j=
 // Common header
 // =============
+//
+// I know common headers aren't good style but Windows is forcing me.
+//
 // .. code-block:: cpp
 //
 #ifndef ch_common_h
 #define ch_common_h
 
-#include "../include/error.h"
+#include "error.h"
+#include "const.h"
 #include "../config.h"
 
 #include <uv.h>
@@ -19,12 +23,15 @@
 #include <stdio.h>
 #ifdef _WIN32
 #if defined(_MSC_VER) && _MSC_VER < 1600
-#include "stdint-msvc2008.h"
-#define inline __inline
-#else // _MSCVER
+#include <stdint-msvc2008.h>
+#define ch_inline __inline
+#else // _MSC_VER
 #include <stdint.h>
+#define ch_inline inline
+#endif // _MSC_VER
+#else // _WIN32
+#define ch_inline inline
 #endif // _WIN32
-#endif
 
 // Logging and assert macros
 // =========================
@@ -79,7 +86,7 @@
 //
 // .. c:function::
 static
-inline
+ch_inline
 ch_error_t
 _ch_uv_error_map(int error)
 //
@@ -105,6 +112,7 @@ _ch_uv_error_map(int error)
 //
 // .. c:function::
 static
+ch_inline
 void
 _ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
 //

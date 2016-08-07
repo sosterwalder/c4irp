@@ -11,7 +11,7 @@ else
 	COVERAGE  := --coverage
 endif
 
-COMMON  := config.h src/common.h
+COMMON  := config.h include/common.h
 MYCFLAGS := -Wall -Werror -Wno-unused-function -Ilibuv/include -std=gnu99 -fPIC
 UNAME_S := $(shell uname -s)
 ifneq ($(UNAME_S),Darwin)
