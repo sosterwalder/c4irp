@@ -4,6 +4,7 @@ set flags=
 set config=Release
 set test=false
 set vs_toolset=x64
+set msbuild_platform=x64
 
 :next-arg
 if "%1"=="" goto args-done
@@ -27,6 +28,7 @@ set GYP_MSVS_VERSION=2008
 
 pushd libuv
 cmd /C "vcbuild.bat nobuild %config% %vs_toolset%" || exit /B 1
+vcbuild.exe uv.sln /msbuild:"/t:%target% /p:Configuration=Chirp%config% /p:Platform=%msbuild_platform% /clp:NoSummary;NoItemAndPropertyList;Verbosity=minimal /nologo"
 popd
 copy libuv\%config%\lib\libuv.lib uv.lib || exit /B 1
 cmd /C ".scripts\win-build.cmd" || exit /B 1
