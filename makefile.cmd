@@ -17,10 +17,13 @@ shift
 goto next-arg
 :args-done
 
-if "%config%" == "Debug" set flags=/Od
-if "%config%" == "Release" set flags=/Ox /DNDEBUG
+if "%config%" == "Debug" set flags=/Od /MDd
+if "%config%" == "Release" set flags=/Ox /MD /DNDEBUG
 
-set CFLAGS=/nologo /W3 /GL /MD %flags% -Ilibuv\include
+set CFLAGS=/nologo /W3 %flags% -Ilibuv\include
+
+call "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat"
+set GYP_MSVS_VERSION=2008
 
 pushd libuv
 cmd /C "vcbuild.bat /test %config% %vs_toolset%" || exit /B 1

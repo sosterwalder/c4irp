@@ -24,7 +24,7 @@ try:
     for source in sources:
         cmd = ["cl"] + cflags + ["/c", "%s.c" % source, "/Fo%s.obj" % source]
         exec_cmd(cmd)
-    cmd = ["lib", "/nologo", "/LTCG"] + [
+    cmd = ["lib", "/nologo"] + [
         "%s.obj" % x for x in objs
     ] + ["/out:chirp.lib"]
     exec_cmd(cmd)
