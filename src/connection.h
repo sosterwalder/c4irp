@@ -11,10 +11,6 @@
 
 #include "sglib.h"
 
-#include <string.h>
-
-#include <uv.h>
-
 // .. c:type:: ch_connection_t
 //
 //    Connection dictionary implemented as rbtree.

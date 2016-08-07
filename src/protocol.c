@@ -6,6 +6,7 @@
 //
 #include "protocol.h"
 #include "chirp.h"
+#include "util.h"
 
 SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     ch_receipt_t,

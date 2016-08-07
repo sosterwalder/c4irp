@@ -5,6 +5,7 @@
 // .. code-block:: cpp
 
 #include "chirp.h"
+#include "util.h"
 
 #include <time.h>
 
