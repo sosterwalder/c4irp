@@ -10,8 +10,10 @@ It is part of Concreteclouds_ and the C99 implementation of Chirp_.
 
 .. _Chirp: https://github.com/concretecloud/chirp
 
-|travis| |appveyor| |rtd| |coverage| [1]_
+|floobits| |travis| |appveyor| |rtd| |coverage| [1]_
 
+.. |floobits|  image:: https://floobits.com/ganwell/c4irp.svg
+   :target: https://floobits.com/ganwell/c4irp/redirect
 .. |travis|  image:: https://travis-ci.org/concretecloud/c4irp.svg?branch=master
    :target: https://travis-ci.org/concretecloud/c4irp
 .. |appveyor| image:: https://ci.appveyor.com/api/projects/status/l8rw8oiv64ledar6?svg=true

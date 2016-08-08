@@ -42,7 +42,7 @@ FAIL_UNDER := 95  # TODO: remove!!
 all: pre-install pymods test-execs  ## Build for development (make setup.py or make.release for production)
 
 vi:  ## Start a vim editing the imporant files
-	vim TODO.rst src/*.c src/*.h c4irp/*.py chirp_cffi/*.py include/*.h doc/ref/* config.defs.h
+	vim *.rst src/*.c src/*.h c4irp/*.py chirp_cffi/*.py include/*.h doc/ref/* config.defs.h makefile.cmd Makefile
 
 lldb: all  ## Build and run py.test in lldb
 	echo lldb `pyenv which python` -- -m pytest -x
