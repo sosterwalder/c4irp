@@ -23,24 +23,23 @@ if "%config%" == "Release" set flags=/Ox /MD /DNDEBUG
 
 set CFLAGS=/nologo /W3 %flags% -Ilibuv\include
 
-call "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat"
-set GYP_MSVS_VERSION=2008
 
 pushd libuv
-cmd /C "vcbuild.bat nobuild %config% %vs_toolset%" || exit /B 1
-vcbuild.exe uv.sln /msbuild:"/t:%target% /p:Configuration=Chirp%config% /p:Platform=%msbuild_platform% /clp:NoSummary;NoItemAndPropertyList;Verbosity=minimal /nologo"
+cmd /C "vcbuild.bat %config% %vs_toolset%" || exit /B 1
 popd
 copy libuv\%config%\lib\libuv.lib uv.lib || exit /B 1
 cmd /C ".scripts\win-build.cmd" || exit /B 1
+call "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat"
+copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\vcvarsamd64.bat"
+copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\amd64\vcvarsamd64.bat"
+pip install -U cffi
+python chirp_cffi/high_level.py || exit /B 1
+python chirp_cffi/low_level.py || exit /B 1
 
 if "%test%"=="true" goto test-it
 goto the-end
 
 :test-it
-copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\vcvarsamd64.bat"
-copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\amd64\vcvarsamd64.bat"
-pip install cffi click freeze hypothesis hypothesis-pytest pytest pytest_catchlog pytest_cov pytest_mock testfixtures || exit /B 1
-python chirp_cffi/high_level.py || exit /B 1
-python chirp_cffi/low_level.py || exit /B 1
+pip install -U click freeze hypothesis hypothesis-pytest pytest pytest_catchlog pytest_cov pytest_mock testfixtures || exit /B 1
 @rem TODO libuv\Debug\\run-tests.exe || exit /B 1
 :the-end
