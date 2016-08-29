@@ -23,11 +23,6 @@ if "%config%" == "Release" set flags=/Ox /MD /DNDEBUG
 
 set CFLAGS=/nologo /W3 %flags% -Ilibuv\include
 
-
-pushd libuv
-cmd /C "vcbuild.bat %config% %vs_toolset%" || exit /B 1
-popd
-copy libuv\%config%\lib\libuv.lib uv.lib || exit /B 1
 cmd /C ".scripts\win-build.cmd" || exit /B 1
 call "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat"
 copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\vcvarsamd64.bat"
