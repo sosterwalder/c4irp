@@ -23,10 +23,11 @@ if "%config%" == "Release" set flags=/Ox /MD /DNDEBUG
 
 set CFLAGS=/nologo /W3 %flags% -Ilibuv\include
 
-cmd /C ".scripts\win-build.cmd" || exit /B 1
 call "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat"
+set GYP_MSVS_VERSION=2008
 copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\vcvarsamd64.bat"
 copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\amd64\vcvarsamd64.bat"
+cmd /C ".scripts\win-build.cmd" || exit /B 1
 pip install -U cffi
 python chirp_cffi/high_level.py || exit /B 1
 python chirp_cffi/low_level.py || exit /B 1
