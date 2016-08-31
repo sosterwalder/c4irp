@@ -18,7 +18,7 @@ shift
 goto next-arg
 :args-done
 
-if "%config%" == "Debug" set flags=/Od /MDd
+if "%config%" == "Debug" set flags=/Od /MD
 if "%config%" == "Release" set flags=/Ox /MD /DNDEBUG
 
 set CFLAGS=/nologo /W3 %flags% -Ilibuv\include
@@ -30,12 +30,12 @@ copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\a
 cmd /C ".scripts\win-build.cmd" || exit /B 1
 pip install -U cffi
 python chirp_cffi/high_level.py || exit /B 1
-python chirp_cffi/low_level.py || exit /B 1
 
 if "%test%"=="true" goto test-it
 goto the-end
 
 :test-it
+python chirp_cffi/low_level.py || exit /B 1
 pip install -U click freeze hypothesis hypothesis-pytest pytest pytest_catchlog pytest_cov pytest_mock testfixtures || exit /B 1
 @rem TODO libuv\Debug\\run-tests.exe || exit /B 1
 :the-end
