@@ -43,8 +43,9 @@ ch_chirp_alloc_var(
         size_t* provided_size
 )
 //
-//   Allocate variable memory. The user can decide to allocate less memory. This
-//   is the interface provided by libuv, we hand the choice down to our user.
+//   Allocate variable memory. The user can decide to allocate less memory.
+//   This is the interface provided by libuv, we hand the choice down to our
+//   user.
 //
 // .. code-block:: cpp
 //

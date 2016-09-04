@@ -51,8 +51,8 @@ ch_pr_start(ch_protocol_t* protocol)
             0
     ));
     if(tmp_err != CH_SUCCESS) {
-        return tmp_err;  // NOCOV UV_EADDRINUSE can happen in tcp_bind or listen
-                         // on my systems it happends in listen
+        return tmp_err;  // NOCOV UV_EADDRINUSE can happen in tcp_bind or
+                         // listen on my systems it happends in listen
     }
     if(uv_tcp_nodelay(&protocol->serverv4, 1) < 0) {
         return CH_UV_ERROR;  // NOCOV don't know how to produce
@@ -137,7 +137,7 @@ ch_pr_stop(ch_protocol_t* protocol)
 
 // .. c:function::
 static void
-_ch_pr_on_new_connection(uv_stream_t* server, int status)
+_ch_pr_on_new_connection(uv_stream_t* server, int status) // NOCOV TODO
 //    :noindex:
 //
 //    see: :c:func:`_ch_pr_on_new_connection`

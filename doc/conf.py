@@ -17,7 +17,7 @@ import sys
 import os
 import sphinx_rtd_theme
 
-version_file = "../c4irp/version.py"
+version_file = "../chirp/version.py"
 with open(version_file) as f:
     code = compile(f.read(), version_file, 'exec')
     exec(code)

@@ -9,7 +9,7 @@
 // .. c:function::
 static
 void*
-bad_alloc(
+bad_alloc( // NOCOV not testable since it segf
         size_t suggested_size,
         size_t required_size,
         size_t* provided_size

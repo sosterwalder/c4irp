@@ -13,15 +13,12 @@ endif
 COMMON        := config.h include/common.h
 
 LIBUVD        := build/libuv
-COMMONCFLAGS  := -std=gnu99 -fPIC -Wall -Werror -Wno-unused-function -I$(LIBUVD)/include -fPIC
-DEBUGCFLAGS   := -g $(COVERAGE)
+COMMONCFLAGS  := -std=gnu99 -fPIC -Wall -Wno-unused-function -I$(LIBUVD)/include -fPIC
+DEBUGCFLAGS   := -g -O0
 RELEASECFLAGS := -O3 -DNDEBUG 
 TESTLIBS      := libchirp.a libuv.a
 ### /Configuration
 
-DOCC=$(wildcard src/*.c)
-DOCH=$(wildcard src/*.h) $(wildcard include/*.h)
-DOCRST=$(DOCC:.c=.c.rst) $(DOCH:.h=.h.rst)
 TESTSRCS=$(wildcard src/*_etest.c)
 TESTEXECS=$(TESTSRCS:.c=)
 
@@ -85,10 +82,13 @@ clean:
 	git clean -xdf
 	cd build/libuv && git clean -xdf
 
+test-lib:
+	CFLAGS="$(MYCFLAGS)" make -C $(LIBUVD) check
+
 %.c: %.h
 
 %.o: %.c $(COMMON)
-	$(CC) -c -o $@ $< $(MYCFLAGS)
+	$(CC) -c -o $@ $< $(MYCFLAGS) -Werror $(COVERAGE)
 
 %_etest: %_etest.c libchirp
-	$(CC) -o $@ $@.o $(TESTLIBS) $(MYCFLAGS) $(LDFLAGS)
+	$(CC) -o $@ $@.o $(TESTLIBS) $(MYCFLAGS) -Werror $(COVERAGE) $(LDFLAGS)
