@@ -19,7 +19,7 @@ It is part of Concreteclouds_ and the C99 implementation of Chirp_.
 .. |appveyor| image:: https://ci.appveyor.com/api/projects/status/l8rw8oiv64ledar6?svg=true
    :target: https://ci.appveyor.com/project/ganwell/c4irp
 .. |rtd| image:: https://img.shields.io/badge/docs-master-brightgreen.svg
-   :target: http://checkmemaster.ignorelist.com/c4irp
+   :target: https://docs.adfinis-sygroup.ch/public/chirp/
 .. |coverage| image:: https://img.shields.io/badge/coverage-100%25-brightgreen.svg
 
 `Read the Docs`_
