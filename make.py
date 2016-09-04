@@ -10,6 +10,7 @@ dotfiles = [
     "floo",
     "flooignore",
     "clang_complete",
+    "requirements.txt",
 ]
 
 if 'CC' not in os.environ:
