@@ -10,7 +10,7 @@ docs:
   stage: docs
   script:
     - pyenv local 3.5.2
-    - make doc-all
+    - ./make.py doc-all
   artifacts:
     expire_in: 1 week
     paths:
@@ -20,22 +20,22 @@ test27:
   stage: tests
   script:
     - pyenv local 2.7.12
-    - make test-nolib
+    - NOLIB=true ./make.py test
 
 test34:
   stage: tests
   script:
     - pyenv local 3.4.5
-    - make test-nolib
+    - NOLIB=true ./make.py test
 
 test35:
   stage: tests
   script:
     - pyenv local 3.5.2
-    - make test-nolib
+    - NOLIB=true ./make.py test
 
 testlib:
   stage: tests
   script:
     - pyenv local 3.5.2
-    - make test-lib
+    - NOLIB=false ./make.py test-lib

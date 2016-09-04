@@ -37,6 +37,6 @@ if sys.platform == "win32":
 else:
     try:
         os.symlink("build/pyproject", "pyproject")
-    except FileExistsError:
+    except Exception:  # Well, lazy python 2/3 compat, really I don't care
         pass
     os.execvp("make", ["make", "-f", "build/project.make"] + sys.argv[1:])
