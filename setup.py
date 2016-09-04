@@ -1,6 +1,6 @@
 """Setuptools package definition."""
 
-from distutils.command import build as build_module
+from distutils.command import build_ext
 from setuptools import setup
 from setuptools import find_packages
 import codecs
@@ -38,7 +38,7 @@ with codecs.open(version_file, encoding="UTF-8") as f:
     exec(code, version)
 
 
-class Build(build_module.build):
+class Build(build_ext.build_ext):
     """Custom build class to build chirp before building the cffi extension."""
 
     def run(self):
@@ -46,7 +46,7 @@ class Build(build_module.build):
             os.system("cmd /C build\\winbuild.py")
         else:
             os.system('make -f build/build.make')
-        build_module.build.run(self)
+        build_ext.build_ext.run(self)
 
 
 def find_data(packages, extensions):
@@ -92,7 +92,7 @@ setup(
         "cffi",
     ],
     cmdclass = {
-        'build': Build,
+        'build_ext': Build,
     },
     author = "Jean-Louis Fuchs",
     author_email = "ganwell@fangorn.ch",
