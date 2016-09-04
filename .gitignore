@@ -20,7 +20,7 @@ __pycache__
 /.coverage
 /*.c
 /libuv.a
-/chirp.egg-info/
+/c4irp.egg-info/
 /chirp/*.c
 /*.info
 /doc/_build
@@ -34,3 +34,5 @@ __pycache__
 /Release
 /Debug
 /*.pyd
+/build/lib.*/
+/build/temp.*/
