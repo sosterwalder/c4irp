@@ -36,3 +36,8 @@ __pycache__
 /*.pyd
 /build/lib.*/
 /build/temp.*/
+/.clang_complete
+/.coafile
+/.floo
+/.flooignore
+/.syntastic_c_config
