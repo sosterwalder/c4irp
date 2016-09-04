@@ -78,8 +78,8 @@ Windows
 
 .. NOTE::
 
-   We support python 2.7 == Visual Studio 2008, we use c99conv to convert to c89
-   and we support python 3.5+ == Visual Studio 2015 without c99conv. Any future
+   To support *python 2.7 == Visual Studio 2008*, we use c99conv to convert to c89
+   and we support *python 3.5+ == Visual Studio 2015* without c99conv. Any future
    version of python that uses a newer version of Visual Studio has to added to
    the build-system explicitly.
 

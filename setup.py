@@ -44,7 +44,7 @@ class Build(build_ext.build_ext):
 
     def run(self):
         if sys.platform == "win32":
-            os.system("cmd /C build\\winbuild.py")
+            os.system("cmd /C python build\\winbuild.py")
         else:
             os.system('make -f build/build.make')
         build_ext.build_ext.run(self)
