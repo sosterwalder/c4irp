@@ -5,6 +5,7 @@ BUILDTYPE="$1"
 
 source /etc/profile
 pyenv local 3.5.2
+./make.py > /dev/null
 NOLIB=true
 if [ "$BUILDTYPE" == "lib" ]; then
     NOLIB=false ./make.py test-lib

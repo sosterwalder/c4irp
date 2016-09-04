@@ -82,7 +82,7 @@ clean:
 	git clean -xdf
 	cd build/libuv && git clean -xdf
 
-test-lib:
+test-lib: | libuv
 	CFLAGS="$(MYCFLAGS)" make -C $(LIBUVD) check
 
 %.c: %.h

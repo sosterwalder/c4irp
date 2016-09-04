@@ -1,5 +1,6 @@
 PROJECT := chirp
 GIT_HUB := https://github.com/concretecloud/c4irp
+PYPY    := $(shell python --version 2>&1 | grep PyPy > /dev/null 2> /dev/null; echo $$?)
 
 include build/pyproject/Makefile
 

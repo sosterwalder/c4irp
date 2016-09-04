@@ -2,6 +2,7 @@
 
 set -e
 
+./make.py > /dev/null
 if [ "$BUILDTYPE" == "osx-test" ]; then
     brew install libffi cppcheck
     sudo ./make.py test
