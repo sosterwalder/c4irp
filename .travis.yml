@@ -42,4 +42,4 @@ matrix:
       env: BUILDTYPE=osx-release
 
 script:
-  - ./.scripts/travis_run.sh 
+  - ./build/travis_run.sh

@@ -25,10 +25,14 @@ doc-all: $(DOCRST) doc  ## Build using c2rst and then generate docs
 cpp-check:  ## Run cppcheck on the project
 	cppcheck -v --std=c99 -Iinclude -I$(LIBUVD)/include --config-exclude=$(LIBUVD)/include -D_SGLIB__h_ --error-exitcode=1 --inline-suppr --enable=warning,style,performance,portability,information,missingInclude src/
 
+ifeq ($(NOLIB),true)
+test-lib:
+else
 test-lib:
 	make -f build/build.make test-lib
+endif
 
-genhtml:  ## Generate html coverage report
+genhtml:.python-version  ## Generate html coverage report
 	mkdir -p lcov_tmp
 	cd lcov_tmp && genhtml --config-file ../lcovrc ../app_total.info
 	cd lcov_tmp && open index.html
