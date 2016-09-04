@@ -34,7 +34,7 @@ WORK IN PROGRESS
 Development
 ===========
 
-Known environment variables:
+Known environment variables::
 
    * CC must be the compiler used to build python. Use
 
@@ -64,15 +64,17 @@ Requirements:
 Windows
 -------
 
-* Install Python 2 (gyp needs this)
+::
 
-* Install Visual Studio 2015 if you want to build for python 3
+   * Install Python 2 (gyp needs this)
 
-   * Select Git for Windows in Visual Studio Installer or install it
+   * Install Visual Studio 2015 if you want to build for python 3
 
-* Install Visual Studio_ 2008 Express
+      * Select Git for Windows in Visual Studio Installer or install it
 
-* Install Windows SDK_ for Windows Server 2008 and .NET Framework 3.5 (python 2)
+   * Install Visual Studio_ 2008 Express
+
+   * Install Windows SDK_ for Windows Server 2008 and .NET Framework 3.5 (python 2)
 
 .. _Studio: http://download.microsoft.com/download/E/8/E/E8EEB394-7F42-4963-A2D8-29559B738298/VS2008ExpressWithSP1ENUX1504728.iso
 
@@ -105,10 +107,12 @@ Please contact me for alternative licenses.
 Copyright
 =========
 
-* © 2016-∞ Jean-Louis Fuchs
+::
 
-* © 2016-∞ Adfinis-SyGroup AG
+   * © 2016-∞ Jean-Louis Fuchs
 
-source used in this reposoitory
+   * © 2016-∞ Adfinis-SyGroup AG
 
-* libuv see https://github.com/libuv/libuv
+source used in this reposoitory::
+
+   * libuv see https://github.com/libuv/libuv
