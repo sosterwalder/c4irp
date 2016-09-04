@@ -34,24 +34,24 @@ WORK IN PROGRESS
 Development
 ===========
 
-Known environment variables::
+Known environment variables:
 
-   * CC must be the compiler used to build python. Use
+* CC must be the compiler used to build python. Use
 
-      * CC=clang pyenv install 3.5.2 to get a clang version of python
+  * CC=clang pyenv install 3.5.2 to get a clang version of python
 
-      * Defaults to gcc and is ignored on Windows
+  * Defaults to gcc and is ignored on Windows
 
-   * MODE=debug|release defaults to release
+* MODE=debug|release defaults to release
 
-   * CFLAGS if you define this all the CFLAGS automatically generated will be
-     replaced by your CFLAGS
+* CFLAGS if you define this all the CFLAGS automatically generated will be
+  replaced by your CFLAGS
 
-   * LDFLAGS if you define this all the LDFLAGS automatically generated will be
-     replaced by your LDFLAGS
+* LDFLAGS if you define this all the LDFLAGS automatically generated will be
+  replaced by your LDFLAGS
 
-   * The python version currently in path as python(.exe) will be used. Use
-     virtualenv, pyenv or pyenv+virtualenv to change the python version
+* The python version currently in path as python(.exe) will be used. Use
+  virtualenv, pyenv or pyenv+virtualenv to change the python version
 
 Requirements:
 
@@ -64,17 +64,15 @@ Requirements:
 Windows
 -------
 
-::
+* Install Python 2 (gyp needs this)
 
-   * Install Python 2 (gyp needs this)
+* Install Visual Studio 2015 if you want to build for python 3
 
-   * Install Visual Studio 2015 if you want to build for python 3
+  * Select Git for Windows in Visual Studio Installer or install it
 
-      * Select Git for Windows in Visual Studio Installer or install it
+* Install Visual Studio_ 2008 Express
 
-   * Install Visual Studio_ 2008 Express
-
-   * Install Windows SDK_ for Windows Server 2008 and .NET Framework 3.5 (python 2)
+* Install Windows SDK_ for Windows Server 2008 and .NET Framework 3.5 (python 2)
 
 .. _Studio: http://download.microsoft.com/download/E/8/E/E8EEB394-7F42-4963-A2D8-29559B738298/VS2008ExpressWithSP1ENUX1504728.iso
 
@@ -107,12 +105,10 @@ Please contact me for alternative licenses.
 Copyright
 =========
 
-::
+* © 2016-∞ Jean-Louis Fuchs
 
-   * © 2016-∞ Jean-Louis Fuchs
+* © 2016-∞ Adfinis-SyGroup AG
 
-   * © 2016-∞ Adfinis-SyGroup AG
+source used in this reposoitory:
 
-source used in this reposoitory::
-
-   * libuv see https://github.com/libuv/libuv
+* libuv see https://github.com/libuv/libuv
