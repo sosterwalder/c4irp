@@ -41,4 +41,5 @@ __pycache__
 /.floo
 /.flooignore
 /.syntastic_c_config
+/pytest.ini
 /pyproject
