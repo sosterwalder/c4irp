@@ -2,7 +2,6 @@
 """OS independent entry point for the project."""
 import os
 import sys
-import shutil
 
 dotfiles = [
     "syntastic_c_config",

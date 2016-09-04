@@ -37,8 +37,10 @@ Development
 Known environment variables:
 
    * CC must be the compiler used to build python. Use
-     * CC=clang pyenv install 3.5.2 to get a clang version of python
-     * Defaults to gcc and is ignored on Windows
+
+      * CC=clang pyenv install 3.5.2 to get a clang version of python
+
+      * Defaults to gcc and is ignored on Windows
 
    * MODE=debug|release defaults to release
 
