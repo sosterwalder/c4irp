@@ -2,6 +2,7 @@
 """OS independent entry point for the project."""
 import os
 import sys
+import shutil
 
 dotfiles = [
     "syntastic_c_config",
@@ -12,13 +13,14 @@ dotfiles = [
 ]
 
 if 'CC' not in os.environ:
-    # Set the same compiler python uses
-    import distutils.sysconfig
-    import distutils.ccompiler
-    compiler = distutils.ccompiler.new_compiler()
-    distutils.sysconfig.get_config_var('CUSTOMIZED_OSX_COMPILER')
-    distutils.sysconfig.customize_compiler(compiler)
-    os.environ['CC'] = compiler.compiler_so[0]
+    if sys.platform != "win32":
+        # Set the same compiler python uses
+        import distutils.sysconfig
+        import distutils.ccompiler
+        compiler = distutils.ccompiler.new_compiler()
+        distutils.sysconfig.get_config_var('CUSTOMIZED_OSX_COMPILER')
+        distutils.sysconfig.customize_compiler(compiler)
+        os.environ['CC'] = compiler.compiler_so[0]
 if 'MODE' not in os.environ:
     os.environ['MODE'] = "debug"
 
@@ -29,7 +31,10 @@ def make_dotfiles(files):
         target = ".%s" % file_
         if not os.path.exists(target):
             source = os.path.join("build", file_)
-            os.symlink(source, target)
+            if sys.platform == "win32":
+                shutil.copy(source, target)
+            else:
+                os.symlink(source, target)
 
 make_dotfiles(dotfiles)
 

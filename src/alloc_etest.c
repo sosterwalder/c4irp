@@ -9,10 +9,10 @@
 // .. c:function::
 static
 void*
-bad_alloc( // NOCOV not testable since it segf
-        size_t suggested_size,
-        size_t required_size,
-        size_t* provided_size
+bad_alloc( // NOCOV not testable since it segfaults
+        size_t suggested_size, // NOCOV not testable since it segf
+        size_t required_size, // NOCOV not testable since it segf
+        size_t* provided_size // NOCOV not testable since it segf
 )
 //
 //    A bad allocator to test if it causes asserts.
