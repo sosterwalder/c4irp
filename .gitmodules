@@ -1,6 +1,6 @@
 [submodule "libuv"]
-	path = libuv
+	path = build/libuv
 	url = https://github.com/concretecloud/libuv.git
 [submodule "pyproject"]
-	path = pyproject
+	path = build/pyproject
 	url = https://github.com/adfinis-sygroup/pyproject.git

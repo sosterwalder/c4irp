@@ -1,6 +1,5 @@
 /.deps
 /.python-version
-/build
 __pycache__
 *.o
 *.pyc
@@ -9,7 +8,7 @@ __pycache__
 *.gcno
 *.gcov
 *.obj
-*.lib
+/*.lib
 /c4irp.info
 /app_total.info
 /array_test
@@ -20,8 +19,9 @@ __pycache__
 /.cache
 /.coverage
 /*.c
-/c4irp.egg-info/
-/c4irp/*.c
+/libuv.a
+/chirp.egg-info/
+/chirp/*.c
 /*.info
 /doc/_build
 /src/*.rst

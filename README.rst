@@ -34,23 +34,43 @@ WORK IN PROGRESS
 Development
 ===========
 
+Known environment variables:
+
+   * CC must be the compiler used to build python. Use
+     * CC=clang pyenv install 3.5.2 to get a clang version of python
+     * Defaults to gcc and is ignored on Windows
+
+   * MODE=debug|release defaults to release
+
+   * CFLAGS if you define this all the CFLAGS automatically generated will be
+     replaced by your CFLAGS
+
+   * LDFLAGS if you define this all the LDFLAGS automatically generated will be
+     replaced by your LDFLAGS
+
+   * The python version currently in path as python(.exe) will be used. Use
+     virtualenv, pyenv or pyenv+virtualenv to change the python version
+
+Requirements:
+
 .. code-block:: bash
 
    apt-get install build-essential automake autoconf cmake clang llvm libssl-dev libssl1.0.0-dbg
-   make test-all
+
+   make.py test
 
 Windows
 -------
 
 * Install Python 2 (gyp needs this)
 
-* Install Visual Studio latest
+* Install Visual Studio 2015 if you want to build for python 3
 
    * Select Git for Windows in Visual Studio Installer or install it
 
 * Install Visual Studio_ 2008 Express
 
-* Install Windows SDK_ for Windows Server 2008 and .NET Framework 3.5
+* Install Windows SDK_ for Windows Server 2008 and .NET Framework 3.5 (python 2)
 
 .. _Studio: http://download.microsoft.com/download/E/8/E/E8EEB394-7F42-4963-A2D8-29559B738298/VS2008ExpressWithSP1ENUX1504728.iso
 
@@ -58,19 +78,20 @@ Windows
 
 .. NOTE::
 
-   Python 2 needs all this, Python 3 is easier, but we need it anyways.
-   Python 2 also recommends to use this exact versions, since Windows is too much
-   work anyways. I just followed the instructions as close as possible.
+   We support python 2.7 == Visual Studio 2008, we use c99conv to convert to c89
+   and we support python 3.5+ == Visual Studio 2015 without c99conv. Any future
+   version of python that uses a newer version of Visual Studio has to added to
+   the build-system explicitly.
 
    Note also, its no real development setup, it always builds everything.
 
 .. code-block:: bash
 
-   cmd /C "makefile.cmd debug test"
+   cmd /C "python make.py"
 
    # or
 
-   cmd /C "makefile.cmd release"
+   cmd /C "python make.py test"
 
 License
 =======

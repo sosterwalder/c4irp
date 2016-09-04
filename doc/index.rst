@@ -5,6 +5,7 @@ Concrete Clouds C Chirp (C4irp)
 .. toctree::
    :maxdepth: 3
 
+   RULES.rst
    rfcs.rst
    reference.rst
 

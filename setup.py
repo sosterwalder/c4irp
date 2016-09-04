@@ -1,54 +1,32 @@
-"""Setuptools package definition"""
+"""Setuptools package definition."""
 
 # pylint: disable=exec-used
 from setuptools import setup
 from setuptools import find_packages
-from setuptools.command.install import install
 import codecs
 import os
 import sys
 
-base_dir = os.path.dirname(os.path.realpath(__file__))
-CFLAGS = [
-    "-O3",
-    "-DNDEBUG",
-    "-Wall",
-    "-Werror",
-    "-Wno-unused-function",
-    "-Ilibuv/include",
-    "-fPIC",
-]
-
-os.environ["SETUPCFLAGS"] = (
-    " ".join(CFLAGS)
-)
-
-requires = [
+MYCFLAGS = requires = [
     "cffi",
     "six",
 ]
 if sys.version_info < (3, 2):
     requires.append("futures")
+cffi_modules = ["chirp_cffi/high_level.py:ffi"]
+if os.environ['MODE'].lower() == "debug":
+    cffi_modules.append("chirp_cffi/high_level.py:ffi")
 
-__version__  = None
-version_file = "c4irp/version.py"
+
+version_file = "chirp/version.py"
+version = {}
 with codecs.open(version_file, encoding="UTF-8") as f:
     code = compile(f.read(), version_file, 'exec')
-    exec(code)
-
-
-class CustomInstallCommand(install):
-    """CustomInstallCommand"""
-    def run(self):
-        if sys.platform == "win32":
-            os.system("cmd /C makefile.cmd release")
-        else:
-            os.system('make -f make.release')
-        install.run(self)
+    exec(code, version)
 
 
 def find_data(packages, extensions):
-    """Finds data files along with source.
+    """Find data files along with source.
 
     :param   packages: Look in these packages
     :param extensions: Look for these extensions
@@ -75,8 +53,8 @@ with codecs.open('README.rst', 'r', encoding="UTF-8") as f:
 
 setup(
     name = "c4irp",
-    version = __version__,
-    cffi_modules=["chirp_cffi/high_level.py:ffi"],
+    version = version['__version__'],
+    cffi_modules=cffi_modules,
     packages = find_packages(),
     package_data=find_data(
         find_packages(), ["pem"]
@@ -89,9 +67,6 @@ setup(
     setup_requires = [
         "cffi",
     ],
-    cmdclass = {
-        'install': CustomInstallCommand,
-    },
     author = "Jean-Louis Fuchs",
     author_email = "ganwell@fangorn.ch",
     description = "Message-passing and actor-based programming for everyone",
