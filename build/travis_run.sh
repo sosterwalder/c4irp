@@ -10,5 +10,5 @@ elif [ "$BUILDTYPE" == "osx-release" ]; then
     sudo python setup.py install
 else
     docker run -v $PWD:/outside adfinissygroup/chirp-jessie /bin/sh \
-        -c "cd /outside && ./.scripts/docker_run.sh $BUILDTYPE"
+        -c "cd /outside && ./build/docker_run.sh $BUILDTYPE"
 fi
