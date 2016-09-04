@@ -59,7 +59,7 @@ Requirements:
 
    apt-get install build-essential automake autoconf cmake clang llvm libssl-dev libssl1.0.0-dbg
 
-   make.py test
+   ./make.py test
 
 Windows
 -------

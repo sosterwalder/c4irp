@@ -45,8 +45,8 @@ build: $(BUILDS)
 
 libchirp-depends: | libuv
 
-config.h: | config.defs.h
-	cp config.defs.h config.h
+config.h: | build/config.defs.h
+	cp build/config.defs.h config.h
 
 $(LIBUVD)/configure:
 	cd $(LIBUVD) && ./autogen.sh
