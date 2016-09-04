@@ -13,7 +13,7 @@ endif
 COMMON        := config.h include/common.h
 
 LIBUVD        := build/libuv
-COMMONCFLAGS  := -std=gnu99 -fPIC -Wall -Wno-unused-function -I$(LIBUVD)/include -fPIC
+COMMONCFLAGS  := -std=gnu99 -fPIC -Wall -Wno-unused-function -I$(LIBUVD)/include $(CFLAGS)
 DEBUGCFLAGS   := -g -O0
 RELEASECFLAGS := -O3 -DNDEBUG 
 TESTLIBS      := libchirp.a libuv.a

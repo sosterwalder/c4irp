@@ -44,11 +44,9 @@ Known environment variables:
 
 * MODE=debug|release defaults to release
 
-* CFLAGS if you define this all the CFLAGS automatically generated will be
-  replaced by your CFLAGS
+* CFLAGS ignored on Windows
 
-* LDFLAGS if you define this all the LDFLAGS automatically generated will be
-  replaced by your LDFLAGS
+* LDFAGS ignored on Windows, only used by distutils
 
 * The python version currently in path as python(.exe) will be used. Use
   virtualenv, pyenv or pyenv+virtualenv to change the python version
