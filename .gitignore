@@ -41,3 +41,4 @@ __pycache__
 /.floo
 /.flooignore
 /.syntastic_c_config
+/pyproject
