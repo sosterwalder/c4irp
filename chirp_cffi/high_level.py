@@ -1,3 +1,4 @@
+"""Defines the high-level bindings of libchirp."""
 from cffi import FFI
 from chirp_cffi.cffi_common import libs
 
@@ -10,7 +11,7 @@ ffi.set_source(
     """,
     libraries=libs,
     library_dirs=["."],
-    include_dirs=["include", "libuv/include"],
+    include_dirs=["include", "build/libuv/include"],
 )
 
 

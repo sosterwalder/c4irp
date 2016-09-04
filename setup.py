@@ -1,21 +1,34 @@
 """Setuptools package definition."""
 
-# pylint: disable=exec-used
+from distutils.command import build as build_module
 from setuptools import setup
 from setuptools import find_packages
 import codecs
 import os
 import sys
 
-MYCFLAGS = requires = [
+requires = [
     "cffi",
     "six",
 ]
 if sys.version_info < (3, 2):
     requires.append("futures")
 cffi_modules = ["chirp_cffi/high_level.py:ffi"]
+if '-g' in sys.argv:
+    os.environ['MODE'] = "debug"
+if 'CC' not in os.environ:
+    # Set the same compiler python uses
+    import distutils.sysconfig
+    import distutils.ccompiler
+    compiler = distutils.ccompiler.new_compiler()
+    distutils.sysconfig.customize_compiler(compiler)
+    os.environ['CC'] = compiler.compiler_so[0]
+if 'MODE' not in os.environ:
+    os.environ['MODE'] = "release"
 if os.environ['MODE'].lower() == "debug":
     cffi_modules.append("chirp_cffi/high_level.py:ffi")
+else:
+    os.environ['MODE'] = "release"
 
 
 version_file = "chirp/version.py"
@@ -23,6 +36,17 @@ version = {}
 with codecs.open(version_file, encoding="UTF-8") as f:
     code = compile(f.read(), version_file, 'exec')
     exec(code, version)
+
+
+class Build(build_module.build):
+    """Custom build class to build chirp before building the cffi extension."""
+
+    def run(self):
+        if sys.platform == "win32":
+            os.system("cmd /C build\\winbuild.py")
+        else:
+            os.system('make -f build/build.make')
+        build_module.build.run(self)
 
 
 def find_data(packages, extensions):
@@ -67,6 +91,9 @@ setup(
     setup_requires = [
         "cffi",
     ],
+    cmdclass = {
+        'build': Build,
+    },
     author = "Jean-Louis Fuchs",
     author_email = "ganwell@fangorn.ch",
     description = "Message-passing and actor-based programming for everyone",
