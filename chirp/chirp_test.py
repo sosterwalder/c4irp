@@ -6,8 +6,9 @@ from contextlib import contextmanager
 from hypothesis import strategies as st
 from hypothesis import given
 
-from . import ChirpPool
 from _chirp_cffi import ffi, lib
+
+from . import ChirpPool
 
 config_st = st.fixed_dictionaries({
     "REUSE_TIME"   : st.integers(2, 3600),

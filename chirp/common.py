@@ -3,6 +3,7 @@
 import itertools
 import logging
 import subprocess
+
 import six
 
 LG = logging.getLogger("c4irp")

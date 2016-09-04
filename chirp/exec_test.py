@@ -3,7 +3,6 @@
 
 from . import sh
 
-
 array = sh.command("src/array_etest")
 alloc = sh.command("src/alloc_etest")
 
