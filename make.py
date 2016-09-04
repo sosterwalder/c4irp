@@ -30,17 +30,17 @@ def make_dotfiles(files):
     """Copy the dot-files if they are missing."""
     for file_ in files:
         target = ".%s" % file_
-        if not os.path.exists(target):
-            source = os.path.join("build", file_)
-            make_file(source, target)
+        source = os.path.join("build", file_)
+        make_file(source, target)
 
 
 def make_file(source, target):
     """Symlink or copy a file."""
-    if sys.platform == "win32":
-        shutil.copy(source, target)
-    else:
-        os.symlink(source, target)
+    if not os.path.exists(target):
+        if sys.platform == "win32":
+            shutil.copy(source, target)
+        else:
+            os.symlink(source, target)
 
 make_dotfiles(dotfiles)
 make_file(os.path.join("build", "pytest.ini"), "pytest.ini")
