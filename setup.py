@@ -21,6 +21,7 @@ if 'CC' not in os.environ:
     import distutils.sysconfig
     import distutils.ccompiler
     compiler = distutils.ccompiler.new_compiler()
+    distutils.sysconfig.get_config_var('CUSTOMIZED_OSX_COMPILER')
     distutils.sysconfig.customize_compiler(compiler)
     os.environ['CC'] = compiler.compiler_so[0]
 if 'MODE' not in os.environ:
