@@ -26,7 +26,7 @@ if 'CC' not in os.environ:
 if 'MODE' not in os.environ:
     os.environ['MODE'] = "release"
 if os.environ['MODE'].lower() == "debug":
-    cffi_modules.append("chirp_cffi/high_level.py:ffi")
+    cffi_modules.append("chirp_cffi/low_level.py:ffi")
 else:
     os.environ['MODE'] = "release"
 

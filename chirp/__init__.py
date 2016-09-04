@@ -7,7 +7,7 @@ from _chirp_cffi import ffi
 from .chirp import ChirpPool  # noqa
 from .const import Config  # noqa
 
-LG = logging.getLogger("c4irp")
+LG = logging.getLogger("chirp")
 
 if sys.version_info > (3, 4):  # noqa
     from .chirp import ChirpAsync  # noqa # pragma: no cover

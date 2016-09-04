@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from hypothesis import strategies as st
 from hypothesis import given
 
-import c4irp
+from . import ChirpPool
 from _chirp_cffi import ffi, lib
 
 config_st = st.fixed_dictionaries({
@@ -134,9 +134,9 @@ def test_chirp_server_handshake():
 def init_chirp(c=None):
     """Initialize chirp for basic tests."""
     if c is None:
-        chirp = c4irp.ChirpPool()
+        chirp = ChirpPool()
     else:
-        chirp = c4irp.ChirpPool(c)
+        chirp = ChirpPool(c)
     chirp._chirp.identity = [0] * 16
     chirp._chirp.loop = ffi.NULL
     assert chirp._chirp.loop == ffi.NULL

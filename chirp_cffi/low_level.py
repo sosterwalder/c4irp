@@ -1,6 +1,6 @@
 """Defines the low-level bindings of libchirp used for testing."""
 from cffi import FFI
-from chirp_cffi.cffi_common import libs
+from chirp_cffi.cffi_common import libs, cflags, ldflags
 
 ffi = FFI()
 
@@ -12,6 +12,8 @@ ffi.set_source(
     libraries=libs,
     library_dirs=["."],
     include_dirs=["include", "build/libuv/include"],
+    extra_compile_args=cflags,
+    extra_link_args=ldflags,
 )
 
 
