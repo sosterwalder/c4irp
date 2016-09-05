@@ -22,23 +22,15 @@ if "%config%" == "Release" set flags=/Ox /MD /DNDEBUG
 
 set CFLAGS=/nologo /W3 %flags% -Ibuild\libuv\include
 
-call "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat"
-set GYP_MSVS_VERSION=2008
-copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\vcvarsamd64.bat"
-copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\amd64\vcvarsamd64.bat"
+call "%VS140COMNTOOLS%\..\..\vc\vcvarsall.bat" %vs_toolset%
+set GYP_MSVS_VERSION=2015
 python build\winbuild.py || exit /B 1
-pushd build\libuv
-cmd /C vcbuild.bat nobuild %mode% %vs_toolset% || exit /B 1
-vcbuild.exe /platform:%msbuild_platform% libuv.vcproj Chirp%config% || exit /B 1
-popd
+cmd /C build\vcbuildwrap.cmd || exit /B 1
 copy build\libuv\Chirp%config%\lib\libuv.lib uv.lib || exit /B 1
 if "%test%"=="true" goto testit
 goto theend
 
 :testit
-pushd build\libuv
-vcbuild.exe /platform:%msbuild_platform% run-tests.vcproj Chirp%config% || exit /B 1
-popd
 build\libuv\Chirp%config%\run-tests.exe || exit /B 1
 :theend
 exit /B 0

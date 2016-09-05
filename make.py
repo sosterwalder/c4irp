@@ -47,7 +47,11 @@ make_file(os.path.join("build", "pytest.ini"), "pytest.ini")
 
 if sys.platform == "win32":
     make_file(os.path.join("build", "config.defs.h"), "config.h")
-    os.system(" ".join(["build\\winbuildlibs2008.cmd"] + sys.argv[1:]))
+    c99 =  sys.version_info > (3, 4)
+    if c99:
+        os.system(" ".join(["build\\winbuildlibs2015.cmd"] + sys.argv[1:]))
+    else:
+        os.system(" ".join(["build\\winbuildlibs2008.cmd"] + sys.argv[1:]))
 else:
     try:
         os.symlink("build/pyproject", "pyproject")
