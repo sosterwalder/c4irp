@@ -45,8 +45,6 @@ class Build(build_ext.build_ext):
 
     def run(self):
         if sys.platform == "win32":
-            if 'MODE' not in os.environ:
-                os.environ['MODE'] = "release"
             os.system("cmd /C python make.py")
         else:
             os.system('make -f build/build.make')
