@@ -41,6 +41,10 @@
 //
 //       General TLS error
 //
+//    .. c:member:: CH_UNINIT
+//
+//       Chirp or another object is not initialized
+//
 // .. code-block:: cpp
 //
 typedef enum {
@@ -51,6 +55,7 @@ typedef enum {
     CH_EADDRINUSE     = 4,
     CH_FATAL          = 5,
     CH_TLS_ERROR      = 6,
+    CH_UNINIT         = 7,
 } ch_error_t;
 
 #endif //ch_inc_error_h

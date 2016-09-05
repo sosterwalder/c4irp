@@ -39,13 +39,14 @@ main(
 // .. code-block:: cpp
 
 {
+    ch_chirp_t chirp;
+    uv_loop_t loop;
     int bad = strtol(argv[1], NULL, 10);
     ch_config_t config = ch_config_defaults;
+
     if(bad) {
         config.ALLOC_CB = bad_alloc; // NOCOV not testable since it segfaults
     } // NOCOV not testable since it segfaults
-    ch_chirp_t chirp;
-    uv_loop_t loop;
     ch_loop_init(&loop);
     ch_chirp_init(&chirp, &config, &loop);
 }

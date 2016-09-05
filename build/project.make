@@ -13,7 +13,7 @@ DOCH=$(wildcard src/*.h) $(wildcard include/*.h)
 DOCRST=$(DOCC:.c=.c.rst) $(DOCH:.h=.h.rst)
 
 vi:  ## Start a vim editing the imporant files
-	vim *.rst src/*.c src/*.h c4irp/*.py chirp_cffi/*.py include/*.h doc/ref/* config.defs.h makefile.cmd Makefile
+	vim *.rst src/*.c src/*.h chirp/*.py chirp_cffi/*.py include/*.h doc/ref/* build/config.defs.h
 
 lldb: all  ## Build and run py.test in lldb
 	echo lldb `pyenv which python` -- -m pytest -x

@@ -25,7 +25,7 @@ if sys.platform == "win32":
     ])
     if os.environ['MODE'].lower() == "debug":
         cflags.extend(["/Zi", "/Od", "/DEBUG"])
-        ldflags.extend(["/Zi", "/Od", "/DEBUG"])
+        ldflags.extend(["/DEBUG"])
 else:
     libs.extend([
         "m",
