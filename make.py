@@ -46,7 +46,10 @@ make_dotfiles(dotfiles)
 make_file(os.path.join("build", "pytest.ini"), "pytest.ini")
 
 if sys.platform == "win32":
-    pass
+    make_file(os.path.join("build", "config.defs.h"), "config.h")
+    os.execvp("cmd", [
+        "cmd", "/K", "build\\winbuildlibs2008.cmd"
+    ] + sys.argv[1:])
 else:
     try:
         os.symlink("build/pyproject", "pyproject")

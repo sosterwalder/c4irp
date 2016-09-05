@@ -9,6 +9,7 @@ __pycache__
 *.gcov
 *.obj
 /*.lib
+/*.pdb
 /c4irp.info
 /app_total.info
 /array_test
@@ -41,5 +42,7 @@ __pycache__
 /.floo
 /.flooignore
 /.syntastic_c_config
+/.requirements.txt
+/dist
 /pytest.ini
 /pyproject

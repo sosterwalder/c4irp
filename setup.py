@@ -17,13 +17,14 @@ cffi_modules = ["chirp_cffi/high_level.py:ffi"]
 if '-g' in sys.argv:
     os.environ['MODE'] = "debug"
 if 'CC' not in os.environ:
-    # Set the same compiler python uses
-    import distutils.sysconfig
-    import distutils.ccompiler
-    compiler = distutils.ccompiler.new_compiler()
-    distutils.sysconfig.get_config_var('CUSTOMIZED_OSX_COMPILER')
-    distutils.sysconfig.customize_compiler(compiler)
-    os.environ['CC'] = compiler.compiler_so[0]
+    if sys.platform != "win32":
+        # Set the same compiler python uses
+        import distutils.sysconfig
+        import distutils.ccompiler
+        compiler = distutils.ccompiler.new_compiler()
+        distutils.sysconfig.get_config_var('CUSTOMIZED_OSX_COMPILER')
+        distutils.sysconfig.customize_compiler(compiler)
+        os.environ['CC'] = compiler.compiler_so[0]
 if 'MODE' not in os.environ:
     os.environ['MODE'] = "release"
 if os.environ['MODE'].lower() == "debug":
@@ -44,7 +45,9 @@ class Build(build_ext.build_ext):
 
     def run(self):
         if sys.platform == "win32":
-            os.system("cmd /C python build\\winbuild.py")
+            if 'MODE' not in os.environ:
+                os.environ['MODE'] = "release"
+            os.system("cmd /C python make.py")
         else:
             os.system('make -f build/build.make')
         build_ext.build_ext.run(self)

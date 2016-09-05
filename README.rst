@@ -87,11 +87,12 @@ Windows
 
 .. code-block:: bash
 
-   cmd /C "python make.py"
+   build\stdpython2.cmd
+   python make.py
 
    # or
 
-   cmd /C "python make.py test"
+   make.py test
 
 License
 =======
