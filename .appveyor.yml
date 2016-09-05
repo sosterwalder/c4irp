@@ -4,9 +4,7 @@ environment:
 
 build: off
 install:
-  - set PATH=c:\\msys64\\usr\\bin;%PATH%
-  - set PATH=c:\\msys64\\mingw64\\bin;%PATH%
   - git submodule update --init --recursive
 
 test_script:
-  - make test-all
+  - build\appveyor2.cmd

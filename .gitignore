@@ -46,3 +46,4 @@ __pycache__
 /dist
 /pytest.ini
 /pyproject
+/watch_dir/
