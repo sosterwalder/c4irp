@@ -21,7 +21,8 @@ if sys.platform == "win32":
         "shell32",
         "user32",
         "userenv",
-        "ws2_32"
+        "ws2_32",
+        "kernel32",
     ])
     if os.environ['MODE'].lower() == "debug":
         cflags.extend(["/Zi", "/Od", "/DEBUG"])
