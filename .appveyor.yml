@@ -8,3 +8,7 @@ install:
 
 test_script:
   - build\appveyor2.cmd
+
+- path: .
+    name: build
+    type: zip
