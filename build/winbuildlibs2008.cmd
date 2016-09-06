@@ -26,13 +26,12 @@ copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\v
 copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\amd64\vcvarsamd64.bat"
 call "%VS90COMNTOOLS%\..\..\vc\vcvarsall.bat" %vs_toolset%
 set GYP_MSVS_VERSION=2008
-set
-python build\winbuild.py || exit /B 1
 pushd build\libuv
 cmd /C vcbuild.bat nobuild %mode% %vs_toolset% || exit /B 1
 vcbuild.exe /platform:%msbuild_platform% libuv.vcproj Chirp%config% || exit /B 1
 popd
 copy build\libuv\Chirp%config%\lib\libuv.lib uv.lib || exit /B 1
+python build\winbuild.py || exit /B 1
 if "%test%"=="true" goto testit
 goto theend
 
