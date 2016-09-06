@@ -2,12 +2,15 @@ environment:
   global:
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
-build: off
+build: on
 install:
   - git submodule update --init --recursive
 
-test_script:
+build_script:
   - build\appveyor2.cmd
+
+test_script:
+  - build\appveyortest2.cmd
 
 artifacts:
   - path: .
