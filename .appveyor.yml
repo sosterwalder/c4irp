@@ -1,17 +1,21 @@
 environment:
-  global:
-    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
-build: on
+  matrix:
+
+    - PYTHON: "C:\\Python27"
+    - PYTHON: "C:\\Python35"
+    - PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python35-x64"
+
 install:
+  - "%PYTHON%\\python.exe -m pip install wheel"
   - git submodule update --init --recursive
 
 build_script:
-  - build\appveyor2.cmd
+  - build\appveyor.cmd
 
 test_script:
-  - build\appveyortest2.cmd
+  - build\appveyortest.cmd
 
 artifacts:
-  - path: build.zip
-    name: build
+  - path: dist\*
