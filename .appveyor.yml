@@ -1,11 +1,12 @@
 environment:
 
   matrix:
-
     - PYTHONVER: "C:\\Python27"
     - PYTHONVER: "C:\\Python35"
     - PYTHONVER: "C:\\Python27-x64"
     - PYTHONVER: "C:\\Python35-x64"
+    - PYTHONVER: "C:\\Python35"
+      TESTLIB: true
 
 install:
   - "%PYTHONVER%\\python.exe -m pip install wheel"

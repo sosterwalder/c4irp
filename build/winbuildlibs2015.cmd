@@ -24,9 +24,9 @@ set CFLAGS=/nologo /W3 %flags% -Ibuild\libuv\include
 
 call "%VS140COMNTOOLS%\..\..\vc\vcvarsall.bat" %vs_toolset%
 set GYP_MSVS_VERSION=2015
-python build\winbuild.py || exit /B 1
 cmd /C build\vcbuildwrap.cmd || exit /B 1
 copy build\libuv\Chirp%config%\lib\libuv.lib uv.lib || exit /B 1
+python build\winbuild.py || exit /B 1
 if "%test%"=="true" goto testit
 goto theend
 

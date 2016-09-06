@@ -32,13 +32,4 @@ vcbuild.exe /platform:%msbuild_platform% libuv.vcproj Chirp%config% || exit /B 1
 popd
 copy build\libuv\Chirp%config%\lib\libuv.lib uv.lib || exit /B 1
 python build\winbuild.py || exit /B 1
-if "%test%"=="true" goto testit
-goto theend
-
-:testit
-pushd build\libuv
-vcbuild.exe /platform:%msbuild_platform% run-tests.vcproj Chirp%config% || exit /B 1
-popd
-build\libuv\Chirp%config%\run-tests.exe || exit /B 1
-:theend
 exit /B 0
