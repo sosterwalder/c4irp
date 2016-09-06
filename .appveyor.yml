@@ -13,8 +13,6 @@ install:
 
 build_script:
   - build\appveyor.cmd
-
-test_script:
   - build\appveyortest.cmd
 
 artifacts:
