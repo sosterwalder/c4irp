@@ -10,6 +10,6 @@ test_script:
   - build\appveyor2.cmd
 
 artifacts:
-  - path: *
+  - path: *.lib
     name: build
     type: zip
