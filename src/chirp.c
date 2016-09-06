@@ -137,7 +137,7 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
     uv_loop_t  loop;
     ch_error_t tmp_err;
     if(chirp_out == NULL) {
-        return CH_UNINIT;
+        return CH_UNINIT; // NOCOV  TODO can be tested
     }
     *chirp_out = NULL;
 
@@ -187,3 +187,4 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
     }
     return CH_SUCCESS;
 }
+
