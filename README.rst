@@ -62,6 +62,14 @@ Requirements:
 Windows
 -------
 
+Use the testbuilds:
+
+* https://ci.appveyor.com/project/ganwell/c4irp
+
+* Navigate to the artifacts
+
+Or build ourself:
+
 * Install Python 2 (gyp needs this)
 
 * Install Visual Studio 2015 if you want to build for python 3

@@ -22,10 +22,10 @@ if "%config%" == "Release" set flags=/Ox /MD /DNDEBUG
 
 set CFLAGS=/nologo /W3 %flags% -Ibuild\libuv\include
 
-call "%VS90COMNTOOLS%\..\..\vc\vcvarsall.bat" %vs_toolset%
-set GYP_MSVS_VERSION=2008
 copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\vcvarsamd64.bat"
 copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\amd64\vcvarsamd64.bat"
+call "%VS90COMNTOOLS%\..\..\vc\vcvarsall.bat" %vs_toolset%
+set GYP_MSVS_VERSION=2008
 python build\winbuild.py || exit /B 1
 pushd build\libuv
 cmd /C vcbuild.bat nobuild %mode% %vs_toolset% || exit /B 1
