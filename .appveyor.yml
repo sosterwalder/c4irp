@@ -10,6 +10,6 @@ test_script:
   - build\appveyor2.cmd
 
 artifacts:
-  - path: *.lib
+  - path: chirp
     name: build
     type: zip
