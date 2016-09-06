@@ -8,7 +8,7 @@ environment:
     - PYTHONVER: "C:\\Python35-x64"
 
 install:
-  - "%PYTHON%\\python.exe -m pip install wheel"
+  - "%PYTHONVER%\\python.exe -m pip install wheel"
   - git submodule update --init --recursive
 
 build_script:
