@@ -1,5 +1,4 @@
 set PATH=%PYTHONVER%;%PYTHONVER%\Scripts;%PATH%
-exit /B 0
 git clean -xdf
 set MODE=debug
 pip install -U -e . || exit /B 1

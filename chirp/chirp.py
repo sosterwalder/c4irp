@@ -67,7 +67,7 @@ class ChirpPool(object):
 
         def run():
             """Run chirp in a thread."""
-            lib.ch_run(self._loop, lib.UV_RUN_DEFAULT)
+            lib.ch_run(self._loop)
             lib.ch_loop_close(self._loop)
 
         self._pool   = fut.ThreadPoolExecutor(

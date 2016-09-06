@@ -206,17 +206,34 @@ ch_loop_close(uv_loop_t* loop)
 static
 ch_inline
 int
-ch_run(uv_loop_t* loop, uv_run_mode mode)
+ch_run(uv_loop_t* loop)
 //
-//    An alias for uv_run. Please refer to the libuv documentation.
+//    A wrapper for uv_run and runs the loop once again, in case closing chirp's
+//    resources caused additional requests/handlers.
+//
+//    Please refer to the libuv documentation.
 //
 //    :param uv_loop_t*  loop: Loop struct allocated by user.
-//    :param uv_run_mode mode: Run mode.
 //
 // .. code-block:: cpp
 //
 {
-    return uv_run(loop, mode);
+    int tmp_err = uv_run(loop, UV_RUN_DEFAULT);
+    if(tmp_err != 0) {
+        /* On Windows uv_run returns non-zero, which I expect, since we
+         * uv_stop() inside a handler that just closed all kinds of resources,
+         * which may cause new requests/handlers.
+         *
+         * I didn't find any documents assuring that my solution is good,
+         * though.
+         */
+        tmp_err = uv_run(loop, UV_RUN_ONCE);
+        /* Now we clearly have a problem */
+        if(tmp_err != 0) {
+            return tmp_err;  // NOCOV only breaking things will trigger this
+        }
+    }
+    return tmp_err;
 }
 // .. c:function::
 extern

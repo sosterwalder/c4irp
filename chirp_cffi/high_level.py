@@ -147,7 +147,7 @@ ch_loop_close(uv_loop_t* loop);
 static
 inline
 int
-ch_run(uv_loop_t* loop, uv_run_mode mode);
+ch_run(uv_loop_t* loop);
 
 extern
 ch_error_t

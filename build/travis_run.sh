@@ -5,7 +5,10 @@ set -e
 ./make.py > /dev/null
 if [ "$BUILDTYPE" == "osx-test" ]; then
     brew install libffi cppcheck
-    sudo ./make.py test
+    NOLIB=true sudo ./make.py test
+elif [ "$BUILDTYPE" == "osx-lib" ]; then
+    brew install libffi
+    NOLIB=false sudo ./make.py test-lib
 elif [ "$BUILDTYPE" == "osx-release" ]; then
     brew install libffi
     sudo python setup.py install

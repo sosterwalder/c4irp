@@ -5,6 +5,8 @@ import subprocess
 import os
 import sys
 
+from chirp_cffi.cffi_common import libs, ldflags
+
 c99 =  sys.version_info > (3, 4)
 
 cflags = []
@@ -67,6 +69,16 @@ try:
         "%s.obj" % x for x in objs
     ] + ["/out:chirp.lib"]
     exec_cmd(cmd)
+    if os.environ['MODE'].lower() == "debug":
+        for test in etests:
+            cmd = ["link", "/nologo"] + ldflags + [
+                "/out:%s.exe" % test, "%s.obj" % test
+            ] + [
+                "%s.obj" % x for x in objs
+            ] +  [
+                "%s.lib" % lib for lib in libs
+            ]
+            exec_cmd(cmd)
 except subprocess.CalledProcessError as e:
     print(e.output)
     raise e
