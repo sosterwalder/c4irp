@@ -187,5 +187,3 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
     }
     return CH_SUCCESS;
 }
-
-
