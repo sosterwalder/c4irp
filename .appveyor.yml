@@ -13,6 +13,5 @@ test_script:
   - build\appveyortest2.cmd
 
 artifacts:
-  - path: .
+  - path: build.zip
     name: build
-    type: zip
