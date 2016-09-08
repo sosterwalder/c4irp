@@ -151,13 +151,12 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
     }
     chirp._->auto_start = 1;
     L((&chirp), "UV-Loop %p run by chirp", &loop);
-    /* This works and is not TOO bad because the function blocks. TODO: Has
-     * anymore a better idea? */
+    /* This works and is not TOO bad because the function blocks. */
     // cppcheck-suppress autoVariables
     *chirp_out = &chirp;
     tmp_err = ch_run(&loop);
     if(tmp_err != 0) {
-        return tmp_err;
+        return tmp_err; // NOCOV only breaking things will trigger this
     }
     if(ch_loop_close(chirp.loop)) {
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this

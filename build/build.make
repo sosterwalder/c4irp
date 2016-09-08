@@ -16,7 +16,7 @@ LIBUVD        := build/libuv
 COMMONCFLAGS  := -std=gnu99 -fPIC -Wall -Wno-unused-function -I$(LIBUVD)/include $(CFLAGS)
 DEBUGCFLAGS   := -g -O0
 RELEASECFLAGS := -O3 -DNDEBUG 
-TESTLIBS      := libchirp.a libuv.a
+TESTLIBS      := libchirp.a libuv.a -lssl -lcrypto
 ### /Configuration
 
 TESTSRCS=$(wildcard src/*_etest.c)
@@ -90,5 +90,5 @@ test-lib: | libuv
 %.o: %.c $(COMMON)
 	$(CC) -c -o $@ $< $(MYCFLAGS) -Werror $(COVERAGE)
 
-%_etest: %_etest.c libchirp
+%_etest: %_etest.c libchirp.a
 	$(CC) -o $@ $@.o $(TESTLIBS) $(MYCFLAGS) -Werror $(COVERAGE) $(LDFLAGS)

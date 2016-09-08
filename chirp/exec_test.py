@@ -5,6 +5,8 @@ from . import sh
 
 array = sh.command("src/array_etest")
 alloc = sh.command("src/alloc_etest")
+ssl_client = sh.command("src/basic_ssl_client_etest")
+ssl_server = sh.background_command("src/basic_ssl_server_etest")
 
 
 def test_alloc_good():
@@ -39,4 +41,12 @@ def test_array_underflow():
 def test_array_ok():
     """Test if normal array access doesn't fail."""
     array(1)
+
+
+def test_ssl():
+    """Test if the build-system creates working openssl servers."""
+    proc = ssl_server(4000)
+    ssl_client("localhost", 4000)
+    proc.wait()
+
 # Stop ignoring

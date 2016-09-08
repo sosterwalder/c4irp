@@ -6,6 +6,7 @@ from setuptools import find_packages
 import codecs
 import os
 import sys
+import subprocess
 
 requires = [
     "cffi",
@@ -45,9 +46,11 @@ class Build(build_ext.build_ext):
 
     def run(self):
         if sys.platform == "win32":
-            os.system("python make.py")
+            ret = os.system("python make.py")
         else:
-            os.system('make -f build/build.make')
+            ret = os.system('make -f build/build.make')
+        if ret != 0:
+            raise OSError("Chirp build failed")
         build_ext.build_ext.run(self)
 
 

@@ -31,6 +31,8 @@ else:
     libs.extend([
         "m",
         "pthread",
+        "ssl",
+        "crypto",
     ])
     if sys.platform != "darwin":
         libs.append("rt")
