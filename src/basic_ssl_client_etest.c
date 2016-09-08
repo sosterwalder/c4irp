@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <resolv.h>
