@@ -34,7 +34,9 @@ else
 	BUILDS   := libchirp
 endif
 ifneq ($(UNAME_S),Darwin)
-	MYCFLAGS += -pthread -I/usr/local/opt/openssl/include
+	MYCFLAGS += -pthread
+else
+	MYCFLAGS += -I/usr/local/opt/openssl/include
 endif
 OBJS=$(SRCS:.c=.o)
 
