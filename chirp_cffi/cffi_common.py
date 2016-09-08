@@ -36,6 +36,9 @@ else:
     ])
     if sys.platform != "darwin":
         libs.append("rt")
+    else:
+        cflags.append("-I/usr/local/opt/openssl/include")
+        ldflags.append("-L/usr/local/opt/openssl/lib")
     if os.environ['MODE'] == "debug":
         cflags.extend(["--coverage"])
         ldflags.extend(["--coverage"])
