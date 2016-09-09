@@ -36,9 +36,13 @@ matrix:
       env: BUILDTYPE=osx-test
     - os: osx
       env: BUILDTYPE=osx-bdist
+    - os: osx
+      env: BUILDTYPE=osx-lib
   allow_failures:
     - os: osx
       env: BUILDTYPE=osx-lib
+    - os: osx
+      env: BUILDTYPE=osx-bdist
 
 script:
   - ./build/travis_run.sh
