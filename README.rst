@@ -102,6 +102,11 @@ Or build ourself:
 
    make.py test
 
+Contributors
+============
+
+* Sven Osterwalder (@sosterwalder)
+
 License
 =======
 
