@@ -37,6 +37,7 @@ ifneq ($(UNAME_S),Darwin)
 	MYCFLAGS += -pthread
 else
 	MYCFLAGS += -I/usr/local/opt/openssl/include
+	TESTLIBS += -L/usr/local/opt/openssl/lib
 endif
 OBJS=$(SRCS:.c=.o)
 
