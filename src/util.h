@@ -71,6 +71,7 @@ _ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
         bytes[i] = ((unsigned int) rand()) % 256;
     }
 #else // ACCEPT_STRANGE_PLATFORM
+// cppcheck-suppress preprocessorErrorDirective
 #error Unexpected RAND_MAX / INT_MAX, define CH_ACCEPT_STRANGE_PLATFORM
 #endif // ACCEPT_STRANGE_PLATFORM
 #else // RAND_MAX < 1073741824 || INT_MAX < 1073741824
