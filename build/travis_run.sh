@@ -13,11 +13,12 @@ elif [ "$BUILDTYPE" == "osx-lib" ]; then
     brew uninstall libtool && brew install libtool
     brew install libffi cppcheck openssl
     NOLIB=false sudo ./make.py test-lib
-elif [ "$BUILDTYPE" == "osx-release" ]; then
+elif [ "$BUILDTYPE" == "osx-bdist" ]; then
     brew update
     brew uninstall libtool && brew install libtool
     brew install libffi cppcheck openssl
-    sudo python setup.py install
+    sudo pip install wheel
+    sudo python setup.py bdist_wheel
 else
     docker run -v $PWD:/outside adfinissygroup/chirp-jessie /bin/sh \
         -c "cd /outside && ./build/docker_run.sh $BUILDTYPE"

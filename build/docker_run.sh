@@ -11,12 +11,9 @@ if [ "$BUILDTYPE" == "lib" ]; then
     NOLIB=false ./make.py test-lib
 elif [ "$BUILDTYPE" == "doc" ]; then
     ./make.py doc-all
-elif [ "$BUILDTYPE" == "osx" ]; then
-    ./make.py test
 elif [ "$BUILDTYPE" == "bdist" ]; then
-    python setup.py bdist
-elif [ "$BUILDTYPE" == "release" ]; then
-    python setup.py install
+    pip install wheel
+    python setup.py bdist_wheel
 else
     pyenv local $BUILDTYPE
     ./make.py test
