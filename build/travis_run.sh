@@ -7,12 +7,12 @@ if [ "$BUILDTYPE" == "osx-test" ]; then
     brew update
     brew uninstall libtool && brew install libtool
     brew install libffi cppcheck openssl
-    NOLIB=true sudo ./make.py test
+    sudo NOLIB=true ./make.py test
 elif [ "$BUILDTYPE" == "osx-lib" ]; then
     brew update
     brew uninstall libtool && brew install libtool
     brew install libffi cppcheck openssl
-    NOLIB=false sudo ./make.py test-lib
+    sudo NOLIB=false ./make.py test-lib
 elif [ "$BUILDTYPE" == "osx-bdist" ]; then
     brew update
     brew uninstall libtool && brew install libtool
