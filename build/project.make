@@ -25,7 +25,7 @@ test_ext: coala cpp-check test-lib doc-all coverage
 doc-all: $(DOCRST) doc  ## Build using c2rst and then generate docs
 
 cpp-check:  ## Run cppcheck on the project
-	cppcheck -v --std=c99 -Iinclude -I$(LIBUVD)/include --config-exclude=$(LIBUVD)/include -D_SGLIB__h_ --error-exitcode=1 --inline-suppr --enable=warning,style,performance,portability,information,missingInclude src/
+	cppcheck -v --std=c99 -Iinclude -I$(LIBUVD)/include --config-exclude=$(LIBUVD)/include -D_SGLIB__h_ --error-exitcode=1 --inline-suppr --enable=warning,style,performance,portability,information,missingInclude --suppress=missingIncludeSystem src/
 
 ifeq ($(NOLIB),true)
 test-lib:
