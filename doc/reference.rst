@@ -44,7 +44,7 @@ Public Python API
 .. toctree::
    :maxdepth: 3
 
-   c4irp.rst
+   chirp.rst
 
 Tests in C
 ==========

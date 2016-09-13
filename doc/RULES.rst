@@ -45,6 +45,55 @@ RULES
 * Provide wheels
 * Provide distro packages
 
+Performance
+===========
+
+* Adding buffering per connection would destroy some of the nice properties of
+  chirp, mainly flow-control, simpleness and robustness.
+
+   * Therefore we do not ever allow to remove the per connection send-lock,
+     which means only one message can be sending and the next message can only
+     be sent after the current message has been acknowledged. The first
+     statement is important for simpleness and robustness and the second
+     statement makes flow-control possible.
+
+* Since chirp is meant for multiprocessing, our performance goals refer to this
+  configuration
+
+   * x must be able to send/receive 300'000+ message to/from a suitable N peers
+
+.. graphviz::
+
+   digraph FAST {
+      concentrate=true;
+      x -> a;
+      x -> b;
+      x -> c;
+      x -> d;
+      x -> e;
+      x -> f;
+      x -> N;
+      a -> x;
+      b -> x;
+      c -> x;
+      d -> x;
+      e -> x;
+      f -> x;
+      N -> x;
+   }
+
+* For this configuration we just have to beat 10'000 messages of course the
+  more the better
+
+.. graphviz::
+
+   digraph FAST {
+      concentrate=true;
+      x -> a;
+      a -> x;
+   }
+
+* Of course 300'000 msg is our stretch goal, 30'000 msg is ok too
 
 =========
 Questions
