@@ -48,6 +48,7 @@ def get_openssl(platform, c99):
     filename = "%s.tar.bz2" % name
     url = "%s/%s" % (winssl, filename)
     sha = hashlib.sha256()
+    print("Download %s" % url)
     with open(filename, 'wb') as handle:
         response = requests.get(url, stream=True)
         if not response.ok:
