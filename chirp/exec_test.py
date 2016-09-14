@@ -43,10 +43,4 @@ def test_array_ok():
     array(1)
 
 
-def test_ssl():
-    """Test if the build-system creates working openssl servers."""
-    proc = ssl_server(4000)
-    ssl_client("localhost", 4000)
-    proc.wait()
-
 # Stop ignoring
