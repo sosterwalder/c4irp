@@ -1,5 +1,5 @@
 docs:
   extract_to: /var/www/html/public/c4irp
-  download_delay: 40
+  download_delay: 600
   stages:
     - docs
