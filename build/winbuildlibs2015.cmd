@@ -20,7 +20,7 @@ goto nextarg
 if "%config%" == "Debug" set flags=/Od /Zi /MD /DEBUG
 if "%config%" == "Release" set flags=/Ox /MD /DNDEBUG
 
-set CFLAGS=/nologo /W3 %flags% -Ibuild\libuv\include
+set CFLAGS=/nologo /W3 %flags% /Ibuild\libuv\include /Iopenssl\include
 
 call "%VS140COMNTOOLS%\..\..\vc\vcvarsall.bat" %vs_toolset%
 set GYP_MSVS_VERSION=2015

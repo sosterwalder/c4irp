@@ -29,9 +29,13 @@ __pycache__
 /include/*.rst
 /.hypothesis/
 /.eggs
+/openssl/
 /FINJA
+/src/.vs/
 /src/*_etest
 /src/*.i
+/src/*.exe
+/src/*.pdb
 /Release
 /Debug
 /*.pyd

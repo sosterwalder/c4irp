@@ -4,6 +4,11 @@ import os
 import sys
 import shutil
 
+winssl = (
+    "https://github.com/concretecloud/winopenssl"
+    "/releases/download/CC1.0.2h_c1"
+)
+
 dotfiles = [
     "syntastic_c_config",
     "coafile",
@@ -12,6 +17,9 @@ dotfiles = [
     "clang_complete",
     "requirements.txt",
 ]
+
+if 'PYTHONPATH' not in os.environ and sys.platform == "win32":
+    os.environ['PYTHONPATH'] = os.getcwd()
 
 if 'CC' not in os.environ:
     if sys.platform != "win32":
@@ -24,6 +32,47 @@ if 'CC' not in os.environ:
         os.environ['CC'] = compiler.compiler_so[0]
 if 'MODE' not in os.environ:
     os.environ['MODE'] = "debug"
+
+
+def get_openssl(platform, c99):
+    """Download openssl from release, checksum, and extract."""
+    import requests
+    import hashlib
+    import codecs
+    import tarfile
+    name = "openssl-{year}-{bit}-{mode}".format(
+        year = "2015" if c99 else "2008",
+        bit =  "32" if platform == "x86" else "64",
+        mode = os.environ['MODE'].lower()
+    )
+    filename = "%s.tar.bz2" % name
+    url = "%s/%s" % (winssl, filename)
+    sha = hashlib.sha256()
+    with open(filename, 'wb') as handle:
+        response = requests.get(url, stream=True)
+        if not response.ok:
+            raise RuntimeError("Cannot download %s" % url)
+
+        for block in response.iter_content(2**14):
+            sys.stdout.write("#")
+            sys.stdout.flush()
+            sha.update(block)
+            handle.write(block)
+    with codecs.open(
+            os.path.join("build", "opensslsha256.sums"),
+            'r',
+            "UTF-8"
+    ) as f:
+        hashes = {line.split(' ')[0].lower() for line in f.readlines()}
+    digest = sha.hexdigest()
+    if digest not in hashes:
+        raise RuntimeError(
+            "Cannot verify openssl %s not in digest list" % digest
+        )
+    with tarfile.open(filename, 'r:bz2') as f:
+        f.extractall()
+    os.unlink(filename)
+    os.rename(name, "openssl")
 
 
 def make_dotfiles(files):
@@ -53,6 +102,8 @@ if sys.platform == "win32":
         pf = "x64"
     else:
         pf = "x86"
+    if not os.path.exists("openssl"):
+        get_openssl(pf, c99)
     if c99:
         os.system(" ".join([
             "build\\winbuildlibs2015.cmd %s" % pf

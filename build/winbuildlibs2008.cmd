@@ -20,7 +20,7 @@ goto nextarg
 if "%config%" == "Debug" set flags=/Od /Zi /MD /DEBUG
 if "%config%" == "Release" set flags=/Ox /MD /DNDEBUG
 
-set CFLAGS=/nologo /W3 %flags% -Ibuild\libuv\include
+set CFLAGS=/nologo /W3 %flags% /Ibuild\libuv\include /Iopenssl\include
 
 copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\vcvarsamd64.bat"
 copy "%VS90COMNTOOLS%\..\..\vc\bin\vcvars64.bat" "%VS90COMNTOOLS%\..\..\vc\bin\amd64\vcvarsamd64.bat"

@@ -6,10 +6,8 @@ from setuptools import find_packages
 import codecs
 import os
 import sys
-import subprocess
 
 requires = [
-    "cffi",
     "six",
 ]
 if sys.version_info < (3, 2):
@@ -95,6 +93,7 @@ setup(
     install_requires = requires,
     setup_requires = [
         "cffi",
+        "requests",
     ],
     cmdclass = {
         'build_ext': Build,
