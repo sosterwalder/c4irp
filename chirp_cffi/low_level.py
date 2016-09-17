@@ -24,11 +24,17 @@ struct uv_tcp_s {
 };
 typedef struct uv_tcp_s uv_tcp_t;
 
+struct  ch_chirp;
+
 typedef struct ch_connection {
     uint8_t               ip_protocol;
     uint8_t               address[16];
     int32_t               port;
     uv_tcp_t              client;
+    void*                 buffer;
+    size_t                buffer_size;
+    int                   buffer_used;
+    struct ch_chirp*      chirp;
     char                  color_field;
     struct ch_connection* left;
     struct ch_connection* right;

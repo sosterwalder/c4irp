@@ -43,18 +43,6 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
 //
 //    Protocol object.
 //
-//    .. c:member:: char identity[16]
-//
-//       Identity of this chirp node, 16 bytes
-//
-//    .. c:member:: uv_loop_t* loop
-//
-//       libuv event loop used by chirp
-//
-//    .. c:member:: ch_config_t* config
-//
-//       config used by chirp
-//
 //    .. c:member:: struct sockaddr_in addrv4
 //
 //       BIND_V4 addr converted to a sockaddr_in
@@ -70,6 +58,8 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
 //    .. c:member:: uv_tcp_t serverv6
 //
 //       reference to the libuv tcp server
+//
+//       TODO Complete
 //
 // .. code-block:: cpp
 
@@ -92,11 +82,15 @@ ch_pr_start(ch_protocol_t* protocol);
 //
 //    Start the protocol
 //
+//    TODO params
+//
 // .. c:function::
 ch_error_t
 ch_pr_stop(ch_protocol_t* protocol);
 //
 //    Stop the protocol
+//
+//    TODO params
 //
 // .. c:function::
 static void
@@ -104,17 +98,31 @@ _ch_on_new_connection(uv_stream_t *server, int status);
 //
 //    Callback from libuv on new connection
 //
+//    TODO params
+//
 // .. c:function::
 static void
 _ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts);
 //
 //    Free all remaining items in a receipts set
 //
+//    TODO params
+//
 // .. c:function::
 static void
 _ch_pr_on_new_connection(uv_stream_t *server, int status);
 //
 //  Callback from libuv on new connection
+//
+//    TODO params
+//
+// .. c:function::
+static void
+_ch_pr_on_read_data(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
+//
+//  Callback from libuv when data was read
+//
+//    TODO params
 //
 // .. code-block:: cpp
 

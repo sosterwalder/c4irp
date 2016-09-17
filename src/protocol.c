@@ -155,10 +155,19 @@ _ch_pr_on_new_connection(uv_stream_t* server, int status) // NOCOV TODO
         chirp,
         sizeof(ch_connection_t)
     ); // NOCOV TODO
+    ch_connection_init(chirp, conn);
     uv_tcp_t* client = &conn->client; // NOCOV TODO
     uv_tcp_init(server->loop, client); // NOCOV TODO
+    client->data = conn;
+    fprintf(stderr, "Conn %p\n", conn);
+    fprintf(stderr, "Client %p\n", client);
+    fflush(stderr);
     if (uv_accept(server, (uv_stream_t*) client) == 0) { // NOCOV TODO
-        uv_read_start((uv_stream_t*) client, NULL, NULL); // NOCOV TODO
+        uv_read_start(
+            (uv_stream_t*) client,
+            ch_cn_read_alloc,
+            _ch_pr_on_read_data
+        ); // NOCOV TODO
     } // NOCOV TODO
     else {
         // TODO uv_close on cleanup and, on close and on remove close
@@ -166,6 +175,21 @@ _ch_pr_on_new_connection(uv_stream_t* server, int status) // NOCOV TODO
         ch_chirp_free(chirp, conn); // NOCOV TODO
     }
 } // NOCOV TODO remove
+//
+static void
+_ch_pr_on_read_data(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) // NOCOV TODO
+//    :noindex:
+//
+//    see: :c:func:`_ch_pr_on_read_data`
+//
+// .. code-block:: cpp
+//
+{
+    ch_connection_t* conn = stream->data;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    conn->buffer_used = 0;
+}
 // .. c:function::
 static void
 _ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts)

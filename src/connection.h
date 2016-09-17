@@ -11,6 +11,8 @@
 
 #include "sglib.h"
 
+struct ch_chirp;
+
 // .. c:type:: ch_connection_t
 //
 //    Connection dictionary implemented as rbtree.
@@ -20,6 +22,8 @@
 //       IPv4/6 address of the sender if the message was received.  IPv4/6
 //       address of the recipient if the message is going to be sent.
 //
+// TODO Complete
+//
 // .. code-block:: cpp
 
 typedef struct ch_connection {
@@ -27,16 +31,42 @@ typedef struct ch_connection {
     uint8_t               address[16];
     int32_t               port;
     uv_tcp_t              client;
+    void*                 buffer;
+    size_t                buffer_size;
+    int                   buffer_used;
+    struct ch_chirp*      chirp;
     char                  color_field;
     struct ch_connection* left;
     struct ch_connection* right;
 } ch_connection_t;
 
+// .. c:function::
 static
 ch_inline
-int
-ch_connection_cmp(ch_connection_t* x, ch_connection_t* y);
+void
+ch_connection_init(struct ch_chirp* chirp, ch_connection_t* conn)
+//
+//    Initialize a connection.
+//
+//    :param ch_chirp_t* chirp: Chirp instance
+//    :param ch_connection_t* conn: Connection to initialize
+//
+// .. code-block:: cpp
+//
+{
+    memset(conn, 0, sizeof(ch_connection_t));
+    conn->chirp = chirp;
+}
 
+// .. c:function::
+void
+ch_cn_read_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
+//
+//    Allocates a buffer on the connection and reuses it for each subsequent
+//    reads.
+//
+//    TODO params
+//
 // .. c:function::
 static
 ch_inline
