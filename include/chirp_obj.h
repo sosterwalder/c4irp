@@ -27,7 +27,7 @@
 //
 //    Libuv wants a buffer of 65536 bytes per stream. It will work with less
 //    though.  So we decided that 1k is the absolute minimum see
-//    LIB_UV_MIN_BUFFER in config.h. Please provide the suggested_size, except
+//    CH_LIB_UV_MIN_BUFFER in config.h. Please provide the suggested_size, except
 //    if you're on very restricted embedded system.
 //
 // .. code-block:: cpp

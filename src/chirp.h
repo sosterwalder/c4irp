@@ -47,6 +47,8 @@ ch_chirp_alloc_var(
 //   This is the interface provided by libuv, we hand the choice down to our
 //   user.
 //
+// TODO param
+//
 // .. code-block:: cpp
 //
 {
@@ -74,6 +76,8 @@ ch_chirp_alloc(
 //
 //   Allocate fixed amount of memory.
 //
+// TODO param
+//
 // .. code-block:: cpp
 //
 {
@@ -98,6 +102,8 @@ ch_chirp_free(
 )
 //
 //   Free a memory handle.
+//
+// TODO param
 //
 // .. code-block:: cpp
 //

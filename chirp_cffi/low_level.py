@@ -24,7 +24,7 @@ struct uv_tcp_s {
 };
 typedef struct uv_tcp_s uv_tcp_t;
 
-struct  ch_chirp;
+struct ch_chirp;
 
 typedef struct ch_connection {
     uint8_t               ip_protocol;

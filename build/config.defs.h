@@ -5,7 +5,7 @@
 //
 // .. code-block:: cpp
 
-#define LIB_UV_MIN_BUFFER 1024
+#define CH_LIB_UV_MIN_BUFFER 1024
 
 // Log to STDERR instead of the callback
 //
