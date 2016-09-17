@@ -177,6 +177,7 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 // .. code-block:: cpp
 //
 {
+    L(chirp, "Closing chirp via callback %p", chirp);
     if(chirp == NULL || chirp->_init != CH_CHIRP_MAGIC) {
         return CH_UNINIT; // NOCOV  TODO can be tested
     }

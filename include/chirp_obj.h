@@ -172,6 +172,7 @@ ch_chirp_register_log_cb(ch_chirp_t* chirp, ch_log_cb_t log_cb)
 //
 {
     chirp->_log = log_cb;
+    L(chirp, "Chirp logging registered %p", chirp);
 }
 // .. c:function::
 static

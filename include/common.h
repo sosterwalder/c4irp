@@ -76,9 +76,9 @@ __inline int c99_snprintf(char *outBuf, size_t size, const char *format, ...)
 // .. code-block:: cpp
 
 #ifndef NDEBUG
-#ifdef LOG_TO_STDERR
-#define L(chirp, ...) fprintf(stderr, ##__VA_ARGS__)
-#else  //LOG_TO_STDERR
+#ifdef CH_LOG_TO_STDERR
+#define L(chirp, ...) fprintf(stderr, ##__VA_ARGS__); fprintf(stderr, "\n")
+#else  //CH_LOG_TO_STDERR
 #define L(chirp, message, ...) do { \
     if(chirp->_log != NULL) { \
         char buf[1024]; \
