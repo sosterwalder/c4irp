@@ -147,7 +147,7 @@ _ch_pr_on_new_connection(uv_stream_t* server, int status) // NOCOV TODO
 //
 {
     CH_GET_CHIRP(server); // NOCOV TODO
-    ch_protocol_t* protocol = &chirp->_->protocol; 
+    ch_protocol_t* protocol = &chirp->_->protocol;
     if (status < 0) { // NOCOV TODO
         L(chirp, "New connection error %s", uv_strerror(status)); // NOCOV TODO
         return; // NOCOV TODO

@@ -280,6 +280,18 @@ ch_chirp_close_ts(ch_chirp_t* chirp);
 //
 //    :param ch_chirp_t chirp: Chirp object
 //
+// .. c:function::
+extern
+void
+ch_chirp_set_auto_stop(ch_chirp_t* chirp);
+//
+//    After this function is called :c:func:`ch_chirp_close_ts` will also stop
+//    the loop.
+//
+//    This function is thread-safe
+//
+//    :param ch_chirp_t chirp: Chirp object
+//
 // .. code-block:: cpp
 
 #endif //ch_inc_chirp_obj_h

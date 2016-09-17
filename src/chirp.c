@@ -156,6 +156,7 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
     // cppcheck-suppress autoVariables
     *chirp_out = &chirp;
     tmp_err = ch_run(&loop);
+    *chirp_out = NULL;
     if(tmp_err != 0) {
         return tmp_err; // NOCOV only breaking things will trigger this
     }
@@ -187,4 +188,18 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this
     }
     return CH_SUCCESS;
+}
+// .. c:function::
+void
+ch_chirp_set_auto_stop(ch_chirp_t* chirp)
+//    :noindex:
+//
+//    see: :c:func:`ch_chirp_set_auto_stop`
+//
+//    This function is thread-safe
+//
+// .. code-block:: cpp
+//
+{
+    chirp->_->auto_start = 1;
 }

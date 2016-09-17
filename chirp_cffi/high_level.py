@@ -160,6 +160,10 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t**);
 extern
 ch_error_t
 ch_chirp_close_ts(ch_chirp_t* chirp);
+
+extern
+void
+ch_chirp_set_auto_stop(ch_chirp_t* chirp);
 """)
 
 

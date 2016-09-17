@@ -63,6 +63,7 @@ class ChirpPool(object):
         lib.ch_chirp_init(
             self._chirp, self._c_config, self._loop
         )
+        lib.ch_chirp_set_auto_stop(self._chirp)
         lib.ch_chirp_register_log_cb(self._chirp, lib.python_log_cb)
 
         def run():
