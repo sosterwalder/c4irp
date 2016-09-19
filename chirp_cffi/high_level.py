@@ -98,23 +98,23 @@ ch_msg_get_address(
 );
 
 //chirp.h
-typedef void* (*ch_alloc_cb)(
+typedef void* (*ch_alloc_cb_t)(
         size_t suggested_size,
         size_t required_size,
         size_t* provided_size
 );
-typedef void (*ch_free_cb)(void* buf);
+typedef void (*ch_free_cb_t)(void* buf);
 
 typedef struct {
-    int          REUSE_TIME;
-    float        TIMEOUT;
-    int          PORT;
-    int          BACKLOG;
-    char         BIND_V6[16];
-    char         BIND_V4[4];
-    char*        CERT_CHAIN_PEM;
-    ch_alloc_cb  ALLOC_CB;
-    ch_free_cb   FREE_CB;
+    int           REUSE_TIME;
+    float         TIMEOUT;
+    int           PORT;
+    int           BACKLOG;
+    char          BIND_V6[16];
+    char          BIND_V4[4];
+    char*         CERT_CHAIN_PEM;
+    ch_alloc_cb_t ALLOC_CB;
+    ch_free_cb_t  FREE_CB;
 } ch_config_t;
 
 typedef void (*ch_log_cb_t)(char msg[]);

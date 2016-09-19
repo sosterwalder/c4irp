@@ -9,7 +9,7 @@
 
 #include "common.h"
 
-// .. c:type:: ch_alloc_cb
+// .. c:type:: ch_alloc_cb_t
 //
 //    Callback used by chirp to request memory. It can be set in ch_config_t.
 //
@@ -32,19 +32,19 @@
 //
 // .. code-block:: cpp
 //
-typedef void* (*ch_alloc_cb)(
+typedef void* (*ch_alloc_cb_t)(
         size_t suggested_size,
         size_t required_size,
         size_t* provided_size
 );
 
-// .. c:type:: ch_free_cb
+// .. c:type:: ch_free_cb_t
 //
 //    Callback used by chirp to free memory. It can be set in ch_config_t.
 //
 // .. code-block:: cpp
 //
-typedef void (*ch_free_cb)(void* buf);
+typedef void (*ch_free_cb_t)(void* buf);
 
 // .. c:type:: ch_config_t
 //
@@ -75,12 +75,12 @@ typedef void (*ch_free_cb)(void* buf);
 //
 //       Override IPv4 bind address.
 //
-//    .. c:member:: ch_alloc_cb ALLOC_CB
+//    .. c:member:: ch_alloc_cb_t ALLOC_CB
 //
 //       Callback used by chirp to request memory. If NULL: the system malloc
 //       function is used.
 //
-//    .. c:member:: ch_free_cb FREE_CB
+//    .. c:member:: ch_free_cb_t FREE_CB
 //
 //       Callback used by chirp to free memory. If NULL: the system free
 //       function is used.
@@ -88,15 +88,15 @@ typedef void (*ch_free_cb)(void* buf);
 // .. code-block:: cpp
 
 typedef struct {
-    int          REUSE_TIME;
-    float        TIMEOUT;
-    int          PORT;
-    int          BACKLOG;
-    char         BIND_V6[16];
-    char         BIND_V4[4];
-    char*        CERT_CHAIN_PEM;
-    ch_alloc_cb  ALLOC_CB;
-    ch_free_cb   FREE_CB;
+    int           REUSE_TIME;
+    float         TIMEOUT;
+    int           PORT;
+    int           BACKLOG;
+    char          BIND_V6[16];
+    char          BIND_V4[4];
+    char*         CERT_CHAIN_PEM;
+    ch_alloc_cb_t ALLOC_CB;
+    ch_free_cb_t  FREE_CB;
 } ch_config_t;
 
 // .. c:type:: ch_log_cb_t

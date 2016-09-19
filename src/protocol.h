@@ -94,7 +94,7 @@ ch_pr_stop(ch_protocol_t* protocol);
 //
 // .. c:function::
 static void
-_ch_on_new_connection(uv_stream_t *server, int status);
+_ch_pr_new_connection_cb(uv_stream_t *server, int status);
 //
 //    Callback from libuv on new connection
 //
@@ -118,15 +118,7 @@ _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections);
 //
 // .. c:function::
 static void
-_ch_pr_on_new_connection(uv_stream_t *server, int status);
-//
-//  Callback from libuv on new connection
-//
-//    TODO params
-//
-// .. c:function::
-static void
-_ch_pr_on_read_data(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
+_ch_pr_read_data_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
 //
 //  Callback from libuv when data was read
 //

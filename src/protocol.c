@@ -60,7 +60,7 @@ ch_pr_start(ch_protocol_t* protocol)
     if(uv_listen(
             (uv_stream_t*) &protocol->serverv4,
             config->BACKLOG,
-            _ch_pr_on_new_connection
+            _ch_pr_new_connection_cb
     ) < 0) {
         return CH_EADDRINUSE;
     }
@@ -90,7 +90,7 @@ ch_pr_start(ch_protocol_t* protocol)
     if(uv_listen(
             (uv_stream_t*) &protocol->serverv6,
             config->BACKLOG,
-            _ch_pr_on_new_connection
+            _ch_pr_new_connection_cb
     ) < 0) {
         return CH_EADDRINUSE; // NOCOV errors happend for IPV4
     }
@@ -138,10 +138,10 @@ ch_pr_stop(ch_protocol_t* protocol)
 
 // .. c:function::
 static void
-_ch_pr_on_new_connection(uv_stream_t* server, int status) // NOCOV TODO
+_ch_pr_new_connection_cb(uv_stream_t* server, int status) // NOCOV TODO
 //    :noindex:
 //
-//    see: :c:func:`_ch_pr_on_new_connection`
+//    see: :c:func:`_ch_pr_new_connection_cb`
 //
 // .. code-block:: cpp
 //
@@ -166,8 +166,8 @@ _ch_pr_on_new_connection(uv_stream_t* server, int status) // NOCOV TODO
         sglib_ch_connection_t_add(&protocol->connections, conn);
         uv_read_start(
             (uv_stream_t*) client,
-            ch_cn_read_alloc,
-            _ch_pr_on_read_data
+            ch_cn_read_alloc_cb,
+            _ch_pr_read_data_cb
         ); // NOCOV TODO
     } // NOCOV TODO
     else {
@@ -178,14 +178,14 @@ _ch_pr_on_new_connection(uv_stream_t* server, int status) // NOCOV TODO
 } // NOCOV TODO remove
 //
 static void
-_ch_pr_on_read_data(
+_ch_pr_read_data_cb(
         uv_stream_t* stream,
         ssize_t nread,
         const uv_buf_t* buf
 ) // NOCOV TODO
 //    :noindex:
 //
-//    see: :c:func:`_ch_pr_on_read_data`
+//    see: :c:func:`_ch_pr_read_data_cb`
 //
 // .. code-block:: cpp
 //

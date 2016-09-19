@@ -9,10 +9,10 @@
 
 // .. c:function::
 void
-ch_cn_read_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
+ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 //    :noindex:
 //
-//    see: :c:func:`_ch_cn_read_alloc`
+//    see: :c:func:`ch_cn_read_alloc_cb`
 //
 // .. code-block:: cpp
 //

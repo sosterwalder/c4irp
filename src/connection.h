@@ -60,7 +60,7 @@ ch_connection_init(struct ch_chirp* chirp, ch_connection_t* conn)
 
 // .. c:function::
 void
-ch_cn_read_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
+ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
 //
 //    Allocates a buffer on the connection and reuses it for each subsequent
 //    reads.
