@@ -44,5 +44,5 @@ else:
         cflags.append("-I/usr/local/opt/openssl/include")
         ldflags.append("-L/usr/local/opt/openssl/lib")
     if os.environ['MODE'] == "debug":
-        cflags.extend(["--coverage"])
+        cflags.extend(["--coverage", "-UNDEBUG", "-O0"])
         ldflags.extend(["--coverage"])
