@@ -178,7 +178,11 @@ _ch_pr_on_new_connection(uv_stream_t* server, int status) // NOCOV TODO
 } // NOCOV TODO remove
 //
 static void
-_ch_pr_on_read_data(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) // NOCOV TODO
+_ch_pr_on_read_data(
+        uv_stream_t* stream,
+        ssize_t nread,
+        const uv_buf_t* buf
+) // NOCOV TODO
 //    :noindex:
 //
 //    see: :c:func:`_ch_pr_on_read_data`

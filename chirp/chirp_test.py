@@ -150,8 +150,8 @@ if __name__ == "__main__":  # pragma: no cover
     import sys
     import logging
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-    c = init_chirp()
+    chirpobj = init_chirp()
     sys.stdin.readline()
     print("Minimal test: closing")
-    c.close()
+    chirpobj.close()
     print("Minimal test: done")
