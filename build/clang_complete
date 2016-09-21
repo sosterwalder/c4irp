@@ -1,4 +1,4 @@
--Ilibuv/include
+-Ibuild/libuv/include
 -L.
 -lc4irp
 -luv

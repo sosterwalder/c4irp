@@ -35,6 +35,7 @@ typedef struct ch_connection {
     size_t                buffer_size;
     int                   buffer_used;
     struct ch_chirp*      chirp;
+    uv_shutdown_t         shutdown_req;
     char                  color_field;
     struct ch_connection* left;
     struct ch_connection* right;
@@ -58,6 +59,22 @@ ch_connection_init(struct ch_chirp* chirp, ch_connection_t* conn)
     conn->chirp = chirp;
 }
 
+// .. c:function::
+void
+ch_cn_close_cb(uv_handle_t* handle);
+//
+//    Called by libuv after closing a handle
+//
+//    TODO params
+//
+// .. c:function::
+void
+ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
+//
+//    Called by libuv after shutting a connection down
+//
+//    TODO params
+//
 // .. c:function::
 void
 ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);

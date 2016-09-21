@@ -13,6 +13,9 @@ DOCC=$(wildcard src/*.c)
 DOCH=$(wildcard src/*.h) $(wildcard include/*.h)
 DOCRST=$(DOCC:.c=.c.rst) $(DOCH:.h=.h.rst)
 
+debug:
+	MODE=debug make -f build/build.make
+
 vi:  ## Start a vim editing the imporant files
 	vim *.rst src/*.c src/*.h chirp/*.py chirp_cffi/*.py include/*.h doc/ref/* build/config.defs.h
 

@@ -172,8 +172,7 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status) // NOCOV TODO
     } // NOCOV TODO
     else {
         // TODO uv_close on cleanup and, on close and on remove close
-        uv_close((uv_handle_t*) client, NULL); // NOCOV TODO
-        ch_chirp_free(chirp, conn); // NOCOV TODO
+        uv_close((uv_handle_t*) client, ch_cn_close_cb); // NOCOV TODO
     }
 } // NOCOV TODO remove
 //
@@ -239,6 +238,5 @@ _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
             t = sglib_ch_connection_t_it_next(&it) // NOCOV TODO remove
     ) {
         uv_close((uv_handle_t*) &t->client, NULL); // NOCOV TODO
-        ch_chirp_free(chirp, t); // NOCOV TODO remove
     } // NOCOV TODO remove
 }

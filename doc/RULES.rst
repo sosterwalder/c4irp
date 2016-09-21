@@ -6,6 +6,7 @@ RULES
 * Callbacks end in _cb
   - Callbacks are in past tense? (not sure)
 * Callback types end in _cb_t
+* Always unpack handles in callbacks till you can verify the chirp magic
 * C4irp and C3irp are only used to disambiguate the python-only and the C based
   version of chirp, everywhere else chirp is used
 * Embeddable: no memory allocation
