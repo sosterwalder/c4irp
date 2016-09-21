@@ -29,10 +29,11 @@ ch_config_t ch_config_defaults = {
 };
 
 // .. c:function::
-void
+static void
 _ch_close_async_cb(uv_async_t* handle)
+//    :noindex:
 //
-//    Internal callback to close chirp. Makes ch_chirp_close_ts thread-safe
+//    see: :c:func:`_ch_close_async_cb`
 //
 // .. code-block:: cpp
 //
@@ -60,13 +61,14 @@ _ch_close_async_cb(uv_async_t* handle)
 // .. c:function::
 static
 void*
-ch_chirp_std_alloc(
+_ch_chirp_std_alloc(
         size_t suggested_size,
         size_t required_size,
         size_t* provided_size
 )
+//    :noindex:
 //
-//    Standard memory allocator used if no allocator is supplied by the user.
+//    see: :c:func:`_ch_chirp_std_alloc`
 //
 // .. code-block:: cpp
 //
@@ -77,9 +79,10 @@ ch_chirp_std_alloc(
 // .. c:function::
 static
 void
-ch_chirp_std_free(void* buf)
+_ch_chirp_std_free(void* buf)
+//    :noindex:
 //
-//    Standard free if no free is supplied by the user.
+//    see: :c:func:`_ch_chirp_std_free`
 //
 // .. code-block:: cpp
 //
@@ -99,10 +102,10 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
 {
     int                       tmp_err;
     if(config->ALLOC_CB == NULL) {
-        config->ALLOC_CB = ch_chirp_std_alloc;
+        config->ALLOC_CB = _ch_chirp_std_alloc;
     }
     if(config->FREE_CB == NULL) {
-        config->FREE_CB = ch_chirp_std_free;
+        config->FREE_CB = _ch_chirp_std_free;
     }
     chirp->config           = config;
     ch_chirp_int_t* ichirp  = ch_chirp_alloc(chirp, sizeof(ch_chirp_int_t));

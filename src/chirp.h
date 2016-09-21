@@ -54,6 +54,30 @@ struct ch_chirp_int {
 };
 
 // .. c:function::
+static void
+_ch_close_async_cb(uv_async_t* handle);
+//
+//    Internal callback to close chirp. Makes ch_chirp_close_ts thread-safe
+//
+// .. c:function::
+static
+void*
+_ch_chirp_std_alloc(
+        size_t suggested_size,
+        size_t required_size,
+        size_t* provided_size
+);
+//
+//    Standard memory allocator used if no allocator is supplied by the user.
+//
+// .. c:function::
+static
+void
+_ch_chirp_std_free(void* buf);
+//
+//    Standard free if no free is supplied by the user.
+//
+// .. c:function::
 static
 ch_inline
 void*
