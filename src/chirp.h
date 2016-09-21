@@ -10,10 +10,30 @@
 #include "../include/chirp_obj.h"
 #include "protocol.h"
 
+// .. c:type:: ch_chirp_flags_t
+//
+//    Represents chirps flags.
+//
+//    .. c:member:: CH_CHIRP_AUTO_STOP
+//
+//       Stop the loop on closing. This is useful if the loop is only used by
+//       chirp.
+//
+//    .. c:member:: CH_CHIRP_CLOSED
+//
+//       Chirp is closed.
+//
+// .. code-block:: cpp
+//
+typedef enum {
+    CH_CHIRP_AUTO_STOP   = 1 << 0,
+    CH_CHIRP_CLOSED      = 1 << 1,
+    CH_CHIRP_CLOSING     = 1 << 2,
+} ch_chirp_flags_t;
+
 // .. c:type:: ch_chirp_int_t
 //
 //    Chirp object.
-//
 //
 //    .. c:member:: uv_async_t close
 //
@@ -27,9 +47,10 @@
 // .. code-block:: cpp
 //
 struct ch_chirp_int {
-    int                      auto_start;
-    uv_async_t               close;
-    ch_protocol_t            protocol;
+    int           closing_tasks;
+    uv_async_t    close;
+    uv_check_t    close_check;
+    ch_protocol_t protocol;
 };
 
 // .. c:function::
@@ -110,5 +131,21 @@ ch_chirp_free(
 {
     chirp->config->FREE_CB(buf);
 }
+// .. c:function::
+void
+ch_chirp_close_cb(uv_handle_t* handle);
+//
+//    Reduce callback semaphore.
+//
+//    TODO params
+//
+// .. c:function::
+static void
+_ch_chirp_check_closing_cb(uv_check_t* handle);
+//
+//    Close chirp when the closing semaphore reaches zero.
+//
+//    TODO params
+//
 
 #endif //ch_chirp_h

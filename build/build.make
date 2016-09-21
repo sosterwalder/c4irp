@@ -89,6 +89,7 @@ test-lib: | libuv
 	CFLAGS="$(MYCFLAGS)" make -C $(LIBUVD) check
 
 %.c: %.h
+	touch $@
 
 %.o: %.c $(COMMON)
 	$(CC) -c -o $@ $< $(MYCFLAGS) -Werror $(COVERAGE)

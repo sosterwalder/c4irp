@@ -20,7 +20,7 @@
 //
 //    .. c:member:: CH_CN_SHUTTING_DOWN
 //
-//       The connection is shutting down 
+//       The connection is shutting down
 //
 // .. code-block:: cpp
 //

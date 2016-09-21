@@ -130,6 +130,7 @@ typedef struct {
     unsigned char identity[16];
     uv_loop_t*    loop;
     ch_config_t*  config;
+    uint8_t       flags;
     ...;
 } ch_chirp_t;
 

@@ -77,7 +77,13 @@ __inline int c99_snprintf(char *outBuf, size_t size, const char *format, ...)
 
 #ifndef NDEBUG
 #ifdef CH_LOG_TO_STDERR
-#define L(chirp, ...) fprintf(stderr, ##__VA_ARGS__); fprintf(stderr, "\n")
+#define L(chirp, message, ...) fprintf( \
+    stderr, \
+    "%s:%d " message "\n", \
+    __FILE__, \
+    __LINE__, \
+    ##__VA_ARGS__ \
+)
 #else  //CH_LOG_TO_STDERR
 #define L(chirp, message, ...) do { \
     if(chirp->_log != NULL) { \

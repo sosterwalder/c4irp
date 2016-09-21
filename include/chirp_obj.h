@@ -152,6 +152,7 @@ typedef struct ch_chirp {
     unsigned char   identity[16];
     uv_loop_t*      loop;
     ch_config_t*    config;
+    uint8_t         flags;
     ch_log_cb_t     _log;
     int             _init;
     ch_chirp_int_t* _;

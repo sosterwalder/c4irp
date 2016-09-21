@@ -24,6 +24,11 @@ struct uv_tcp_s {
 };
 typedef struct uv_tcp_s uv_tcp_t;
 
+struct uv_shutdown_s {
+    ...;
+};
+typedef struct uv_shutdown_s uv_shutdown_t;
+
 struct ch_chirp;
 
 typedef struct ch_connection {
@@ -33,8 +38,9 @@ typedef struct ch_connection {
     uv_tcp_t              client;
     void*                 buffer;
     size_t                buffer_size;
-    int                   buffer_used;
     struct ch_chirp*      chirp;
+    uv_shutdown_t         shutdown_req;
+    uint8_t               flags;
     char                  color_field;
     struct ch_connection* left;
     struct ch_connection* right;

@@ -129,13 +129,13 @@ ch_pr_stop(ch_protocol_t* protocol)
     ch_chirp_t* chirp = protocol->chirp;
     L(chirp, "Closing protocol %p", chirp);
     _ch_pr_close_free_connections(chirp, protocol->connections);
-    uv_close((uv_handle_t*) &protocol->serverv4, NULL);
-    uv_close((uv_handle_t*) &protocol->serverv6, NULL);
+    uv_close((uv_handle_t*) &protocol->serverv4, ch_chirp_close_cb);
+    uv_close((uv_handle_t*) &protocol->serverv6, ch_chirp_close_cb);
+    chirp->_->closing_tasks += 2;
     _ch_pr_free_receipts(chirp, protocol->receipts);
     _ch_pr_free_receipts(chirp, protocol->late_receipts);
     return CH_SUCCESS;
 }
-
 // .. c:function::
 static void
 _ch_pr_new_connection_cb(uv_stream_t* server, int status) // NOCOV TODO
