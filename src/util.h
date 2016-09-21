@@ -29,6 +29,7 @@ _ch_uv_error_map(int error)
             return CH_SUCCESS;
         case(UV_EADDRINUSE):
             return CH_EADDRINUSE;
+        case(UV_ENOTCONN):
         case(UV_EINVAL):
             return CH_VALUE_ERROR;
         default:

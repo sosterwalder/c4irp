@@ -192,7 +192,8 @@ _ch_pr_read_data_cb(
     ch_connection_t* conn = stream->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    conn->buffer_used = 0;
+    conn->flags &= ~CH_CN_BUF_USED;
+    ch_chirp_close_ts(chirp);
 }
 // .. c:function::
 static void
@@ -237,6 +238,6 @@ _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
             t != NULL;
             t = sglib_ch_connection_t_it_next(&it) // NOCOV TODO remove
     ) {
-        uv_close((uv_handle_t*) &t->client, NULL); // NOCOV TODO
+        ch_cn_shutdown(t);
     } // NOCOV TODO remove
 }

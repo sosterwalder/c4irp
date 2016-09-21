@@ -6,6 +6,7 @@
 //
 #include "connection.h"
 #include "chirp.h"
+#include "util.h"
 
 // .. c:function::
 void
@@ -20,7 +21,37 @@ ch_cn_close_cb(uv_handle_t* handle)
     ch_connection_t* conn = handle->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    ch_chirp_free(chirp, handle);
+    if(conn->buffer) {
+        ch_chirp_free(chirp, conn->buffer);
+    }
+    ch_chirp_free(chirp, conn);
+}
+// .. c:function::
+ch_error_t
+ch_cn_shutdown(ch_connection_t* conn)
+//    :noindex:
+//
+//    see: :c:func:`ch_cn_shutdown`
+//
+// .. code-block:: cpp
+//
+{
+    int tmp_err;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    if(conn->flags & CH_CN_SHUTTING_DOWN) {
+        return CH_IN_PRORESS;
+    }
+    conn->flags |= CH_CN_SHUTTING_DOWN;
+    tmp_err = _ch_uv_error_map(uv_shutdown(
+        &conn->shutdown_req,
+        (uv_stream_t*) &conn->client,
+        ch_cn_shutdown_cb
+    ));
+    if(tmp_err != CH_SUCCESS) {
+        return tmp_err;
+    }
+    return CH_SUCCESS;
 }
 // .. c:function::
 void
@@ -59,9 +90,9 @@ ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
             &provided_size
         );
         conn->buffer_size = provided_size;
-        conn->buffer_used = 1;
+        conn->flags |= CH_CN_BUF_USED;
     } else {
-        A(!conn->buffer_used, "Buffer still used");
+        A(!conn->flags & CH_CN_BUF_USED, "Buffer still used");
     }
     buf->base = conn->buffer;
     buf->len = conn->buffer_size;

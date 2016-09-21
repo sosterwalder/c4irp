@@ -10,6 +10,25 @@
 #include "../include/message.h"
 
 #include "sglib.h"
+// .. c:type:: ch_cn_flags_t
+//
+//    Represents connection flags.
+//
+//    .. c:member:: CH_CN_BUF_USED
+//
+//       The connections buffer is currently used by libuv
+//
+//    .. c:member:: CH_CN_SHUTTING_DOWN
+//
+//       The connection is shutting down 
+//
+// .. code-block:: cpp
+//
+typedef enum {
+    CH_CN_BUF_USED       = 1 << 0,
+    CH_CN_SHUTTING_DOWN  = 1 << 1,
+} ch_cn_flags_t;
+
 
 struct ch_chirp;
 
@@ -33,9 +52,9 @@ typedef struct ch_connection {
     uv_tcp_t              client;
     void*                 buffer;
     size_t                buffer_size;
-    int                   buffer_used;
     struct ch_chirp*      chirp;
     uv_shutdown_t         shutdown_req;
+    uint8_t               flags;
     char                  color_field;
     struct ch_connection* left;
     struct ch_connection* right;
@@ -63,7 +82,15 @@ ch_connection_init(struct ch_chirp* chirp, ch_connection_t* conn)
 void
 ch_cn_close_cb(uv_handle_t* handle);
 //
-//    Called by libuv after closing a handle
+//    Called by libuv after closing a handle.
+//
+//    TODO params
+//
+// .. c:function::
+ch_error_t
+ch_cn_shutdown(ch_connection_t* conn);
+//
+//    Shutdown this connection.
 //
 //    TODO params
 //
@@ -71,7 +98,7 @@ ch_cn_close_cb(uv_handle_t* handle);
 void
 ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
 //
-//    Called by libuv after shutting a connection down
+//    Called by libuv after shutting a connection down.
 //
 //    TODO params
 //
@@ -90,7 +117,7 @@ ch_inline
 int
 ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
 //
-//    Compare operator for connections
+//    Compare operator for connections.
 //
 //    :param ch_connection_t* x: x
 //    :param ch_connection_t* y: y

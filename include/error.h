@@ -45,6 +45,10 @@
 //
 //       Chirp or another object is not initialized
 //
+//    .. c:member:: CH_IN_PRORESS
+//
+//       Action is already in progress
+//
 // .. code-block:: cpp
 //
 typedef enum {
@@ -56,6 +60,7 @@ typedef enum {
     CH_FATAL          = 5,
     CH_TLS_ERROR      = 6,
     CH_UNINIT         = 7,
+    CH_IN_PRORESS     = 8,
 } ch_error_t;
 
 #endif //ch_inc_error_h
