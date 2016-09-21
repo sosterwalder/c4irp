@@ -49,7 +49,7 @@ typedef enum {
 struct ch_chirp_int {
     int           closing_tasks;
     uv_async_t    close;
-    uv_check_t    close_check;
+    uv_prepare_t  close_check;
     ch_protocol_t protocol;
 };
 
@@ -141,7 +141,7 @@ ch_chirp_close_cb(uv_handle_t* handle);
 //
 // .. c:function::
 static void
-_ch_chirp_check_closing_cb(uv_check_t* handle);
+_ch_chirp_check_closing_cb(uv_prepare_t* handle);
 //
 //    Close chirp when the closing semaphore reaches zero.
 //

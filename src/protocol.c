@@ -127,7 +127,7 @@ ch_pr_stop(ch_protocol_t* protocol)
 //
 {
     ch_chirp_t* chirp = protocol->chirp;
-    L(chirp, "Closing protocol %p", chirp);
+    L(chirp, "Closing protocol. ch_chirp_t:%p", chirp);
     _ch_pr_close_free_connections(chirp, protocol->connections);
     uv_close((uv_handle_t*) &protocol->serverv4, ch_chirp_close_cb);
     uv_close((uv_handle_t*) &protocol->serverv6, ch_chirp_close_cb);
@@ -149,7 +149,12 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status) // NOCOV TODO
     CH_GET_CHIRP(server); // NOCOV TODO
     ch_protocol_t* protocol = &chirp->_->protocol;
     if (status < 0) { // NOCOV TODO
-        L(chirp, "New connection error %s", uv_strerror(status)); // NOCOV TODO
+        L(
+            chirp,
+            "New connection error %s. ch_chirp_t:%p",
+            uv_strerror(status),
+            chirp
+        ); // NOCOV TODO
         return; // NOCOV TODO
     }
 
@@ -162,7 +167,7 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status) // NOCOV TODO
     uv_tcp_init(server->loop, client); // NOCOV TODO
     client->data = conn;
     if (uv_accept(server, (uv_stream_t*) client) == 0) { // NOCOV TODO
-        L(chirp, "Accepted connection %p", conn);
+        L(chirp, "Accepted connection. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
         sglib_ch_connection_t_add(&protocol->connections, conn);
         uv_read_start(
             (uv_stream_t*) client,
@@ -193,7 +198,7 @@ _ch_pr_read_data_cb(
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     conn->flags &= ~CH_CN_BUF_USED;
-    ch_chirp_close_ts(chirp);
+    // ch_chirp_close_ts(chirp);
 }
 // .. c:function::
 static void

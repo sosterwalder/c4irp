@@ -28,9 +28,10 @@ ch_cn_close_cb(uv_handle_t* handle)
     chirp->_->closing_tasks -= 1;
     L(
         chirp,
-        "Closed connection %p, closing semaphore (%d)",
+        "Closed connection, closing semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
+        chirp->_->closing_tasks,
         conn,
-        chirp->_->closing_tasks
+        chirp
     );
 }
 // .. c:function::
@@ -59,7 +60,7 @@ ch_cn_shutdown(ch_connection_t* conn)
         return tmp_err;
     }
     chirp->_->closing_tasks += 1;
-    L(chirp, "Shutdown connection %p", conn);
+    L(chirp, "Shutdown connection. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
     return CH_SUCCESS;
 }
 // .. c:function::
@@ -75,14 +76,26 @@ ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
     ch_connection_t* conn = req->handle->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    L(chirp, "Shutdown callback called %p", conn);
+    L(chirp, "Shutdown callback called. ch_connection_t:%p, ch_chirp_t:%p", conn,  chirp);
     uv_handle_t* handle = (uv_handle_t*) req->handle;
     if(uv_is_closing(handle)) {
         chirp->_->closing_tasks -= 1;
-        L(chirp, "Error: connection already closed after shutdown %p", conn);
+        L(
+            chirp,
+            "Error: connection already closed after shutdown. "
+            "ch_connection_t:%p, ch_chirp_t:%p",
+            conn,
+            chirp
+        );
     } else {
         uv_close((uv_handle_t*) req->handle, ch_cn_close_cb);
-        L(chirp, "Closing connection after shutdown %p", conn);
+        L(
+            chirp,
+            "Closing connection after shutdown. "
+            "ch_connection_t:%p, ch_chirp_t:%p",
+            conn,
+            chirp
+        );
         // chirp->_->closing_tasks += 0; One is finished, one is added
     }
 }
