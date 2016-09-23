@@ -2,9 +2,24 @@
 RULES
 =====
 
+* The following are our given abstractions:
+
+  - libuv
+  - sglib
+  - array.h
+  - openssl
+  - We try not do add our own abstractions, to keep complexity low
+
+    - For example we use a async-semaphore pattern to await multiple callbacks,
+      it would be possible to build a abstraction (API) from this, put it would
+      increase complexity. So unless we need this async-semaphore in 8+ place we
+      just repeat the pattern, which keeps flexibility high and complexity low.
+
 * Types end in _t
 * Callbacks end in _cb
-  - Callbacks are in past tense? (not sure)
+
+  - Use natural names and _cb will indicated that it probably happened AFTER
+
 * Callback types end in _cb_t
 * Always unpack handles in callbacks till you can verify the chirp magic
 * C4irp and C3irp are only used to disambiguate the python-only and the C based
@@ -12,27 +27,20 @@ RULES
 * Embeddable: no memory allocation
 * Every function returns ch_error_t
 * Use pointers sparsely
-  
+
   - Copy small structs 
   - Use pointers for large structs (with const)
   - Use pointer if it has to be modified (also out params)
 
 * Embrace libuv styles and use it for c4irp API
 * Literate programming
-* Reader and write may not be linked by a lock. Since the send function waits
-  for an ACK, this means a second send may start when the first message is sent
-  out but the ACK has not be received yet (means batching is possible)
 * Local messages are sent to scheduler directly
-* Localhost connections bypass TLS and don't use cleanup
-
-  - Therefore no retry etc is needed! -> speed speed speed
-
+* Localhost connections bypass TLS
 * Binding will send local messages to scheduler directly (not using c4irp)
 * Use C99 plus the extension used by libuv
 * PEP8 style in C is ok
 * Sending messages my not allocate memory
 
-  - Only bookkeeping may allocate memory when a connection is open/closed
   - Only things that happen seldom may allocate
   - Luckily chirp is already design that way
 
@@ -42,11 +50,6 @@ RULES
   - So we have a pure-python and C implementation
 
 * Static linking rules
-* Always check coverage and scan-build
-* The development build system may be hacky
-
-  - BUT the release build system (make.release, setup.py) must be rock solid
-
 * Provide wheels
 * Provide distro packages
 
@@ -104,6 +107,3 @@ Performance
 Questions
 =========
 
-Not rules yet.
-
-* Python binding: Should we ask python for memory?
