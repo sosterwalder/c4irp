@@ -9,7 +9,8 @@ stages:
 docs:
   stage: docs
   script:
-    - aptitude -y install graphviz
+    - apt-get update
+    - apt-get -y install graphviz
     - pyenv local 3.5.2
     - ./make.py doc-all
   artifacts:
