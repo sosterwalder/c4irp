@@ -52,6 +52,12 @@ _ch_close_async_cb(uv_async_t* handle)
     ichirp->closing_tasks += 1;
     assert(uv_prepare_init(chirp->loop, &ichirp->close_check) == CH_SUCCESS);
     ichirp->close_check.data = chirp;
+    // We use a semaphore to wait until all callbacks are done:
+    // 1. Every time a new callback is scheduled we do ichirp->closing_tasks += 1
+    // 2. Every time a callback is called we do ichirp->closing_tasks -= 1
+    // 3. Every uv_loop iteration before it blocks we check ichirp->closing_tasks == 0
+    // -> if we reach 0 all callbacks are done and we continue freeing memory
+    // etc.
     assert(uv_prepare_start(
         &ichirp->close_check,
         _ch_chirp_check_closing_cb
@@ -118,7 +124,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
     srand((unsigned int) time(NULL));
     _ch_random_ints_to_bytes(chirp->identity, 16);
 
-    if(uv_async_init(chirp->loop, &ichirp->close, &_ch_close_async_cb) < 0) {
+    if(uv_async_init(chirp->loop, &ichirp->close, _ch_close_async_cb) < 0) {
         ch_chirp_free(chirp, ichirp);
         return CH_UV_ERROR; // NOCOV
     }

@@ -12,7 +12,7 @@ RULES
 
     - For example we use a async-semaphore pattern to await multiple callbacks,
       it would be possible to build a abstraction (API) from this, put it would
-      increase complexity. So unless we need this async-semaphore in 8+ place we
+      increase complexity. So unless we need this async-semaphore in 8+ places we
       just repeat the pattern, which keeps flexibility high and complexity low.
 
 * Types end in _t
@@ -21,22 +21,24 @@ RULES
   - Use natural names and _cb will indicated that it probably happened AFTER
 
 * Callback types end in _cb_t
-* Always unpack handles in callbacks till you can verify the chirp magic
+* Use one flags member instead of many bools (int)
+* Always unpack handles in functions and callbacks till you can verify the chirp magic
 * C4irp and C3irp are only used to disambiguate the python-only and the C based
   version of chirp, everywhere else chirp is used
-* Embeddable: no memory allocation
+* Embeddable: allocate memory via user callback
 * Every function returns ch_error_t
 * Use pointers sparsely
 
   - Copy small structs 
   - Use pointers for large structs (with const)
   - Use pointer if it has to be modified (also out params)
+  - Use pointer where you have to because of forward declarations
 
 * Embrace libuv styles and use it for c4irp API
 * Literate programming
 * Local messages are sent to scheduler directly
+  - Binding will send local messages to scheduler directly (not using c4irp)
 * Localhost connections bypass TLS
-* Binding will send local messages to scheduler directly (not using c4irp)
 * Use C99 plus the extension used by libuv
 * PEP8 style in C is ok
 * Sending messages my not allocate memory
@@ -107,3 +109,4 @@ Performance
 Questions
 =========
 
+Thing that aren't rules yet
