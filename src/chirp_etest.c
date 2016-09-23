@@ -13,6 +13,7 @@ main(
     int argc,
     char *argv[]
 )
+//    :noindex:
 //
 //    Run chirp
 //

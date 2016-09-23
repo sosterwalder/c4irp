@@ -138,7 +138,7 @@ ch_pr_stop(ch_protocol_t* protocol)
 }
 // .. c:function::
 static void
-_ch_pr_new_connection_cb(uv_stream_t* server, int status) // NOCOV TODO
+_ch_pr_new_connection_cb(uv_stream_t* server, int status)
 //    :noindex:
 //
 //    see: :c:func:`_ch_pr_new_connection_cb`
@@ -181,12 +181,13 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status) // NOCOV TODO
     }
 } // NOCOV TODO remove
 //
+// .. c:function::
 static void
 _ch_pr_read_data_cb(
         uv_stream_t* stream,
         ssize_t nread,
         const uv_buf_t* buf
-) // NOCOV TODO
+)
 //    :noindex:
 //
 //    see: :c:func:`_ch_pr_read_data_cb`

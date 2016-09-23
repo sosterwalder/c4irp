@@ -18,6 +18,7 @@ Public C API
    inc/error.h.rst
    inc/chirp_obj.h.rst
    inc/const.h.rst
+   inc/common.h.rst
 
 Internal C API
 ==============
@@ -27,8 +28,6 @@ Internal C API
    :includehidden:
 
    src/array.h.rst
-   src/array_test.c.rst
-   src/common.h.rst
    src/message.h.rst
    src/message.c.rst
    src/chirp.h.rst
@@ -37,6 +36,7 @@ Internal C API
    src/protocol.c.rst
    src/connection.h.rst
    src/connection.c.rst
+   src/util.h.rst
 
 Public Python API
 =================
@@ -55,6 +55,17 @@ Tests in C
 
    src/connection_test.h.rst
    src/connection_test.c.rst
+
+Test binaries
+=============
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+
+   src/alloc_etest.c.rst
+   src/array_etest.c.rst
+   src/chirp_etest.c.rst
 
 External Libs
 ==============

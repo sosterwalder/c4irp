@@ -30,6 +30,7 @@ main(
     int argc,
     char *argv[]
 )
+//    :noindex:
 //
 //    Test if a bad memory allocator will assert.
 //

@@ -123,7 +123,7 @@ ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
         conn->buffer_size = provided_size;
         conn->flags |= CH_CN_BUF_USED;
     } else {
-        A(!conn->flags & CH_CN_BUF_USED, "Buffer still used");
+        A(!(conn->flags & CH_CN_BUF_USED), "Buffer still used");
     }
     buf->base = conn->buffer;
     buf->len = conn->buffer_size;
