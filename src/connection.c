@@ -48,6 +48,12 @@ ch_cn_shutdown(ch_connection_t* conn)
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     if(conn->flags & CH_CN_SHUTTING_DOWN) {
+        L(
+            chirp,
+            "Error: Shutdown in progress. ch_connection_t:%p, ch_chirp_t:%p",
+            conn,
+            chirp
+        );
         return CH_IN_PRORESS;
     }
     conn->flags |= CH_CN_SHUTTING_DOWN;

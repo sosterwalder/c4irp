@@ -212,19 +212,34 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 {
     L(chirp, "Closing chirp via callback. ch_chirp_t:%p", chirp);
     if(chirp == NULL || chirp->_init != CH_CHIRP_MAGIC) {
+        fprintf(
+            stderr,
+            "%s:%d Fatal: chirp is not initialzed. ch_chirp_t:%p\n",
+            __FILE__,
+            __LINE__,
+            chirp
+        );
         return CH_UNINIT; // NOCOV  TODO can be tested
     }
     ch_chirp_int_t* ichirp = chirp->_;
     if(chirp->flags & CH_CHIRP_CLOSED) {
+        fprintf(
+            stderr,
+            "%s:%d Fatal: chirp is already closed. ch_chirp_t:%p\n",
+            __FILE__,
+            __LINE__,
+            chirp
+        );
         return CH_FATAL;
     }
     if(chirp->flags & CH_CHIRP_CLOSING) {
+        L(chirp, "Error: close already in progress. ch_chirp_t:%p", chirp);
         return CH_IN_PRORESS;
     }
     chirp->flags |= CH_CHIRP_CLOSING;
     ichirp->close.data = chirp;
     if(uv_async_send(&ichirp->close) < 0) {
-        L((&chirp), "Error: could not call close callback. ch_chirp_t:%p", chirp);
+        L(chirp, "Error: could not call close callback. ch_chirp_t:%p", chirp);
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this
     }
     return CH_SUCCESS;
