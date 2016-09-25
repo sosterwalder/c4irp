@@ -52,13 +52,13 @@ class ChirpPool(object):
         self._loop      = ffi.new("uv_loop_t*")
         self._thread    = None
         self._pool      = None
+        self._uv_ret    = 0
         self._chirp_ret = 0
 
     # TODO properties
 
     def start(self):
         """Start servers and cleanup routines."""
-        # TODO error to excetion method
         self._fill_c_config()
         lib.ch_loop_init(self._loop)
         err = lib.ch_chirp_init(
@@ -72,7 +72,7 @@ class ChirpPool(object):
 
         def run():
             """Run chirp in a thread."""
-            lib.ch_run(self._loop)
+            self._uv_ret = lib.ch_run(self._loop)
             self._chirp_ret = lib.ch_loop_close(self._loop)
 
         self._pool   = fut.ThreadPoolExecutor(
@@ -85,6 +85,7 @@ class ChirpPool(object):
         """Closing everything."""
         lib.ch_chirp_close_ts(self._chirp)
         self._thread.join()
+        assert(self._uv_ret == lib.CH_SUCCESS)
         assert(self._chirp_ret == lib.CH_SUCCESS)
         self._pool.shutdown()
 
