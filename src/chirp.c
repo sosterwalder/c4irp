@@ -113,6 +113,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
     if(config->FREE_CB == NULL) {
         config->FREE_CB = _ch_chirp_std_free;
     }
+    memset(chirp, 0, sizeof(ch_chirp_t));
     chirp->config           = config;
     ch_chirp_int_t* ichirp  = ch_chirp_alloc(chirp, sizeof(ch_chirp_int_t));
     memset(ichirp, 0, sizeof(ch_chirp_int_t));
@@ -206,7 +207,7 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
     if(chirp->flags & CH_CHIRP_CLOSING) {
         return CH_IN_PRORESS;
     }
-    chirp->flags = CH_CHIRP_CLOSING;
+    chirp->flags |= CH_CHIRP_CLOSING;
     ichirp->close.data = chirp;
     if(uv_async_send(&ichirp->close) < 0) {
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this
