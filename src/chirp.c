@@ -136,6 +136,7 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
         return tmp_err;
     }
     chirp->_init = CH_CHIRP_MAGIC;
+    L(chirp, "Chirp initialized. ch_chirp_t:%p, uv_loop_t:%p", &chirp, &loop);
     return CH_SUCCESS;
 }
 

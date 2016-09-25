@@ -52,6 +52,7 @@ def basic_uv():
     error = lib.ch_chirp_init(
         chirp, ffi.addressof(lib.ch_config_defaults), loop
     )
+    lib.ch_chirp_set_auto_stop(chirp)
     lib.ch_chirp_register_log_cb(chirp, lib.python_log_cb)
     yield error
     if error == lib.CH_SUCCESS:

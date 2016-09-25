@@ -201,7 +201,19 @@ ch_loop_close(uv_loop_t* loop)
 // .. code-block:: cpp
 //
 {
-    return uv_loop_close(loop);
+    int tmp_err;
+    tmp_err = uv_loop_close(loop);
+#if defined(CH_LOG_TO_STDERR) && !defined(NDEBUG)
+    fprintf(
+        stderr,
+        "%s:%d Closing loop exitcode:%d. uv_loop_t:%p\n",
+        __FILE__,
+        __LINE__,
+        tmp_err,
+        loop
+    );
+#endif
+    return tmp_err;
 }
 // .. c:function::
 static

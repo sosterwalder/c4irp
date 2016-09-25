@@ -10,7 +10,7 @@ else
 endif
 
 ### Configuration
-COMMON        := config.h include/common.h
+COMMON        := config.h include/common.h include/chirp_obj.h
 
 LIBUVD        := build/libuv
 COMMONCFLAGS  := -std=gnu99 -fPIC -Wall -Wno-unused-function -I$(LIBUVD)/include $(CFLAGS)
@@ -71,7 +71,7 @@ libuv: libuv.a
 
 libchirp: libchirp.a
 
-libchirp.a: $(OBJS) | libchirp-depends
+libchirp.a: $(OBJS) $(COMMON) | libchirp-depends
 	ar $(ARFLAGS) $@ $^
 ifneq ($(MODE),debug)
 ifeq ($(UNAME_S),Darwin)
@@ -88,7 +88,7 @@ clean:
 test-lib: | libuv
 	CFLAGS="$(MYCFLAGS)" make -C $(LIBUVD) check
 
-%.c: %.h
+%.c: %.h $(COMMON)
 	touch $@
 
 %.o: %.c $(COMMON)

@@ -26,6 +26,5 @@ main(
     ch_loop_init(&loop);
     ch_chirp_init(&chirp, &config, &loop);
     ch_run(&loop);
-    ch_loop_close(&loop);
-    return 0;
+    return ch_loop_close(&loop);
 }
