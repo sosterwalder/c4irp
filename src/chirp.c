@@ -264,12 +264,26 @@ _ch_chirp_check_closing_cb(uv_prepare_t* handle)
     L(chirp, "Check closing semaphore (%d). ch_chirp_t:%p", ichirp->closing_tasks, chirp);
     if(ichirp->closing_tasks == 0) {
         assert(uv_prepare_stop(handle) == CH_SUCCESS);
-        if(chirp->flags & CH_CHIRP_AUTO_STOP) {
-            uv_stop(chirp->loop);
-            L(chirp, "UV-Loop stopped by chirp. ch_chirp_t:%p", chirp->loop);
-        }
-        ch_chirp_free(chirp, ichirp);
-        chirp->flags |= CH_CHIRP_CLOSED;
-        L(chirp, "Closed. ch_chirp_t:%p", chirp);
+        uv_close((uv_handle_t*) handle, _ch_chirp_closing_down_cb);
     }
+}
+// .. c:function::
+static void
+_ch_chirp_closing_down_cb(uv_handle_t* handle)
+//    :noindex:
+//
+//    see: :c:func:`_ch_chirp_closing_down_cb`
+//
+// .. code-block:: cpp
+//
+{
+    CH_GET_CHIRP(handle);
+    ch_chirp_int_t* ichirp = chirp->_;
+    if(chirp->flags & CH_CHIRP_AUTO_STOP) {
+        uv_stop(chirp->loop);
+        L(chirp, "UV-Loop stopped by chirp. ch_chirp_t:%p", chirp->loop);
+    }
+    ch_chirp_free(chirp, ichirp);
+    chirp->flags |= CH_CHIRP_CLOSED;
+    L(chirp, "Closed. ch_chirp_t:%p", chirp);
 }

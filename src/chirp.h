@@ -171,5 +171,13 @@ _ch_chirp_check_closing_cb(uv_prepare_t* handle);
 //
 //    TODO params
 //
+// .. c:function::
+static void
+_ch_chirp_closing_down_cb(uv_handle_t* handle);
+//
+//    Closing chirp after the check callback has been closed.
+//
+//    TODO params
+//
 
 #endif //ch_chirp_h

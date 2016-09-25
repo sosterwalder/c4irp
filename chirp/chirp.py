@@ -46,12 +46,13 @@ class ChirpPool(object):
             self,
             config = None,
     ):
-        self._config   = common.complete_config(config, const.Config())
-        self._c_config = ffi.new("ch_config_t*")
-        self._chirp    = ffi.new("ch_chirp_t*")
-        self._loop     = ffi.new("uv_loop_t*")
-        self._thread   = None
-        self._pool     = None
+        self._config    = common.complete_config(config, const.Config())
+        self._c_config  = ffi.new("ch_config_t*")
+        self._chirp     = ffi.new("ch_chirp_t*")
+        self._loop      = ffi.new("uv_loop_t*")
+        self._thread    = None
+        self._pool      = None
+        self._chirp_ret = 0
 
     # TODO properties
 
@@ -69,7 +70,7 @@ class ChirpPool(object):
         def run():
             """Run chirp in a thread."""
             lib.ch_run(self._loop)
-            lib.ch_loop_close(self._loop)
+            self._chirp_ret = lib.ch_loop_close(self._loop)
 
         self._pool   = fut.ThreadPoolExecutor(
             max_workers=self._config.MAX_HANDLERS
@@ -81,6 +82,7 @@ class ChirpPool(object):
         """Closing everything."""
         lib.ch_chirp_close_ts(self._chirp)
         self._thread.join()
+        assert(self._chirp_ret == lib.CH_SUCCESS)
         self._pool.shutdown()
 
     def _fill_c_config(self):
