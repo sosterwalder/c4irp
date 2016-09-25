@@ -50,10 +50,12 @@ def basic_uv():
     loop = ffi.new("uv_loop_t*")
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
     error = lib.ch_chirp_init(
-        chirp, ffi.addressof(lib.ch_config_defaults), loop
+        chirp,
+        ffi.addressof(lib.ch_config_defaults),
+        loop,
+        lib.python_log_cb
     )
     lib.ch_chirp_set_auto_stop(chirp)
-    lib.ch_chirp_register_log_cb(chirp, lib.python_log_cb)
     yield error
     if error == lib.CH_SUCCESS:
         assert lib.ch_chirp_close_ts(chirp) == lib.CH_SUCCESS

@@ -251,13 +251,20 @@ ch_run(uv_loop_t* loop)
 // .. c:function::
 extern
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop);
+ch_chirp_init(
+        ch_chirp_t* chirp,
+        ch_config_t* config,
+        uv_loop_t* loop,
+        ch_log_cb_t log_cb
+);
 //
 //    Intialiaze a chirp object. Memory is provided by caller. You must call
 //    :c:func:`ch_chirp_close` to cleanup the object.
 //
 //    :param ch_chirp_t* chirp: Out: Chirp object
 //    :param ch_config_t* config: Chirp config
+//    :param uv_loop_t* loop: Reference to a libuv loop
+//    :param ch_log_cb_t log_cb: Callback to logging facility, can be NULL
 //
 // .. c:function::
 extern

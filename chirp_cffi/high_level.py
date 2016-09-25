@@ -156,7 +156,12 @@ ch_run(uv_loop_t* loop);
 
 extern
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop);
+ch_chirp_init(
+        ch_chirp_t* chirp,
+        ch_config_t* config,
+        uv_loop_t* loop,
+        ch_log_cb_t log_cb
+);
 
 extern
 ch_error_t

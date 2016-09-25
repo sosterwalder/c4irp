@@ -98,7 +98,12 @@ _ch_chirp_std_free(void* buf)
 
 // .. c:function::
 ch_error_t
-ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
+ch_chirp_init(
+        ch_chirp_t* chirp,
+        ch_config_t* config,
+        uv_loop_t* loop,
+        ch_log_cb_t log_cb
+)
 //    :noindex:
 //
 //    see: :c:func:`ch_chirp_init`
@@ -120,6 +125,10 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
     ch_protocol_t* protocol = &ichirp->protocol;
     chirp->_                = ichirp;
     chirp->loop             = loop;
+
+    if(log_cb != NULL) {
+        ch_chirp_register_log_cb(chirp, log_cb);
+    }
 
     // rand
     srand((unsigned int) time(NULL));
@@ -175,7 +184,7 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
         L((&chirp), "Error: Could not init loop: %d. uv_loop_t:%p", tmp_err, &loop);
         return tmp_err;  // NOCOV this can only fail with access error
     }
-    tmp_err = ch_chirp_init(&chirp, config, &loop);
+    tmp_err = ch_chirp_init(&chirp, config, &loop, NULL);
     if(tmp_err != CH_SUCCESS) {
         L((&chirp), "Error: Could not init chirp: %d ch_chirp_t:%p", tmp_err, &chirp);
         return tmp_err;  // NOCOV covered in ch_chirp_init tests

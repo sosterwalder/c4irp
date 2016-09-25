@@ -62,13 +62,15 @@ class ChirpPool(object):
         self._fill_c_config()
         lib.ch_loop_init(self._loop)
         err = lib.ch_chirp_init(
-            self._chirp, self._c_config, self._loop
+            self._chirp,
+            self._c_config,
+            self._loop,
+            lib.python_log_cb
         )
         if err == lib.CH_EADDRINUSE:
             raise RuntimeError("Port %d already in use." % self._config.PORT)
         assert(err == lib.CH_SUCCESS)
         lib.ch_chirp_set_auto_stop(self._chirp)
-        lib.ch_chirp_register_log_cb(self._chirp, lib.python_log_cb)
 
         def run():
             """Run chirp in a thread."""

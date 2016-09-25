@@ -34,7 +34,7 @@ main(
     ch_chirp_t chirp;
     uv_loop_t loop;
     ch_loop_init(&loop);
-    ch_chirp_init(&chirp, &config, &loop);
+    ch_chirp_init(&chirp, &config, &loop, NULL);
     ca_int_t a;
     a = ca_new_int(&chirp, 3);
     CA(int, a, index) = 0;

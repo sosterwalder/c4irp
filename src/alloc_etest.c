@@ -49,5 +49,5 @@ main(
         config.ALLOC_CB = bad_alloc; // NOCOV not testable since it segfaults
     } // NOCOV not testable since it segfaults
     ch_loop_init(&loop);
-    ch_chirp_init(&chirp, &config, &loop);
+    ch_chirp_init(&chirp, &config, &loop, NULL);
 }
