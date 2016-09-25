@@ -31,6 +31,21 @@ It is part of Concreteclouds_ and the C99 implementation of Chirp_.
 WORK IN PROGRESS
 ================
 
+FAQ
+===
+
+* There is problem with c4irp, how can I get more logging and information?
+
+.. code-block:: bash
+
+   pip uninstall c4irp
+   git clone https://github.com/concretecloud/c4irp.git
+   cd c4irp
+   MODE=debug python setup.py install
+
+This will enable a lot of logging in the c4irp library. See also Development.
+
+
 Development
 ===========
 

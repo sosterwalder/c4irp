@@ -126,6 +126,11 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
     _ch_random_ints_to_bytes(chirp->identity, 16);
 
     if(uv_async_init(chirp->loop, &ichirp->close, _ch_close_async_cb) < 0) {
+        L(
+            chirp,
+            "Error: Could not initialize close callback. ch_chirp_t:%p",
+            &chirp
+        );
         ch_chirp_free(chirp, ichirp);
         return CH_UV_ERROR; // NOCOV
     }
@@ -133,6 +138,12 @@ ch_chirp_init(ch_chirp_t* chirp, ch_config_t* config, uv_loop_t* loop)
     protocol->chirp    = chirp;
     tmp_err            = ch_pr_start(protocol);
     if(tmp_err != CH_SUCCESS) {
+        L(
+            chirp,
+            "Error: Could not start protocol: %d. ch_chirp_t:%p",
+            tmp_err,
+            &chirp
+        );
         ch_chirp_free(chirp, ichirp);
         return tmp_err;
     }
@@ -161,10 +172,12 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
 
     tmp_err = _ch_uv_error_map(ch_loop_init(&loop));
     if(tmp_err != CH_SUCCESS) {
+        L((&chirp), "Error: Could not init loop: %d. uv_loop_t:%p", tmp_err, &loop);
         return tmp_err;  // NOCOV this can only fail with access error
     }
     tmp_err = ch_chirp_init(&chirp, config, &loop);
     if(tmp_err != CH_SUCCESS) {
+        L((&chirp), "Error: Could not init chirp: %d ch_chirp_t:%p", tmp_err, &chirp);
         return tmp_err;  // NOCOV covered in ch_chirp_init tests
     }
     chirp.flags |= CH_CHIRP_AUTO_STOP;
@@ -176,6 +189,7 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
     tmp_err = ch_run(&loop);
     *chirp_out = NULL;
     if(tmp_err != 0) {
+        L((&chirp), "Error: uv_run returned with error: %d, uv_loop_t:%p", tmp_err, &loop);
         return tmp_err; // NOCOV only breaking things will trigger this
     }
     if(ch_loop_close(chirp.loop)) {
@@ -210,6 +224,7 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
     chirp->flags |= CH_CHIRP_CLOSING;
     ichirp->close.data = chirp;
     if(uv_async_send(&ichirp->close) < 0) {
+        L((&chirp), "Error: could not call close callback. ch_chirp_t:%p", chirp);
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this
     }
     return CH_SUCCESS;

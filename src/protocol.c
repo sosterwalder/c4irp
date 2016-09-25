@@ -51,6 +51,13 @@ ch_pr_start(ch_protocol_t* protocol)
             0
     ));
     if(tmp_err != CH_SUCCESS) {
+        fprintf(
+            stderr,
+            "%s:%d Fatal: cannot bind port (ipv4). ch_chirp_t:%p\n",
+            __FILE__,
+            __LINE__,
+            chirp
+        );
         return tmp_err;  // NOCOV UV_EADDRINUSE can happen in tcp_bind or
                          // listen on my systems it happends in listen
     }
@@ -62,6 +69,13 @@ ch_pr_start(ch_protocol_t* protocol)
             config->BACKLOG,
             _ch_pr_new_connection_cb
     ) < 0) {
+        fprintf(
+            stderr,
+            "%s:%d Fatal: cannot listen port (ipv4). ch_chirp_t:%p\n",
+            __FILE__,
+            __LINE__,
+            chirp
+        );
         return CH_EADDRINUSE;
     }
 
@@ -82,6 +96,13 @@ ch_pr_start(ch_protocol_t* protocol)
             UV_TCP_IPV6ONLY
     ));
     if(tmp_err != CH_SUCCESS) {
+        fprintf(
+            stderr,
+            "%s:%d Fatal: cannot bind port (ipv6). ch_chirp_t:%p\n",
+            __FILE__,
+            __LINE__,
+            chirp
+        );
         return tmp_err; // NOCOV errors happend for IPV4
     }
     if(uv_tcp_nodelay(&protocol->serverv6, 1) < 0) {
@@ -92,6 +113,13 @@ ch_pr_start(ch_protocol_t* protocol)
             config->BACKLOG,
             _ch_pr_new_connection_cb
     ) < 0) {
+        fprintf(
+            stderr,
+            "%s:%d Fatal: cannot listen port (ipv6). ch_chirp_t:%p\n",
+            __FILE__,
+            __LINE__,
+            chirp
+        );
         return CH_EADDRINUSE; // NOCOV errors happend for IPV4
     }
     protocol->receipts = NULL;

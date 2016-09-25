@@ -61,9 +61,9 @@ class ChirpPool(object):
         # TODO error to excetion method
         self._fill_c_config()
         lib.ch_loop_init(self._loop)
-        lib.ch_chirp_init(
+        assert(lib.ch_chirp_init(
             self._chirp, self._c_config, self._loop
-        )
+        ) == lib.CH_SUCCESS)
         lib.ch_chirp_set_auto_stop(self._chirp)
         lib.ch_chirp_register_log_cb(self._chirp, lib.python_log_cb)
 
