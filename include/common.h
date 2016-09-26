@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
+
 // Logging and assert macros
 // =========================
 //
@@ -82,6 +83,11 @@
 ch_chirp_t* chirp = (ch_chirp_t*) handle->data; \
 A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*")
 /* Fail fast, best I know :( */
+
+// Windows compatiblity
+// ====================
+//
+// .. code-block:: cpp
 
 #ifdef _WIN32
 #   if defined(_MSC_VER) && _MSC_VER < 1600
