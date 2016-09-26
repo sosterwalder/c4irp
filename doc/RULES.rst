@@ -11,8 +11,8 @@ RULES
   - We try not do add our own abstractions, to keep complexity low
 
     - For example we use a async-semaphore pattern to await multiple callbacks,
-      it would be possible to build a abstraction (API) from this, put it would
-      increase complexity. So unless we need this async-semaphore in 8+ places we
+      it would be possible to build a abstraction (API) from this, but it would
+      increase complexity. So unless we need this async-semaphore in 20+ places we
       just repeat the pattern, which keeps flexibility high and complexity low.
 
 * Types end in _t
