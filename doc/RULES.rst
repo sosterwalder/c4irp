@@ -15,11 +15,17 @@ RULES
       increase complexity. So unless we need this async-semaphore in 20+ places we
       just repeat the pattern, which keeps flexibility high and complexity low.
 
+* We use defined length integers ie. uint8_t for file-formates, wire-protocols
+  and when plain int is really really wasteful
+* Use one flags member instead of many bools (int)
+* Structs end in _s
+* All the structs have a typedef ending in _t
 * Types end in _t
 * Callbacks end in _cb
 
   - Use natural names and _cb will indicated that it probably happened AFTER
 
+* Callback types end in _cb_t
 * Sort symbols alphabetically ignoring underscores "_"
 * Basic layout, follow where feasible
 
@@ -49,8 +55,6 @@ RULES
    #   endif // _MSC_VER
    #endif //_WIN32
 
-* Callback types end in _cb_t
-* Use one flags member instead of many bools (int)
 * Always unpack handles in functions and callbacks till you can verify the chirp magic
 * C4irp and C3irp are only used to disambiguate the python-only and the C based
   version of chirp, everywhere else chirp is used
