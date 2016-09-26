@@ -10,6 +10,7 @@
 #include "../include/message.h"
 
 #include "sglib.h"
+
 // .. c:type:: ch_cn_flags_t
 //
 //    Represents connection flags.
@@ -59,6 +60,21 @@ typedef struct ch_connection {
     struct ch_connection* left;
     struct ch_connection* right;
 } ch_connection_t;
+
+// Sglib Prototypes
+// ================
+//
+// .. code-block:: cpp
+//
+#define CH_CONNECTION_CMP(x,y) ch_connection_cmp(x, y)
+
+SGLIB_DEFINE_RBTREE_PROTOTYPES(
+    ch_connection_t,
+    left,
+    right,
+    color_field,
+    CH_CONNECTION_CMP
+);
 
 // .. c:function::
 static
@@ -136,14 +152,5 @@ ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
         }
     }
 }
-#define CH_CONNECTION_CMP(x,y) ch_connection_cmp(x, y)
-
-SGLIB_DEFINE_RBTREE_PROTOTYPES(
-    ch_connection_t,
-    left,
-    right,
-    color_field,
-    CH_CONNECTION_CMP
-);
 
 #endif //ch_connection_h

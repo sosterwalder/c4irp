@@ -8,6 +8,19 @@
 #include "chirp.h"
 #include "util.h"
 
+// Sglib Prototypes
+// ================
+//
+// .. code-block:: cpp
+//
+SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
+    ch_connection_t,
+    left,
+    right,
+    color_field,
+    CH_CONNECTION_CMP
+);
+
 // .. c:function::
 void
 ch_cn_close_cb(uv_handle_t* handle)
@@ -136,10 +149,3 @@ ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 }
 
 
-SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
-    ch_connection_t,
-    left,
-    right,
-    color_field,
-    CH_CONNECTION_CMP
-);
