@@ -11,6 +11,6 @@
 //
 // .. code-block:: cpp
 //
-/*#define CH_LOG_TO_STDERR*/
+////#define CH_LOG_TO_STDERR
 
 #endif //ch_global_config_h
