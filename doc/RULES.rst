@@ -20,6 +20,35 @@ RULES
 
   - Use natural names and _cb will indicated that it probably happened AFTER
 
+* Sort symbols alphabetically ignoring underscores "_"
+* Basic layout, follow where feasible
+
+.. code-block:: text
+
+   internal includes
+
+   external includes
+
+   defines
+
+   other symbols
+
+   function symbols
+
+* Indent ifdef
+
+.. code-block:: cpp
+
+   #ifdef _WIN32
+   #   if defined(_MSC_VER) && _MSC_VER < 1600
+   #       include <stdint-msvc2008.h>
+   #       define ch_inline __inline
+   #   else // _MSC_VER
+   #       include <stdint.h>
+   #       define ch_inline inline
+   #   endif // _MSC_VER
+   #endif //_WIN32
+
 * Callback types end in _cb_t
 * Use one flags member instead of many bools (int)
 * Always unpack handles in functions and callbacks till you can verify the chirp magic

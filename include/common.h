@@ -22,46 +22,56 @@
 #include <stddef.h>
 #include <stdio.h>
 #ifdef _WIN32
-#if defined(_MSC_VER) && _MSC_VER < 1600
-#include <stdint-msvc2008.h>
-#define ch_inline __inline
-#else // _MSC_VER
-#include <stdint.h>
-#define ch_inline inline
-#endif // _MSC_VER
+#   if defined(_MSC_VER) && _MSC_VER < 1600
+#       include <stdint-msvc2008.h>
+#       define ch_inline __inline
+#   else // _MSC_VER
+#       include <stdint.h>
+#       define ch_inline inline
+#   endif // _MSC_VER
 
-#if defined(_MSC_VER) && _MSC_VER < 1900
+#   if defined(_MSC_VER) && _MSC_VER < 1900
 
-#define snprintf c99_snprintf
-#define vsnprintf c99_vsnprintf
+#       define snprintf c99_snprintf
+#       define vsnprintf c99_vsnprintf
 
-__inline int c99_vsnprintf(char *outBuf, size_t size, const char *format, va_list ap)
-{
-    int count = -1;
+        __inline int c99_vsnprintf(
+                char *outBuf,
+                size_t size,
+                const char *format,
+                va_list ap
+        )
+        {
+            int count = -1;
 
-    if (size != 0)
-        count = _vsnprintf_s(outBuf, size, _TRUNCATE, format, ap);
-    if (count == -1)
-        count = _vscprintf(format, ap);
+            if (size != 0)
+                count = _vsnprintf_s(outBuf, size, _TRUNCATE, format, ap);
+            if (count == -1)
+                count = _vscprintf(format, ap);
 
-    return count;
-}
+            return count;
+        }
 
-__inline int c99_snprintf(char *outBuf, size_t size, const char *format, ...)
-{
-    int count;
-    va_list ap;
+        __inline int c99_snprintf(
+                char *outBuf,
+                size_t size,
+                const char *format,
+                ...
+        )
+        {
+            int count;
+            va_list ap;
 
-    va_start(ap, format);
-    count = c99_vsnprintf(outBuf, size, format, ap);
-    va_end(ap);
+            va_start(ap, format);
+            count = c99_vsnprintf(outBuf, size, format, ap);
+            va_end(ap);
 
-    return count;
-}
+            return count;
+        }
 
-#endif // MSVC
+#   endif // MSVC
 #else // _WIN32
-#define ch_inline inline
+#   define ch_inline inline
 #endif // _WIN32
 
 // Logging and assert macros
@@ -76,47 +86,47 @@ __inline int c99_snprintf(char *outBuf, size_t size, const char *format, ...)
 // .. code-block:: cpp
 
 #ifndef NDEBUG
-#ifdef CH_LOG_TO_STDERR
-#define L(chirp, message, ...) fprintf( \
-    stderr, \
-    "%s:%d " message "\n", \
-    __FILE__, \
-    __LINE__, \
-    ##__VA_ARGS__ \
-)
-#else  //CH_LOG_TO_STDERR
-#define L(chirp, message, ...) do { \
-    if(chirp->_log != NULL) { \
-        char buf[1024]; \
-        snprintf( \
-            buf, \
-            1024, \
-            "%s:%d " message, \
+#   ifdef CH_LOG_TO_STDERR
+#       define L(chirp, message, ...) fprintf( \
+            stderr, \
+            "%s:%d " message "\n", \
             __FILE__, \
             __LINE__, \
             ##__VA_ARGS__ \
-        ); \
-        chirp->_log(buf); \
-    } \
-} while(0)
-#endif
-#define A(condition, ...) do { \
-    if(!(condition)) { \
-        fprintf(stderr, ##__VA_ARGS__); \
-        fprintf(stderr, "\n"); \
-        assert(condition); \
-    } \
-} while(0)
+        )
+#   else  //CH_LOG_TO_STDERR
+#       define L(chirp, message, ...) do { \
+            if(chirp->_log != NULL) { \
+                char buf[1024]; \
+                snprintf( \
+                    buf, \
+                    1024, \
+                    "%s:%d " message, \
+                    __FILE__, \
+                    __LINE__, \
+                    ##__VA_ARGS__ \
+                ); \
+                chirp->_log(buf); \
+            } \
+        } while(0)
+#   endif
+#   define A(condition, ...) do { \
+        if(!(condition)) { \
+            fprintf(stderr, ##__VA_ARGS__); \
+            fprintf(stderr, "\n"); \
+            assert(condition); \
+        } \
+    } while(0)
 #else //NDEBUG
-#define L(chrip, message, ...) (void)(chirp); (void)(message)
-#define A(condition, ...) (void)(condition)
+#   define L(chrip, message, ...) (void)(chirp); (void)(message)
+#   define A(condition, ...) (void)(condition)
 #endif
 
 #ifndef A
-#error Assert macro not defined
+#   error Assert macro not defined
 #endif
 #ifndef L
-#error Log macro not defined
+#   error Log macro not defined
 #endif
 
 #define CH_CHIRP_MAGIC 42429
