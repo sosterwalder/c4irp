@@ -31,9 +31,9 @@ RULES
 
    defines
 
-   other symbols
+   other symbols (sorted)
 
-   function symbols
+   function symbols (sorted)
 
 * Indent ifdef
 
