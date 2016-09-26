@@ -27,6 +27,9 @@ RULES
 
 * Callback types end in _cb_t
 * Sort symbols alphabetically ignoring underscores "_"
+  * When independent
+  * Forward declarations go directly before being used
+
 * Basic layout, follow where feasible
 
 .. code-block:: text
@@ -37,7 +40,7 @@ RULES
 
    defines
 
-   other symbols (sorted)
+   other symbols (sorted, when independent)
 
    function symbols (sorted)
 
