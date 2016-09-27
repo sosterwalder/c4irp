@@ -30,10 +30,29 @@ ch_config_t ch_config_defaults = {
 
 // .. c:function::
 static void
-_ch_close_async_cb(uv_async_t* handle)
+_ch_chirp_check_closing_cb(uv_prepare_t* handle)
 //    :noindex:
 //
-//    see: :c:func:`_ch_close_async_cb`
+//    see: :c:func:`ch_chirp_close_cb`
+//
+// .. code-block:: cpp
+//
+{
+    CH_GET_CHIRP(handle);
+    ch_chirp_int_t* ichirp = chirp->_;
+    A(ichirp->closing_tasks > -1, "Closing semaphore dropped below zero");
+    L(chirp, "Check closing semaphore (%d). ch_chirp_t:%p", ichirp->closing_tasks, chirp);
+    if(ichirp->closing_tasks == 0) {
+        assert(uv_prepare_stop(handle) == CH_SUCCESS);
+        uv_close((uv_handle_t*) handle, _ch_chirp_closing_down_cb);
+    }
+}
+// .. c:function::
+static void
+_ch_chirp_close_async_cb(uv_async_t* handle)
+//    :noindex:
+//
+//    see: :c:func:`_ch_chirp_close_async_cb`
 //
 // .. code-block:: cpp
 //
@@ -63,37 +82,93 @@ _ch_close_async_cb(uv_async_t* handle)
         _ch_chirp_check_closing_cb
     ) == CH_SUCCESS);
 }
+// .. c:function::
+void
+ch_chirp_close_cb(uv_handle_t* handle)
+//    :noindex:
+//
+//    see: :c:func:`ch_chirp_close_cb`
+//
+// .. code-block:: cpp
+//
+{
+    CH_GET_CHIRP(handle);
+    chirp->_->closing_tasks -= 1;
+    L(
+        chirp,
+        "Decr closing semaphore to (%d). uv_handle_t:%p, ch_chirp_t:%p",
+        chirp->_->closing_tasks,
+        handle,
+        chirp
+    );
+}
 
 // .. c:function::
-static
-void*
-_ch_chirp_std_alloc(
-        size_t suggested_size,
-        size_t required_size,
-        size_t* provided_size
-)
+ch_error_t
+ch_chirp_close_ts(ch_chirp_t* chirp)
 //    :noindex:
 //
-//    see: :c:func:`_ch_chirp_std_alloc`
+//    see: :c:func:`ch_chirp_close_ts`
+//
+//    This function is thread-safe
 //
 // .. code-block:: cpp
 //
 {
-    *provided_size = suggested_size;
-    return malloc(suggested_size);
+    L(chirp, "Closing chirp via callback. ch_chirp_t:%p", chirp);
+    if(chirp == NULL || chirp->_init != CH_CHIRP_MAGIC) {
+        fprintf(
+            stderr,
+            "%s:%d Fatal: chirp is not initialzed. ch_chirp_t:%p\n",
+            __FILE__,
+            __LINE__,
+            chirp
+        );
+        return CH_UNINIT; // NOCOV  TODO can be tested
+    }
+    ch_chirp_int_t* ichirp = chirp->_;
+    if(chirp->flags & CH_CHIRP_CLOSED) {
+        fprintf(
+            stderr,
+            "%s:%d Fatal: chirp is already closed. ch_chirp_t:%p\n",
+            __FILE__,
+            __LINE__,
+            chirp
+        );
+        return CH_FATAL;
+    }
+    if(chirp->flags & CH_CHIRP_CLOSING) {
+        L(chirp, "Error: close already in progress. ch_chirp_t:%p", chirp);
+        return CH_IN_PRORESS;
+    }
+    chirp->flags |= CH_CHIRP_CLOSING;
+    ichirp->close.data = chirp;
+    if(uv_async_send(&ichirp->close) < 0) {
+        L(chirp, "Error: could not call close callback. ch_chirp_t:%p", chirp);
+        return CH_UV_ERROR; // NOCOV only breaking things will trigger this
+    }
+    return CH_SUCCESS;
 }
+
 // .. c:function::
-static
-void
-_ch_chirp_std_free(void* buf)
+static void
+_ch_chirp_closing_down_cb(uv_handle_t* handle)
 //    :noindex:
 //
-//    see: :c:func:`_ch_chirp_std_free`
+//    see: :c:func:`_ch_chirp_closing_down_cb`
 //
 // .. code-block:: cpp
 //
 {
-    free(buf);
+    CH_GET_CHIRP(handle);
+    ch_chirp_int_t* ichirp = chirp->_;
+    if(chirp->flags & CH_CHIRP_AUTO_STOP) {
+        uv_stop(chirp->loop);
+        L(chirp, "UV-Loop stopped by chirp. ch_chirp_t:%p", chirp->loop);
+    }
+    ch_chirp_free(chirp, ichirp);
+    chirp->flags |= CH_CHIRP_CLOSED;
+    L(chirp, "Closed. ch_chirp_t:%p", chirp);
 }
 
 // .. c:function::
@@ -134,7 +209,7 @@ ch_chirp_init(
     srand((unsigned int) time(NULL));
     _ch_random_ints_to_bytes(chirp->identity, 16);
 
-    if(uv_async_init(chirp->loop, &ichirp->close, _ch_close_async_cb) < 0) {
+    if(uv_async_init(chirp->loop, &ichirp->close, _ch_chirp_close_async_cb) < 0) {
         L(
             chirp,
             "Error: Could not initialize close callback. ch_chirp_t:%p",
@@ -208,52 +283,6 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
 }
 
 // .. c:function::
-ch_error_t
-ch_chirp_close_ts(ch_chirp_t* chirp)
-//    :noindex:
-//
-//    see: :c:func:`ch_chirp_close_ts`
-//
-//    This function is thread-safe
-//
-// .. code-block:: cpp
-//
-{
-    L(chirp, "Closing chirp via callback. ch_chirp_t:%p", chirp);
-    if(chirp == NULL || chirp->_init != CH_CHIRP_MAGIC) {
-        fprintf(
-            stderr,
-            "%s:%d Fatal: chirp is not initialzed. ch_chirp_t:%p\n",
-            __FILE__,
-            __LINE__,
-            chirp
-        );
-        return CH_UNINIT; // NOCOV  TODO can be tested
-    }
-    ch_chirp_int_t* ichirp = chirp->_;
-    if(chirp->flags & CH_CHIRP_CLOSED) {
-        fprintf(
-            stderr,
-            "%s:%d Fatal: chirp is already closed. ch_chirp_t:%p\n",
-            __FILE__,
-            __LINE__,
-            chirp
-        );
-        return CH_FATAL;
-    }
-    if(chirp->flags & CH_CHIRP_CLOSING) {
-        L(chirp, "Error: close already in progress. ch_chirp_t:%p", chirp);
-        return CH_IN_PRORESS;
-    }
-    chirp->flags |= CH_CHIRP_CLOSING;
-    ichirp->close.data = chirp;
-    if(uv_async_send(&ichirp->close) < 0) {
-        L(chirp, "Error: could not call close callback. ch_chirp_t:%p", chirp);
-        return CH_UV_ERROR; // NOCOV only breaking things will trigger this
-    }
-    return CH_SUCCESS;
-}
-// .. c:function::
 void
 ch_chirp_set_auto_stop(ch_chirp_t* chirp)
 //    :noindex:
@@ -267,62 +296,36 @@ ch_chirp_set_auto_stop(ch_chirp_t* chirp)
 {
     chirp->flags |= CH_CHIRP_AUTO_STOP;
 }
+
 // .. c:function::
+static
+void*
+_ch_chirp_std_alloc(
+        size_t suggested_size,
+        size_t required_size,
+        size_t* provided_size
+)
+//    :noindex:
+//
+//    see: :c:func:`_ch_chirp_std_alloc`
+//
+// .. code-block:: cpp
+//
+{
+    *provided_size = suggested_size;
+    return malloc(suggested_size);
+}
+
+// .. c:function::
+static
 void
-ch_chirp_close_cb(uv_handle_t* handle)
+_ch_chirp_std_free(void* buf)
 //    :noindex:
 //
-//    see: :c:func:`ch_chirp_close_cb`
+//    see: :c:func:`_ch_chirp_std_free`
 //
 // .. code-block:: cpp
 //
 {
-    CH_GET_CHIRP(handle);
-    chirp->_->closing_tasks -= 1;
-    L(
-        chirp,
-        "Decr closing semaphore to (%d). uv_handle_t:%p, ch_chirp_t:%p",
-        chirp->_->closing_tasks,
-        handle,
-        chirp
-    );
-}
-// .. c:function::
-static void
-_ch_chirp_check_closing_cb(uv_prepare_t* handle)
-//    :noindex:
-//
-//    see: :c:func:`ch_chirp_close_cb`
-//
-// .. code-block:: cpp
-//
-{
-    CH_GET_CHIRP(handle);
-    ch_chirp_int_t* ichirp = chirp->_;
-    A(ichirp->closing_tasks > -1, "Closing semaphore dropped below zero");
-    L(chirp, "Check closing semaphore (%d). ch_chirp_t:%p", ichirp->closing_tasks, chirp);
-    if(ichirp->closing_tasks == 0) {
-        assert(uv_prepare_stop(handle) == CH_SUCCESS);
-        uv_close((uv_handle_t*) handle, _ch_chirp_closing_down_cb);
-    }
-}
-// .. c:function::
-static void
-_ch_chirp_closing_down_cb(uv_handle_t* handle)
-//    :noindex:
-//
-//    see: :c:func:`_ch_chirp_closing_down_cb`
-//
-// .. code-block:: cpp
-//
-{
-    CH_GET_CHIRP(handle);
-    ch_chirp_int_t* ichirp = chirp->_;
-    if(chirp->flags & CH_CHIRP_AUTO_STOP) {
-        uv_stop(chirp->loop);
-        L(chirp, "UV-Loop stopped by chirp. ch_chirp_t:%p", chirp->loop);
-    }
-    ch_chirp_free(chirp, ichirp);
-    chirp->flags |= CH_CHIRP_CLOSED;
-    L(chirp, "Closed. ch_chirp_t:%p", chirp);
+    free(buf);
 }

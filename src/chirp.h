@@ -7,7 +7,7 @@
 #ifndef ch_chirp_h
 #define ch_chirp_h
 
-#include "../include/chirp_obj.h"
+#include "../include/chirp.h"
 #include "protocol.h"
 
 // .. c:type:: ch_chirp_flags_t
@@ -54,29 +54,32 @@ struct ch_chirp_int {
 };
 
 // .. c:function::
-static void
-_ch_close_async_cb(uv_async_t* handle);
-//
-//    Internal callback to close chirp. Makes ch_chirp_close_ts thread-safe
-//
-// .. c:function::
 static
+ch_inline
 void*
-_ch_chirp_std_alloc(
-        size_t suggested_size,
-        size_t required_size,
-        size_t* provided_size
-);
+ch_chirp_alloc(
+        ch_chirp_t* chirp,
+        size_t size
+)
 //
-//    Standard memory allocator used if no allocator is supplied by the user.
+//   Allocate fixed amount of memory.
 //
-// .. c:function::
-static
-void
-_ch_chirp_std_free(void* buf);
+// TODO param
 //
-//    Standard free if no free is supplied by the user.
+// .. code-block:: cpp
 //
+{
+    void* handle;
+    size_t provided_size;
+    handle = chirp->config->ALLOC_CB(
+        size,
+        size,
+        &provided_size
+    );
+    A(provided_size >= size, "Not enough memory provided by ALLOC_CB");
+    return handle;
+}
+
 // .. c:function::
 static
 ch_inline
@@ -111,32 +114,35 @@ ch_chirp_alloc_var(
 }
 
 // .. c:function::
-static
-ch_inline
-void*
-ch_chirp_alloc(
-        ch_chirp_t* chirp,
-        size_t size
-)
+static void
+_ch_chirp_check_closing_cb(uv_prepare_t* handle);
 //
-//   Allocate fixed amount of memory.
+//    Close chirp when the closing semaphore reaches zero.
 //
-// TODO param
+//    TODO params
 //
-// .. code-block:: cpp
+// .. c:function::
+static void
+_ch_chirp_close_async_cb(uv_async_t* handle);
 //
-{
-    void* handle;
-    size_t provided_size;
-    handle = chirp->config->ALLOC_CB(
-        size,
-        size,
-        &provided_size
-    );
-    A(provided_size >= size, "Not enough memory provided by ALLOC_CB");
-    return handle;
-}
-
+//    Internal callback to close chirp. Makes ch_chirp_close_ts thread-safe
+//
+// .. c:function::
+void
+ch_chirp_close_cb(uv_handle_t* handle);
+//
+//    Reduce callback semaphore.
+//
+//    TODO params
+//
+// .. c:function::
+static void
+_ch_chirp_closing_down_cb(uv_handle_t* handle);
+//
+//    Closing chirp after the check callback has been closed.
+//
+//    TODO params
+//
 // .. c:function::
 static
 ch_inline
@@ -156,28 +162,23 @@ ch_chirp_free(
     chirp->config->FREE_CB(buf);
 }
 // .. c:function::
+static
+void*
+_ch_chirp_std_alloc(
+        size_t suggested_size,
+        size_t required_size,
+        size_t* provided_size
+);
+//
+//    Standard memory allocator used if no allocator is supplied by the user.
+//
+// .. c:function::
+static
 void
-ch_chirp_close_cb(uv_handle_t* handle);
+_ch_chirp_std_free(void* buf);
 //
-//    Reduce callback semaphore.
+//    Standard free if no free is supplied by the user.
 //
-//    TODO params
-//
-// .. c:function::
-static void
-_ch_chirp_check_closing_cb(uv_prepare_t* handle);
-//
-//    Close chirp when the closing semaphore reaches zero.
-//
-//    TODO params
-//
-// .. c:function::
-static void
-_ch_chirp_closing_down_cb(uv_handle_t* handle);
-//
-//    Closing chirp after the check callback has been closed.
-//
-//    TODO params
-//
+// .. code-block:: cpp
 
 #endif //ch_chirp_h
