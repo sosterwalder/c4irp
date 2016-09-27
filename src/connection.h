@@ -77,28 +77,19 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
 );
 
 // .. c:function::
-static
-ch_inline
-void
-ch_connection_init(struct ch_chirp* chirp, ch_connection_t* conn)
-//
-//    Initialize a connection.
-//
-//    :param ch_chirp_t* chirp: Chirp instance
-//    :param ch_connection_t* conn: Connection to initialize
-//
-// .. code-block:: cpp
-//
-{
-    memset(conn, 0, sizeof(ch_connection_t));
-    conn->chirp = chirp;
-}
-
-// .. c:function::
 void
 ch_cn_close_cb(uv_handle_t* handle);
 //
 //    Called by libuv after closing a handle.
+//
+//    TODO params
+//
+// .. c:function::
+void
+ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
+//
+//    Allocates a buffer on the connection and reuses it for each subsequent
+//    reads.
 //
 //    TODO params
 //
@@ -115,15 +106,6 @@ void
 ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
 //
 //    Called by libuv after shutting a connection down.
-//
-//    TODO params
-//
-// .. c:function::
-void
-ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
-//
-//    Allocates a buffer on the connection and reuses it for each subsequent
-//    reads.
 //
 //    TODO params
 //
@@ -151,6 +133,23 @@ ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
             return x->port - y->port;
         }
     }
+}
+// .. c:function::
+static
+ch_inline
+void
+ch_connection_init(struct ch_chirp* chirp, ch_connection_t* conn)
+//
+//    Initialize a connection.
+//
+//    :param ch_chirp_t* chirp: Chirp instance
+//    :param ch_connection_t* conn: Connection to initialize
+//
+// .. code-block:: cpp
+//
+{
+    memset(conn, 0, sizeof(ch_connection_t));
+    conn->chirp = chirp;
 }
 
 #endif //ch_connection_h
