@@ -16,15 +16,6 @@
 #include <arpa/inet.h>
 #endif // _WIN32
 
-// .. c:type:: ch_text_address_t
-//
-//    Type to be used with :c:func:`ch_msg_get_address`
-//
-// .. code-block:: cpp
-//
-typedef struct {
-    char data[INET6_ADDRSTRLEN];
-} ch_text_address_t;
 
 // .. c:type:: ch_message_t
 //
@@ -59,6 +50,16 @@ typedef struct {
     int8_t   free_data;
 } ch_message_t;
 
+// .. c:type:: ch_text_address_t
+//
+//    Type to be used with :c:func:`ch_msg_get_address`
+//
+// .. code-block:: cpp
+//
+typedef struct {
+    char data[INET6_ADDRSTRLEN];
+} ch_text_address_t;
+
 // Protocol receiver /Pseudo code/
 //
 // .. code-block:: cpp
@@ -91,6 +92,21 @@ typedef struct {
 // .. c:function::
 extern
 ch_error_t
+ch_msg_get_address(
+    const ch_message_t* message,
+    ch_text_address_t* address
+);
+//
+//    Get the messages' address: IP-address. The port and ip_protocol can be
+//    read from the message directly. Address must be of the size
+//    INET(6)_ADDRSTRLEN.
+//
+//    :param ch_message_t* message: Pointer to the message
+//    :param ch_text_address_t* address: Out: Textual representation of IP
+//
+// .. c:function::
+extern
+ch_error_t
 ch_msg_init(ch_message_t* message);
 //
 //    Intialiaze a message. Memory provided by caller (for performance).
@@ -113,21 +129,6 @@ ch_msg_set_address(
 //    :param ch_ip_protocol_t ip_protocol: IP-protocol of the address
 //    :param char* address: Textual representation of IP
 //    :param int32_t port: Port of the remote
-//
-// .. c:function::
-extern
-ch_error_t
-ch_msg_get_address(
-    const ch_message_t* message,
-    ch_text_address_t* address
-);
-//
-//    Get the messages' address: IP-address. The port and ip_protocol can be
-//    read from the message directly. Address must be of the size
-//    INET(6)_ADDRSTRLEN.
-//
-//    :param ch_message_t* message: Pointer to the message
-//    :param ch_text_address_t* address: Out: Textual representation of IP
 //
 // .. code-block:: cpp
 
