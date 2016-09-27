@@ -28,17 +28,6 @@ typedef struct ch_receipt {
   struct ch_receipt* right;
 } ch_receipt_t;
 
-#define CH_RECEIPT_CMP(x,y) \
-    memcmp(x->receipt, y->receipt, 16)
-
-SGLIB_DEFINE_RBTREE_PROTOTYPES(
-    ch_receipt_t,
-    left,
-    right,
-    color_field,
-    CH_RECEIPT_CMP
-);
-
 // .. c:type:: ch_protocol_t
 //
 //    Protocol object.
@@ -76,27 +65,23 @@ typedef struct ch_protocol {
     struct ch_chirp*          chirp;
 } ch_protocol_t;
 
-// .. c:function::
-ch_error_t
-ch_pr_start(ch_protocol_t* protocol);
-//
-//    Start the protocol
-//
-//    TODO params
-//
-// .. c:function::
-ch_error_t
-ch_pr_stop(ch_protocol_t* protocol);
-//
-//    Stop the protocol
-//
-//    TODO params
-//
+
+#define CH_RECEIPT_CMP(x,y) \
+    memcmp(x->receipt, y->receipt, 16)
+
+SGLIB_DEFINE_RBTREE_PROTOTYPES(
+    ch_receipt_t,
+    left,
+    right,
+    color_field,
+    CH_RECEIPT_CMP
+);
+
 // .. c:function::
 static void
-_ch_pr_new_connection_cb(uv_stream_t *server, int status);
+_ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections);
 //
-//    Callback from libuv on new connection
+//    Close and free all remaining connections
 //
 //    TODO params
 //
@@ -110,9 +95,9 @@ _ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts);
 //
 // .. c:function::
 static void
-_ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections);
+_ch_pr_new_connection_cb(uv_stream_t *server, int status);
 //
-//    Close and free all remaining connections
+//    Callback from libuv on new connection
 //
 //    TODO params
 //
@@ -121,6 +106,22 @@ static void
 _ch_pr_read_data_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
 //
 //  Callback from libuv when data was read
+//
+//    TODO params
+//
+// .. c:function::
+ch_error_t
+ch_pr_start(ch_protocol_t* protocol);
+//
+//    Start the protocol
+//
+//    TODO params
+//
+// .. c:function::
+ch_error_t
+ch_pr_stop(ch_protocol_t* protocol);
+//
+//    Stop the protocol
 //
 //    TODO params
 //

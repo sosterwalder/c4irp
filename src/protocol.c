@@ -17,6 +17,120 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
 );
 
 // .. c:function::
+static void
+_ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
+//    :noindex:
+//
+//    see: :c:func:`_ch_pr_close_free_connections`
+//
+// .. code-block:: cpp
+//
+{
+    ch_connection_t* t;
+    struct sglib_ch_connection_t_iterator it;
+    for(
+            t = sglib_ch_connection_t_it_init(
+                &it,
+                connections
+            );
+            t != NULL;
+            t = sglib_ch_connection_t_it_next(&it) // NOCOV TODO remove
+    ) {
+        ch_cn_shutdown(t);
+    } // NOCOV TODO remove
+}
+
+// .. c:function::
+static void
+_ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts)
+//    :noindex:
+//
+//    see: :c:func:`_ch_pr_free_receipts`
+//
+// .. code-block:: cpp
+//
+{
+    ch_receipt_t* t;
+    struct sglib_ch_receipt_t_iterator it;
+    for(
+            t = sglib_ch_receipt_t_it_init(
+                &it,
+                receipts
+            );
+            t != NULL;
+            t = sglib_ch_receipt_t_it_next(&it) // NOCOV TODO remove
+    ) {
+        ch_chirp_free(chirp, t); // NOCOV TODO remove
+    } // NOCOV TODO remove
+}
+
+// .. c:function::
+static void
+_ch_pr_new_connection_cb(uv_stream_t* server, int status)
+//    :noindex:
+//
+//    see: :c:func:`_ch_pr_new_connection_cb`
+//
+// .. code-block:: cpp
+//
+{
+    CH_GET_CHIRP(server); // NOCOV TODO
+    ch_protocol_t* protocol = &chirp->_->protocol;
+    if (status < 0) { // NOCOV TODO
+        L(
+            chirp,
+            "New connection error %s. ch_chirp_t:%p",
+            uv_strerror(status),
+            chirp
+        ); // NOCOV TODO
+        return; // NOCOV TODO
+    }
+
+    ch_connection_t* conn = (ch_connection_t*) ch_chirp_alloc( // NOCOV TODO
+        chirp,
+        sizeof(ch_connection_t)
+    ); // NOCOV TODO
+    ch_connection_init(chirp, conn);
+    uv_tcp_t* client = &conn->client; // NOCOV TODO
+    uv_tcp_init(server->loop, client); // NOCOV TODO
+    client->data = conn;
+    if (uv_accept(server, (uv_stream_t*) client) == 0) { // NOCOV TODO
+        L(chirp, "Accepted connection. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
+        sglib_ch_connection_t_add(&protocol->connections, conn);
+        uv_read_start(
+            (uv_stream_t*) client,
+            ch_cn_read_alloc_cb,
+            _ch_pr_read_data_cb
+        ); // NOCOV TODO
+    } // NOCOV TODO
+    else {
+        // TODO uv_close on cleanup and, on close and on remove close
+        uv_close((uv_handle_t*) client, ch_cn_close_cb); // NOCOV TODO
+    }
+} // NOCOV TODO remove
+
+// .. c:function::
+static void
+_ch_pr_read_data_cb(
+        uv_stream_t* stream,
+        ssize_t nread,
+        const uv_buf_t* buf
+)
+//    :noindex:
+//
+//    see: :c:func:`_ch_pr_read_data_cb`
+//
+// .. code-block:: cpp
+//
+{
+    ch_connection_t* conn = stream->data;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    conn->flags &= ~CH_CN_BUF_USED;
+    // ch_chirp_close_ts(chirp);
+}
+
+// .. c:function::
 ch_error_t
 ch_pr_start(ch_protocol_t* protocol)
 //    :noindex:
@@ -144,6 +258,7 @@ ch_pr_start(ch_protocol_t* protocol)
     } */
     return CH_SUCCESS;
 }
+
 // .. c:function::
 ch_error_t
 ch_pr_stop(ch_protocol_t* protocol)
@@ -164,114 +279,4 @@ ch_pr_stop(ch_protocol_t* protocol)
     _ch_pr_free_receipts(chirp, protocol->late_receipts);
     return CH_SUCCESS;
 }
-// .. c:function::
-static void
-_ch_pr_new_connection_cb(uv_stream_t* server, int status)
-//    :noindex:
 //
-//    see: :c:func:`_ch_pr_new_connection_cb`
-//
-// .. code-block:: cpp
-//
-{
-    CH_GET_CHIRP(server); // NOCOV TODO
-    ch_protocol_t* protocol = &chirp->_->protocol;
-    if (status < 0) { // NOCOV TODO
-        L(
-            chirp,
-            "New connection error %s. ch_chirp_t:%p",
-            uv_strerror(status),
-            chirp
-        ); // NOCOV TODO
-        return; // NOCOV TODO
-    }
-
-    ch_connection_t* conn = (ch_connection_t*) ch_chirp_alloc( // NOCOV TODO
-        chirp,
-        sizeof(ch_connection_t)
-    ); // NOCOV TODO
-    ch_connection_init(chirp, conn);
-    uv_tcp_t* client = &conn->client; // NOCOV TODO
-    uv_tcp_init(server->loop, client); // NOCOV TODO
-    client->data = conn;
-    if (uv_accept(server, (uv_stream_t*) client) == 0) { // NOCOV TODO
-        L(chirp, "Accepted connection. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
-        sglib_ch_connection_t_add(&protocol->connections, conn);
-        uv_read_start(
-            (uv_stream_t*) client,
-            ch_cn_read_alloc_cb,
-            _ch_pr_read_data_cb
-        ); // NOCOV TODO
-    } // NOCOV TODO
-    else {
-        // TODO uv_close on cleanup and, on close and on remove close
-        uv_close((uv_handle_t*) client, ch_cn_close_cb); // NOCOV TODO
-    }
-} // NOCOV TODO remove
-//
-// .. c:function::
-static void
-_ch_pr_read_data_cb(
-        uv_stream_t* stream,
-        ssize_t nread,
-        const uv_buf_t* buf
-)
-//    :noindex:
-//
-//    see: :c:func:`_ch_pr_read_data_cb`
-//
-// .. code-block:: cpp
-//
-{
-    ch_connection_t* conn = stream->data;
-    ch_chirp_t* chirp = conn->chirp;
-    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    conn->flags &= ~CH_CN_BUF_USED;
-    // ch_chirp_close_ts(chirp);
-}
-// .. c:function::
-static void
-_ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts)
-//    :noindex:
-//
-//    see: :c:func:`_ch_pr_free_receipts`
-//
-// .. code-block:: cpp
-//
-{
-    ch_receipt_t* t;
-    struct sglib_ch_receipt_t_iterator it;
-    for(
-            t = sglib_ch_receipt_t_it_init(
-                &it,
-                receipts
-            );
-            t != NULL;
-            t = sglib_ch_receipt_t_it_next(&it) // NOCOV TODO remove
-    ) {
-        ch_chirp_free(chirp, t); // NOCOV TODO remove
-    } // NOCOV TODO remove
-}
-// .. c:function::
-static void
-_ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
-//    :noindex:
-//
-//    see: :c:func:`_ch_pr_close_free_connections`
-//
-// .. code-block:: cpp
-//
-{
-    ch_connection_t* t;
-    struct sglib_ch_connection_t_iterator it;
-    for(
-            t = sglib_ch_connection_t_it_init(
-                &it,
-                connections
-            );
-            t != NULL;
-            t = sglib_ch_connection_t_it_next(&it) // NOCOV TODO remove
-    ) {
-        ch_cn_shutdown(t);
-    } // NOCOV TODO remove
-}
