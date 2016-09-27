@@ -8,43 +8,8 @@
 #define ch_inc_chirp_obj_h
 
 #include "common.h"
-
-// .. c:type:: ch_alloc_cb_t
-//
-//    Callback used by chirp to request memory. It can be set in ch_config_t.
-//
-//    .. c:member:: size_t suggested_size
-//
-//       The size the user should allocate if possible
-//
-//    .. c:member:: size_t required_size
-//
-//       The size the user has to allocate
-//
-//    .. c:member:: size_t provided_size
-//
-//       Out: The size the user has allocated
-//
-//    Libuv wants a buffer of 65536 bytes per stream. It will work with less
-//    though.  So we decided that 1k is the absolute minimum see
-//    CH_LIB_UV_MIN_BUFFER in config.h. Please provide the suggested_size, except
-//    if you're on very restricted embedded system.
-//
-// .. code-block:: cpp
-//
-typedef void* (*ch_alloc_cb_t)(
-        size_t suggested_size,
-        size_t required_size,
-        size_t* provided_size
-);
-
-// .. c:type:: ch_free_cb_t
-//
-//    Callback used by chirp to free memory. It can be set in ch_config_t.
-//
-// .. code-block:: cpp
-//
-typedef void (*ch_free_cb_t)(void* buf);
+#include "callbacks.h"
+#include "wrappers.h"
 
 // .. c:type:: ch_config_t
 //
@@ -99,13 +64,6 @@ typedef struct {
     ch_free_cb_t  FREE_CB;
 } ch_config_t;
 
-// .. c:type:: ch_log_cb_t
-//
-//    Logging callback
-//
-// .. code-block:: cpp
-
-typedef void (*ch_log_cb_t)(char msg[]);
 
 //
 // .. c:var:: ch_config_defaults
@@ -159,95 +117,17 @@ typedef struct ch_chirp {
 } ch_chirp_t;
 
 // .. c:function::
-static
-ch_inline
-void
-ch_chirp_register_log_cb(ch_chirp_t* chirp, ch_log_cb_t log_cb)
+extern
+ch_error_t
+ch_chirp_close_ts(ch_chirp_t* chirp);
 //
-//    Register a callback for sending log messages.
+//    Cleanup chirp object. Will remove all callbacks. Pending outs will be
+//    ignored after calling free.
 //
-//    :param ch_chirp_t* chirp: Chirp instance
-//    :param ch_log_cb_t   log: Callback to be called on log messages
+//    This function is thread-safe
 //
-// .. code-block:: cpp
+//    :param ch_chirp_t chirp: Chirp object
 //
-{
-    chirp->_log = log_cb;
-}
-// .. c:function::
-static
-ch_inline
-int
-ch_loop_init(uv_loop_t* loop)
-//
-//    An alias for uv_loop_init. Please refer to the libuv documentation.
-//
-//    :param uv_loop_t* loop: Loop struct allocated by user.
-//
-// .. code-block:: cpp
-//
-{
-    return uv_loop_init(loop);
-}
-static
-ch_inline
-int
-ch_loop_close(uv_loop_t* loop)
-//
-//    An alias for uv_loop_close. Please refer to the libuv documentation.
-//
-//    :param uv_loop_t* loop: Loop struct allocated by user.
-//
-// .. code-block:: cpp
-//
-{
-    int tmp_err;
-    tmp_err = uv_loop_close(loop);
-#if defined(CH_LOG_TO_STDERR) && !defined(NDEBUG)
-    fprintf(
-        stderr,
-        "%s:%d Closing loop exitcode:%d. uv_loop_t:%p\n",
-        __FILE__,
-        __LINE__,
-        tmp_err,
-        loop
-    );
-#endif
-    return tmp_err;
-}
-// .. c:function::
-static
-ch_inline
-int
-ch_run(uv_loop_t* loop)
-//
-//    A wrapper for uv_run and runs the loop once again, in case closing chirp's
-//    resources caused additional requests/handlers.
-//
-//    Please refer to the libuv documentation.
-//
-//    :param uv_loop_t*  loop: Loop struct allocated by user.
-//
-// .. code-block:: cpp
-//
-{
-    int tmp_err = uv_run(loop, UV_RUN_DEFAULT);
-    if(tmp_err != 0) {
-        /* On Windows uv_run returns non-zero, which I expect, since we
-         * uv_stop() inside a handler that just closed all kinds of resources,
-         * which may cause new requests/handlers.
-         *
-         * I didn't find any documents assuring that my solution is good,
-         * though.
-         */
-        tmp_err = uv_run(loop, UV_RUN_ONCE);
-        /* Now we clearly have a problem */
-        if(tmp_err != 0) {
-            return tmp_err;  // NOCOV only breaking things will trigger this
-        }
-    }
-    return tmp_err;
-}
 // .. c:function::
 extern
 ch_error_t
@@ -266,6 +146,22 @@ ch_chirp_init(
 //    :param uv_loop_t* loop: Reference to a libuv loop
 //    :param ch_log_cb_t log_cb: Callback to logging facility, can be NULL
 //
+// .. c:function::
+static
+ch_inline
+void
+ch_chirp_register_log_cb(ch_chirp_t* chirp, ch_log_cb_t log_cb)
+//
+//    Register a callback for sending log messages.
+//
+//    :param ch_chirp_t* chirp: Chirp instance
+//    :param ch_log_cb_t   log: Callback to be called on log messages
+//
+// .. code-block:: cpp
+//
+{
+    chirp->_log = log_cb;
+}
 // .. c:function::
 extern
 ch_error_t
@@ -286,18 +182,6 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp);
 //    :param ch_config_t* config: Chirp config
 //    :param ch_chirp_t** chirp: Out: Pointer to chirp object pointer. Ca be
 //                               NULL
-//
-// .. c:function::
-extern
-ch_error_t
-ch_chirp_close_ts(ch_chirp_t* chirp);
-//
-//    Cleanup chirp object. Will remove all callbacks. Pending outs will be
-//    ignored after calling free.
-//
-//    This function is thread-safe
-//
-//    :param ch_chirp_t chirp: Chirp object
 //
 // .. c:function::
 extern

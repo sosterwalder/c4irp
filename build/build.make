@@ -10,7 +10,7 @@ else
 endif
 
 ### Configuration
-COMMON        := config.h include/common.h include/chirp_obj.h
+COMMON        := config.h $(wildcard include/*.h)
 
 LIBUVD        := build/libuv
 COMMONCFLAGS  := -std=gnu99 -fPIC -Wall -Wno-unused-function -I$(LIBUVD)/include $(CFLAGS)
