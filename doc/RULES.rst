@@ -27,8 +27,8 @@ RULES
 
 * Callback types end in _cb_t
 * Sort symbols alphabetically ignoring underscores "_"
-  * When independent
-  * Forward declarations go directly before being used
+  - When independent
+  - Forward declarations go directly before being used
 
 * Basic layout, follow where feasible
 
@@ -97,7 +97,7 @@ Performance
 * Adding buffering per connection would destroy some of the nice properties of
   chirp, mainly flow-control, simpleness and robustness.
 
-   * Therefore we do not ever allow to remove the per connection send-lock,
+   - Therefore we do not ever allow to remove the per connection send-lock,
      which means only one message can be sending and the next message can only
      be sent after the current message has been acknowledged. The first
      statement is important for simpleness and robustness and the second
@@ -106,7 +106,7 @@ Performance
 * Since chirp is meant for multiprocessing, our performance goals refer to this
   configuration
 
-   * x must be able to send/receive 300'000+ message to/from a suitable N peers
+   - x must be able to send/receive 300'000+ message to/from a suitable N peers
 
 .. graphviz::
 
