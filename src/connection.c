@@ -34,18 +34,30 @@ ch_cn_close_cb(uv_handle_t* handle)
     ch_connection_t* conn = handle->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    if(conn->buffer) {
-        ch_chirp_free(chirp, conn->buffer);
-    }
-    ch_chirp_free(chirp, conn);
     chirp->_->closing_tasks -= 1;
+    conn->shutdown_tasks -= 1;
+    A(conn->shutdown_tasks > -1, "Shutdown semaphore dropped below zero");
     L(
         chirp,
-        "Closed connection, closing semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
-        chirp->_->closing_tasks,
+        "Shutdown sempaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
+        conn->shutdown_tasks,
         conn,
         chirp
     );
+
+    if(conn->shutdown_tasks == 0) {
+        if(conn->buffer) {
+            ch_chirp_free(chirp, conn->buffer);
+        }
+        ch_chirp_free(chirp, conn);
+        L(
+            chirp,
+            "Closed connection, closing semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
+            chirp->_->closing_tasks,
+            conn,
+            chirp
+        );
+    }
 }
 // .. c:function::
 void
@@ -99,32 +111,79 @@ ch_cn_shutdown(ch_connection_t* conn)
         return CH_IN_PRORESS;
     }
     conn->flags |= CH_CN_SHUTTING_DOWN;
-    tmp_err = _ch_uv_error_map(uv_shutdown(
+    tmp_err = uv_shutdown(
         &conn->shutdown_req,
         (uv_stream_t*) &conn->client,
         ch_cn_shutdown_cb
-    ));
+    );
     if(tmp_err != CH_SUCCESS) {
-        return tmp_err;
+        L(
+            chirp,
+            "Error: uv_shutdown returned error: %d. ch_connection_t:%p, ch_chirp_t:%p",
+            tmp_err,
+            conn,
+            chirp
+        );
+        return _ch_uv_error_map(tmp_err);
+    }
+    tmp_err = uv_timer_init(chirp->loop, &conn->shutdown_timeout);
+    if(tmp_err != CH_SUCCESS) {
+        L(
+            chirp,
+            "Error: Initializing shutdown timeout failed: %d. ch_connection_t:%p,"
+            " ch_chirp_t:%p",
+            tmp_err,
+            conn,
+            chirp
+        );
     }
     chirp->_->closing_tasks += 1;
+    conn->shutdown_timeout.data = conn;
+    tmp_err = uv_timer_start(
+        &conn->shutdown_timeout,
+        _ch_cn_shutdown_timeout_cb,
+        chirp->config->TIMEOUT * 1000,
+        0
+    );
+    if(tmp_err != CH_SUCCESS) {
+        L(
+            chirp,
+            "Error: Starting shutdown timeout failed: %d. ch_connection_t:%p,"
+            " ch_chirp_t:%p",
+            tmp_err,
+            conn,
+            chirp
+        );
+    }
     L(chirp, "Shutdown connection. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
     return CH_SUCCESS;
 }
-// .. c:function::
+// .. c:function:
 void
 ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
 //    :noindex:
 //
-//    see: :c:func:`ch_cn_shutdown_cb`
+//    see: :c:func:`_ch_cn_shutdown_cb`
 //
 // .. code-block:: cpp
 //
 {
+    int tmp_err;
     ch_connection_t* conn = req->handle->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     L(chirp, "Shutdown callback called. ch_connection_t:%p, ch_chirp_t:%p", conn,  chirp);
+    tmp_err = uv_timer_stop(&conn->shutdown_timeout);
+    if(tmp_err != CH_SUCCESS) {
+        L(
+            chirp,
+            "Error: Stopping shutdown timeout failed: %d. ch_connection_t:%p,"
+            " ch_chirp_t:%p",
+            tmp_err,
+            conn,
+            chirp
+        );
+    }
     uv_handle_t* handle = (uv_handle_t*) req->handle;
     if(uv_is_closing(handle)) {
         chirp->_->closing_tasks -= 1;
@@ -137,6 +196,9 @@ ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
         );
     } else {
         uv_close((uv_handle_t*) req->handle, ch_cn_close_cb);
+        uv_close((uv_handle_t*) &conn->shutdown_timeout, ch_cn_close_cb);
+        conn->shutdown_tasks += 2;
+        chirp->_->closing_tasks += 1;
         L(
             chirp,
             "Closing connection after shutdown. "
@@ -144,6 +206,35 @@ ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
             conn,
             chirp
         );
-        // chirp->_->closing_tasks += 0; One is finished, one is added
     }
+}
+// .. c:function:
+static
+void
+_ch_cn_shutdown_timeout_cb(uv_timer_t* handle)
+//    :noindex:
+//
+//    see: :c:func:`ch_cn_shutdown_timeout_cb`
+//
+// .. code-block:: cpp
+//
+{
+    int tmp_err;
+    ch_connection_t* conn = handle->data;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    chirp->_->closing_tasks -= 1;
+    ch_cn_shutdown_cb(&conn->shutdown_req, 1);
+    tmp_err = uv_cancel((uv_req_t*) &conn->shutdown_req);
+    if(tmp_err != CH_SUCCESS) {
+        L(
+            chirp,
+            "Error: Candling shutdown timeout failed: %d. ch_connection_t:%p,"
+            " ch_chirp_t:%p",
+            tmp_err,
+            conn,
+            chirp
+        );
+    }
+    L(chirp, "Shutdown timed out closing. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
 }

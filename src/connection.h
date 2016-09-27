@@ -55,6 +55,8 @@ typedef struct ch_connection {
     size_t                buffer_size;
     struct ch_chirp*      chirp;
     uv_shutdown_t         shutdown_req;
+    uv_timer_t            shutdown_timeout;
+    int8_t                shutdown_tasks;
     uint8_t               flags;
     char                  color_field;
     struct ch_connection* left;
@@ -108,6 +110,14 @@ ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
 //    Called by libuv after shutting a connection down.
 //
 //    TODO params
+//
+// .. c:function::
+static
+void
+_ch_cn_shutdown_timeout_cb(uv_timer_t* handle);
+//
+//    Called after shutdown timeout. Closing the connection even though
+//    shutdown was delayed.
 //
 // .. c:function::
 static
