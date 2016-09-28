@@ -13,12 +13,14 @@ Public C API
 .. toctree::
    :maxdepth: 2
 
+   inc/callbacks.h.rst
    inc/chirp.h.rst
-   inc/message.h.rst
-   inc/error.h.rst
    inc/chirp_obj.h.rst
    inc/const.h.rst
    inc/common.h.rst
+   inc/error.h.rst
+   inc/message.h.rst
+   inc/wrappers.h.rst
 
 Internal C API
 ==============
@@ -28,14 +30,16 @@ Internal C API
    :includehidden:
 
    src/array.h.rst
-   src/message.h.rst
-   src/message.c.rst
    src/chirp.h.rst
    src/chirp.c.rst
-   src/protocol.h.rst
-   src/protocol.c.rst
    src/connection.h.rst
    src/connection.c.rst
+   src/encryption.h.rst
+   src/encryption.c.rst
+   src/message.h.rst
+   src/message.c.rst
+   src/protocol.h.rst
+   src/protocol.c.rst
    src/util.h.rst
 
 Public Python API
@@ -68,7 +72,7 @@ Test binaries
    src/chirp_etest.c.rst
 
 External Libs
-==============
+=============
 
 .. toctree::
    :maxdepth: 2

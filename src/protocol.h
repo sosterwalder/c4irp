@@ -52,17 +52,15 @@ typedef struct ch_receipt_s {
 //
 // .. code-block:: cpp
 
-struct  ch_chirp_s;
-
 typedef struct ch_protocol_s {
-    struct sockaddr_in        addrv4;
-    struct sockaddr_in6       addrv6;
-    uv_tcp_t                  serverv4;
-    uv_tcp_t                  serverv6;
-    ch_connection_t*          connections;
-    ch_receipt_t*             receipts;
-    ch_receipt_t*             late_receipts;
-    struct ch_chirp_s*        chirp;
+    struct sockaddr_in  addrv4;
+    struct sockaddr_in6 addrv6;
+    uv_tcp_t            serverv4;
+    uv_tcp_t            serverv6;
+    ch_connection_t*    connections;
+    ch_receipt_t*       receipts;
+    ch_receipt_t*       late_receipts;
+    ch_chirp_t*         chirp;
 } ch_protocol_t;
 
 
