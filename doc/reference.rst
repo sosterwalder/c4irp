@@ -18,6 +18,7 @@ Public C API
    inc/chirp_obj.h.rst
    inc/const.h.rst
    inc/common.h.rst
+   inc/encryption.h.rst
    inc/error.h.rst
    inc/message.h.rst
    inc/wrappers.h.rst

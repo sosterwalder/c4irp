@@ -26,6 +26,7 @@ ch_config_t ch_config_defaults = {
     .CERT_CHAIN_PEM = NULL,
     .ALLOC_CB       = NULL,
     .FREE_CB        = NULL,
+    .REALLOC_CB     = NULL,
 };
 
 // .. c:function::
@@ -58,12 +59,12 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
 //
 {
     CH_GET_CHIRP(handle);
-    if(chirp->flags & CH_CHIRP_CLOSED) {
+    ch_chirp_int_t* ichirp = chirp->_;
+    if(ichirp->flags & CH_CHIRP_CLOSED) {
         L(chirp, "Error: chirp closing callback called on closed. ch_chirp_t:%p", chirp);
         return;
     }
     L(chirp, "Chirp closing callback called. ch_chirp_t:%p", chirp);
-    ch_chirp_int_t* ichirp = chirp->_;
     assert(ch_pr_stop(&ichirp->protocol) == CH_SUCCESS);
     assert(ch_en_stop(&ichirp->encryption) == CH_SUCCESS);
     uv_close((uv_handle_t*) &ichirp->close, ch_chirp_close_cb);
@@ -126,7 +127,7 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
         return CH_UNINIT; // NOCOV  TODO can be tested
     }
     ch_chirp_int_t* ichirp = chirp->_;
-    if(chirp->flags & CH_CHIRP_CLOSED) {
+    if(ichirp->flags & CH_CHIRP_CLOSED) {
         fprintf(
             stderr,
             "%s:%d Fatal: chirp is already closed. ch_chirp_t:%p\n",
@@ -136,11 +137,11 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
         );
         return CH_FATAL;
     }
-    if(chirp->flags & CH_CHIRP_CLOSING) {
+    if(ichirp->flags & CH_CHIRP_CLOSING) {
         L(chirp, "Error: close already in progress. ch_chirp_t:%p", chirp);
         return CH_IN_PRORESS;
     }
-    chirp->flags |= CH_CHIRP_CLOSING;
+    ichirp->flags |= CH_CHIRP_CLOSING;
     ichirp->close.data = chirp;
     if(uv_async_send(&ichirp->close) < 0) {
         L(chirp, "Error: could not call close callback. ch_chirp_t:%p", chirp);
@@ -161,12 +162,12 @@ _ch_chirp_closing_down_cb(uv_handle_t* handle)
 {
     CH_GET_CHIRP(handle);
     ch_chirp_int_t* ichirp = chirp->_;
-    if(chirp->flags & CH_CHIRP_AUTO_STOP) {
+    if(ichirp->flags & CH_CHIRP_AUTO_STOP) {
         uv_stop(chirp->loop);
         L(chirp, "UV-Loop stopped by chirp. ch_chirp_t:%p", chirp->loop);
     }
     ch_chirp_free(chirp, ichirp);
-    chirp->flags |= CH_CHIRP_CLOSED;
+    ichirp->flags |= CH_CHIRP_CLOSED;
     L(chirp, "Closed. ch_chirp_t:%p", chirp);
 }
 
@@ -185,12 +186,15 @@ ch_chirp_init(
 // .. code-block:: cpp
 //
 {
-    int                       tmp_err;
+    int tmp_err;
     if(config->ALLOC_CB == NULL) {
         config->ALLOC_CB = _ch_chirp_std_alloc;
     }
     if(config->FREE_CB == NULL) {
         config->FREE_CB = _ch_chirp_std_free;
+    }
+    if(config->REALLOC_CB == NULL) {
+        config->REALLOC_CB = _ch_chirp_std_realloc;
     }
     memset(chirp, 0, sizeof(ch_chirp_t));
     chirp->config           = config;
@@ -277,7 +281,7 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
         L((&chirp), "Error: Could not init chirp: %d ch_chirp_t:%p", tmp_err, &chirp);
         return tmp_err;  // NOCOV covered in ch_chirp_init tests
     }
-    chirp.flags |= CH_CHIRP_AUTO_STOP;
+    chirp._->flags |= CH_CHIRP_AUTO_STOP;
     L((&chirp), "UV-Loop run by chirp. ch_chirp_t:%p, uv_loop_t:%p", &chirp, &loop);
     /* This works and is not TOO bad because the function blocks. */
     // cppcheck-suppress unmatchedSuppression
@@ -307,7 +311,7 @@ ch_chirp_set_auto_stop(ch_chirp_t* chirp)
 // .. code-block:: cpp
 //
 {
-    chirp->flags |= CH_CHIRP_AUTO_STOP;
+    chirp->_->flags |= CH_CHIRP_AUTO_STOP;
 }
 
 // .. c:function::
@@ -341,4 +345,17 @@ _ch_chirp_std_free(void* buf)
 //
 {
     free(buf);
+}
+// .. c:function::
+static
+void*
+_ch_chirp_std_realloc(void* buf, size_t new_size)
+//    :noindex:
+//
+//    see: :c:func:`_ch_chirp_std_realloc`
+//
+// .. code-block:: cpp
+//
+{
+    return realloc(buf, new_size);
 }

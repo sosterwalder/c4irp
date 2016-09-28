@@ -49,6 +49,7 @@ typedef enum {
 //
 struct ch_chirp_int_s {
     int             closing_tasks;
+    uint8_t         flags;
     uv_async_t      close;
     uv_prepare_t    close_check;
     ch_protocol_t   protocol;
@@ -180,6 +181,13 @@ void
 _ch_chirp_std_free(void* buf);
 //
 //    Standard free if no free is supplied by the user.
+//
+// .. c:function::
+static
+void*
+_ch_chirp_std_realloc(void* buf, size_t new_size);
+//
+//    Standard realloc if no realloc is supplied by the user.
 //
 // .. code-block:: cpp
 

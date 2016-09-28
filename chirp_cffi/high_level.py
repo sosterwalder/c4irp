@@ -57,6 +57,16 @@ typedef enum {
     CH_IN_PRORESS     = 8,
 } ch_error_t;
 
+//callbacks.h
+typedef void* (*ch_alloc_cb_t)(
+        size_t suggested_size,
+        size_t required_size,
+        size_t* provided_size
+);
+typedef void (*ch_free_cb_t)(void* buf);
+typedef void (*ch_log_cb_t)(char msg[]);
+typedef void* (*ch_realloc_cb_t)(void* buf, size_t new_size);
+
 //message.h
 typedef struct {
     char data[...];
@@ -102,26 +112,20 @@ ch_msg_get_address(
 );
 
 //chirp.h
-typedef void* (*ch_alloc_cb_t)(
-        size_t suggested_size,
-        size_t required_size,
-        size_t* provided_size
-);
-typedef void (*ch_free_cb_t)(void* buf);
 
 typedef struct {
-    int           REUSE_TIME;
-    float         TIMEOUT;
-    int           PORT;
-    int           BACKLOG;
-    char          BIND_V6[16];
-    char          BIND_V4[4];
-    char*         CERT_CHAIN_PEM;
-    ch_alloc_cb_t ALLOC_CB;
-    ch_free_cb_t  FREE_CB;
+    int             REUSE_TIME;
+    float           TIMEOUT;
+    int             PORT;
+    int             BACKLOG;
+    char            BIND_V6[16];
+    char            BIND_V4[4];
+    char*           CERT_CHAIN_PEM;
+    ch_alloc_cb_t   ALLOC_CB;
+    ch_free_cb_t    FREE_CB;
+    ch_realloc_cb_t REALLOC_CB;
 } ch_config_t;
 
-typedef void (*ch_log_cb_t)(char msg[]);
 extern "Python" void python_log_cb(char msg[]);
 
 extern ch_config_t ch_config_defaults;
@@ -158,14 +162,14 @@ extern
 ch_error_t
 ch_chirp_init(
         ch_chirp_t* chirp,
-        ch_config_t* config,
+        const ch_config_t* config,
         uv_loop_t* loop,
         ch_log_cb_t log_cb
 );
 
 extern
 ch_error_t
-ch_chirp_run(ch_config_t* config, ch_chirp_t**);
+ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp);
 
 extern
 ch_error_t

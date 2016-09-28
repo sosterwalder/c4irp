@@ -9,5 +9,6 @@
 
 #include "message.h"
 #include "chirp_obj.h"
+#include "encryption.h"
 
 #endif //ch_inc_chirp_h

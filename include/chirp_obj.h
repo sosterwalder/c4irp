@@ -53,15 +53,16 @@
 // .. code-block:: cpp
 
 typedef struct {
-    int           REUSE_TIME;
-    float         TIMEOUT;
-    int           PORT;
-    int           BACKLOG;
-    char          BIND_V6[16];
-    char          BIND_V4[4];
-    char*         CERT_CHAIN_PEM;
-    ch_alloc_cb_t ALLOC_CB;
-    ch_free_cb_t  FREE_CB;
+    int             REUSE_TIME;
+    float           TIMEOUT;
+    int             PORT;
+    int             BACKLOG;
+    char            BIND_V6[16];
+    char            BIND_V4[4];
+    char*           CERT_CHAIN_PEM;
+    ch_alloc_cb_t   ALLOC_CB;
+    ch_free_cb_t    FREE_CB;
+    ch_realloc_cb_t REALLOC_CB;
 } ch_config_t;
 
 
@@ -110,7 +111,6 @@ typedef struct ch_chirp_s {
     unsigned char   identity[16];
     uv_loop_t*      loop;
     ch_config_t*    config;
-    uint8_t         flags;
     ch_log_cb_t     _log;
     int             _init;
     ch_chirp_int_t* _;

@@ -28,6 +28,10 @@ struct uv_shutdown_s {
     ...;
 };
 typedef struct uv_shutdown_s uv_shutdown_t;
+struct uv_timer_s {
+    ...;
+};
+typedef struct uv_timer_s uv_timer_t;
 
 struct ch_chirp_s;
 
