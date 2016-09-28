@@ -13,7 +13,7 @@ DOCC=$(wildcard src/*.c)
 DOCH=$(wildcard src/*.h) $(wildcard include/*.h)
 DOCRST=$(DOCC:.c=.c.rst) $(DOCH:.h=.h.rst)
 
-debug:
+debug:  ## Build the project in debug mode
 	MODE=debug make -f build/build.make
 
 vi:  ## Start a vim editing the imporant files
