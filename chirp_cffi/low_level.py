@@ -29,21 +29,23 @@ struct uv_shutdown_s {
 };
 typedef struct uv_shutdown_s uv_shutdown_t;
 
-struct ch_chirp;
+struct ch_chirp_s;
 
-typedef struct ch_connection {
-    uint8_t               ip_protocol;
-    uint8_t               address[16];
-    int32_t               port;
-    uv_tcp_t              client;
-    void*                 buffer;
-    size_t                buffer_size;
-    struct ch_chirp*      chirp;
-    uv_shutdown_t         shutdown_req;
-    uint8_t               flags;
-    char                  color_field;
-    struct ch_connection* left;
-    struct ch_connection* right;
+typedef struct ch_connection_s {
+    uint8_t                 ip_protocol;
+    uint8_t                 address[16];
+    int32_t                 port;
+    uv_tcp_t                client;
+    void*                   buffer;
+    size_t                  buffer_size;
+    struct ch_chirp_s*      chirp;
+    uv_shutdown_t           shutdown_req;
+    uv_timer_t              shutdown_timeout;
+    int8_t                  shutdown_tasks;
+    uint8_t                 flags;
+    char                    color_field;
+    struct ch_connection_s* left;
+    struct ch_connection_s* right;
 } ch_connection_t;
 
 //connection_test.h

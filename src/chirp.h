@@ -46,7 +46,7 @@ typedef enum {
 //
 // .. code-block:: cpp
 //
-struct ch_chirp_int {
+struct ch_chirp_int_s {
     int           closing_tasks;
     uv_async_t    close;
     uv_prepare_t  close_check;

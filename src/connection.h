@@ -31,7 +31,7 @@ typedef enum {
 } ch_cn_flags_t;
 
 
-struct ch_chirp;
+struct ch_chirp_s;
 
 // .. c:type:: ch_connection_t
 //
@@ -46,21 +46,21 @@ struct ch_chirp;
 //
 // .. code-block:: cpp
 
-typedef struct ch_connection {
-    uint8_t               ip_protocol;
-    uint8_t               address[16];
-    int32_t               port;
-    uv_tcp_t              client;
-    void*                 buffer;
-    size_t                buffer_size;
-    struct ch_chirp*      chirp;
-    uv_shutdown_t         shutdown_req;
-    uv_timer_t            shutdown_timeout;
-    int8_t                shutdown_tasks;
-    uint8_t               flags;
-    char                  color_field;
-    struct ch_connection* left;
-    struct ch_connection* right;
+typedef struct ch_connection_s {
+    uint8_t                 ip_protocol;
+    uint8_t                 address[16];
+    int32_t                 port;
+    uv_tcp_t                client;
+    void*                   buffer;
+    size_t                  buffer_size;
+    struct ch_chirp_s*      chirp;
+    uv_shutdown_t           shutdown_req;
+    uv_timer_t              shutdown_timeout;
+    int8_t                  shutdown_tasks;
+    uint8_t                 flags;
+    char                    color_field;
+    struct ch_connection_s* left;
+    struct ch_connection_s* right;
 } ch_connection_t;
 
 // Sglib Prototypes
@@ -148,7 +148,7 @@ ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
 static
 ch_inline
 void
-ch_connection_init(struct ch_chirp* chirp, ch_connection_t* conn)
+ch_connection_init(struct ch_chirp_s* chirp, ch_connection_t* conn)
 //
 //    Initialize a connection.
 //

@@ -21,11 +21,11 @@
 //
 // .. code-block:: cpp
 
-typedef struct ch_receipt {
-  unsigned char      receipt[16];
-  char               color_field;
-  struct ch_receipt* left;
-  struct ch_receipt* right;
+typedef struct ch_receipt_s {
+  unsigned char        receipt[16];
+  char                 color_field;
+  struct ch_receipt_s* left;
+  struct ch_receipt_s* right;
 } ch_receipt_t;
 
 // .. c:type:: ch_protocol_t
@@ -52,9 +52,9 @@ typedef struct ch_receipt {
 //
 // .. code-block:: cpp
 
-struct  ch_chirp;
+struct  ch_chirp_s;
 
-typedef struct ch_protocol {
+typedef struct ch_protocol_s {
     struct sockaddr_in        addrv4;
     struct sockaddr_in6       addrv6;
     uv_tcp_t                  serverv4;
@@ -62,7 +62,7 @@ typedef struct ch_protocol {
     ch_connection_t*          connections;
     ch_receipt_t*             receipts;
     ch_receipt_t*             late_receipts;
-    struct ch_chirp*          chirp;
+    struct ch_chirp_s*        chirp;
 } ch_protocol_t;
 
 

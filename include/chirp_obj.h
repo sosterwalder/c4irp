@@ -86,7 +86,7 @@ extern ch_config_t ch_config_defaults;
 //
 // .. code-block:: cpp
 
-typedef struct ch_chirp_int ch_chirp_int_t;
+typedef struct ch_chirp_int_s ch_chirp_int_t;
 
 // .. c:type:: ch_chirp_t
 //
@@ -106,7 +106,7 @@ typedef struct ch_chirp_int ch_chirp_int_t;
 //
 // .. code-block:: cpp
 
-typedef struct ch_chirp {
+typedef struct ch_chirp_s {
     unsigned char   identity[16];
     uv_loop_t*      loop;
     ch_config_t*    config;
