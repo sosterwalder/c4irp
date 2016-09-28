@@ -57,7 +57,6 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
 // .. code-block:: cpp
 //
 {
-    int tmp_err;
     CH_GET_CHIRP(handle);
     if(chirp->flags & CH_CHIRP_CLOSED) {
         L(chirp, "Error: chirp closing callback called on closed. ch_chirp_t:%p", chirp);
@@ -66,7 +65,7 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
     L(chirp, "Chirp closing callback called. ch_chirp_t:%p", chirp);
     ch_chirp_int_t* ichirp = chirp->_;
     assert(ch_pr_stop(&ichirp->protocol) == CH_SUCCESS);
-    (void)(tmp_err);
+    assert(ch_en_stop(&ichirp->encryption) == CH_SUCCESS);
     uv_close((uv_handle_t*) &ichirp->close, ch_chirp_close_cb);
     ichirp->closing_tasks += 1;
     assert(uv_prepare_init(chirp->loop, &ichirp->close_check) == CH_SUCCESS);
@@ -198,6 +197,7 @@ ch_chirp_init(
     ch_chirp_int_t* ichirp  = ch_chirp_alloc(chirp, sizeof(ch_chirp_int_t));
     memset(ichirp, 0, sizeof(ch_chirp_int_t));
     ch_protocol_t* protocol = &ichirp->protocol;
+    ch_encryption_t* enc    = &ichirp->encryption;
     chirp->_                = ichirp;
     chirp->loop             = loop;
 
@@ -219,8 +219,8 @@ ch_chirp_init(
         return CH_UV_ERROR; // NOCOV
     }
 
-    protocol->chirp    = chirp;
-    tmp_err            = ch_pr_start(protocol);
+    ch_pr_init(chirp, protocol);
+    tmp_err = ch_pr_start(protocol);
     if(tmp_err != CH_SUCCESS) {
         L(
             chirp,
@@ -231,6 +231,19 @@ ch_chirp_init(
         ch_chirp_free(chirp, ichirp);
         return tmp_err;
     }
+    ch_en_init(chirp, enc);
+    tmp_err = ch_en_start(enc);
+    if(tmp_err != CH_SUCCESS) {
+        L(
+            chirp,
+            "Error: Could not start protocol: %d. ch_chirp_t:%p",
+            tmp_err,
+            &chirp
+        );
+        ch_chirp_free(chirp, ichirp);
+        return tmp_err;
+    }
+
     chirp->_init = CH_CHIRP_MAGIC;
     L(chirp, "Chirp initialized. ch_chirp_t:%p, uv_loop_t:%p", &chirp, &loop);
     return CH_SUCCESS;

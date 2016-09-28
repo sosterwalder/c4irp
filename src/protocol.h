@@ -84,6 +84,23 @@ _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections);
 //    TODO params
 //
 // .. c:function::
+static
+ch_inline
+void
+ch_pr_init(ch_chirp_t* chirp, ch_protocol_t* protocol)
+//
+//    Initialize the protocol struct.
+//
+//    :param ch_chirp_t* chirp: Chirp instance
+//    :param ch_protocol_t* protocol: Protocol to initialize
+//
+// .. code-block:: cpp
+//
+{
+    memset(protocol, 0, sizeof(ch_protocol_t));
+    protocol->chirp = chirp;
+}
+// .. c:function::
 static void
 _ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts);
 //

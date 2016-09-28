@@ -9,6 +9,7 @@
 
 #include "../include/chirp.h"
 #include "protocol.h"
+#include "encryption.h"
 
 // .. c:type:: ch_chirp_flags_t
 //
@@ -47,10 +48,11 @@ typedef enum {
 // .. code-block:: cpp
 //
 struct ch_chirp_int_s {
-    int           closing_tasks;
-    uv_async_t    close;
-    uv_prepare_t  close_check;
-    ch_protocol_t protocol;
+    int             closing_tasks;
+    uv_async_t      close;
+    uv_prepare_t    close_check;
+    ch_protocol_t   protocol;
+    ch_encryption_t encryption;
 };
 
 // .. c:function::
