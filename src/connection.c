@@ -22,6 +22,15 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
 );
 
 // .. c:function::
+static
+void
+_ch_cn_shutdown_timeout_cb(uv_timer_t* handle);
+//
+//    Called after shutdown timeout. Closing the connection even though
+//    shutdown was delayed.
+//
+
+// .. c:function::
 void
 ch_cn_close_cb(uv_handle_t* handle)
 //    :noindex:
@@ -101,6 +110,7 @@ ch_cn_shutdown(ch_connection_t* conn)
     int tmp_err;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    ch_chirp_int_t* ichirp = chirp->_;
     if(conn->flags & CH_CN_SHUTTING_DOWN) {
         L(
             chirp,
@@ -126,7 +136,7 @@ ch_cn_shutdown(ch_connection_t* conn)
         );
         return _ch_uv_error_map(tmp_err);
     }
-    tmp_err = uv_timer_init(chirp->loop, &conn->shutdown_timeout);
+    tmp_err = uv_timer_init(ichirp->loop, &conn->shutdown_timeout);
     if(tmp_err != CH_SUCCESS) {
         L(
             chirp,
@@ -142,7 +152,7 @@ ch_cn_shutdown(ch_connection_t* conn)
     tmp_err = uv_timer_start(
         &conn->shutdown_timeout,
         _ch_cn_shutdown_timeout_cb,
-        chirp->config->TIMEOUT * 1000,
+        ichirp->config.TIMEOUT * 1000,
         0
     );
     if(tmp_err != CH_SUCCESS) {

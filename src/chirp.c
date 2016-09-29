@@ -29,6 +29,55 @@ ch_config_t ch_config_defaults = {
     .REALLOC_CB     = NULL,
 };
 
+
+// .. c:function::
+static void
+_ch_chirp_check_closing_cb(uv_prepare_t* handle);
+//
+//    Close chirp when the closing semaphore reaches zero.
+//
+//    TODO params
+//
+// .. c:function::
+static void
+_ch_chirp_close_async_cb(uv_async_t* handle);
+//
+//    Internal callback to close chirp. Makes ch_chirp_close_ts thread-safe
+//
+// .. c:function::
+static void
+_ch_chirp_closing_down_cb(uv_handle_t* handle);
+//
+//    Closing chirp after the check callback has been closed.
+//
+//    TODO params
+//
+// .. c:function::
+static
+void*
+_ch_chirp_std_alloc(
+        size_t suggested_size,
+        size_t required_size,
+        size_t* provided_size
+);
+//
+//    Standard memory allocator used if no allocator is supplied by the user.
+//
+// .. c:function::
+static
+void
+_ch_chirp_std_free(void* buf);
+//
+//    Standard free if no free is supplied by the user.
+//
+// .. c:function::
+static
+void*
+_ch_chirp_std_realloc(void* buf, size_t new_size);
+//
+//    Standard realloc if no realloc is supplied by the user.
+//
+
 // .. c:function::
 static void
 _ch_chirp_check_closing_cb(uv_prepare_t* handle)
@@ -69,7 +118,7 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
     assert(ch_en_stop(&ichirp->encryption) == CH_SUCCESS);
     uv_close((uv_handle_t*) &ichirp->close, ch_chirp_close_cb);
     ichirp->closing_tasks += 1;
-    assert(uv_prepare_init(chirp->loop, &ichirp->close_check) == CH_SUCCESS);
+    assert(uv_prepare_init(ichirp->loop, &ichirp->close_check) == CH_SUCCESS);
     ichirp->close_check.data = chirp;
     // We use a semaphore to wait until all callbacks are done:
     // 1. Every time a new callback is scheduled we do ichirp->closing_tasks += 1
@@ -126,6 +175,7 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
         );
         return CH_UNINIT; // NOCOV  TODO can be tested
     }
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_chirp_int_t* ichirp = chirp->_;
     if(ichirp->flags & CH_CHIRP_CLOSED) {
         fprintf(
@@ -163,8 +213,8 @@ _ch_chirp_closing_down_cb(uv_handle_t* handle)
     CH_GET_CHIRP(handle);
     ch_chirp_int_t* ichirp = chirp->_;
     if(ichirp->flags & CH_CHIRP_AUTO_STOP) {
-        uv_stop(chirp->loop);
-        L(chirp, "UV-Loop stopped by chirp. ch_chirp_t:%p", chirp->loop);
+        uv_stop(ichirp->loop);
+        L(chirp, "UV-Loop stopped by chirp. ch_chirp_t:%p", ichirp->loop);
     }
     ch_chirp_free(chirp, ichirp);
     ichirp->flags |= CH_CHIRP_CLOSED;
@@ -187,23 +237,24 @@ ch_chirp_init(
 //
 {
     int tmp_err;
-    if(config->ALLOC_CB == NULL) {
-        config->ALLOC_CB = _ch_chirp_std_alloc;
-    }
-    if(config->FREE_CB == NULL) {
-        config->FREE_CB = _ch_chirp_std_free;
-    }
-    if(config->REALLOC_CB == NULL) {
-        config->REALLOC_CB = _ch_chirp_std_realloc;
-    }
     memset(chirp, 0, sizeof(ch_chirp_t));
-    chirp->config           = config;
     ch_chirp_int_t* ichirp  = ch_chirp_alloc(chirp, sizeof(ch_chirp_int_t));
     memset(ichirp, 0, sizeof(ch_chirp_int_t));
     ch_protocol_t* protocol = &ichirp->protocol;
     ch_encryption_t* enc    = &ichirp->encryption;
     chirp->_                = ichirp;
-    chirp->loop             = loop;
+    ichirp->config          = *config;
+    ichirp->loop            = loop;
+    ch_config_t* tmp_conf   = &ichirp->config;
+    if(tmp_conf->ALLOC_CB == NULL) {
+        tmp_conf->ALLOC_CB = _ch_chirp_std_alloc;
+    }
+    if(tmp_conf->FREE_CB == NULL) {
+        tmp_conf->FREE_CB = _ch_chirp_std_free;
+    }
+    if(tmp_conf->REALLOC_CB == NULL) {
+        tmp_conf->REALLOC_CB = _ch_chirp_std_realloc;
+    }
 
     if(log_cb != NULL) {
         ch_chirp_register_log_cb(chirp, log_cb);
@@ -211,9 +262,9 @@ ch_chirp_init(
 
     // rand
     srand((unsigned int) time(NULL));
-    _ch_random_ints_to_bytes(chirp->identity, 16);
+    _ch_random_ints_to_bytes(ichirp->identity, 16);
 
-    if(uv_async_init(chirp->loop, &ichirp->close, _ch_chirp_close_async_cb) < 0) {
+    if(uv_async_init(ichirp->loop, &ichirp->close, _ch_chirp_close_async_cb) < 0) {
         L(
             chirp,
             "Error: Could not initialize close callback. ch_chirp_t:%p",
@@ -293,7 +344,7 @@ ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp_out)
         L((&chirp), "Error: uv_run returned with error: %d, uv_loop_t:%p", tmp_err, &loop);
         return tmp_err; // NOCOV only breaking things will trigger this
     }
-    if(ch_loop_close(chirp.loop)) {
+    if(ch_loop_close(chirp._->loop)) {
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this
     }
     return CH_SUCCESS;

@@ -76,14 +76,6 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
 );
 
 // .. c:function::
-static void
-_ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections);
-//
-//    Close and free all remaining connections
-//
-//    TODO params
-//
-// .. c:function::
 static
 ch_inline
 void
@@ -100,30 +92,6 @@ ch_pr_init(ch_chirp_t* chirp, ch_protocol_t* protocol)
     memset(protocol, 0, sizeof(ch_protocol_t));
     protocol->chirp = chirp;
 }
-// .. c:function::
-static void
-_ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts);
-//
-//    Free all remaining items in a receipts set
-//
-//    TODO params
-//
-// .. c:function::
-static void
-_ch_pr_new_connection_cb(uv_stream_t *server, int status);
-//
-//    Callback from libuv on new connection
-//
-//    TODO params
-//
-// .. c:function::
-static void
-_ch_pr_read_data_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
-//
-//  Callback from libuv when data was read
-//
-//    TODO params
-//
 // .. c:function::
 ch_error_t
 ch_pr_start(ch_protocol_t* protocol);

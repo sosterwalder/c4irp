@@ -54,6 +54,9 @@ struct ch_chirp_int_s {
     uv_prepare_t    close_check;
     ch_protocol_t   protocol;
     ch_encryption_t encryption;
+    unsigned char   identity[16];
+    uv_loop_t*      loop;
+    ch_config_t     config;
 };
 
 // .. c:function::
@@ -74,7 +77,7 @@ ch_chirp_alloc(
 {
     void* handle;
     size_t provided_size;
-    handle = chirp->config->ALLOC_CB(
+    handle = chirp->_->config.ALLOC_CB(
         size,
         size,
         &provided_size
@@ -104,7 +107,7 @@ ch_chirp_alloc_var(
 //
 {
     void* handle;
-    handle = chirp->config->ALLOC_CB(
+    handle = chirp->_->config.ALLOC_CB(
         suggested_size,
         required_size,
         provided_size
@@ -117,32 +120,10 @@ ch_chirp_alloc_var(
 }
 
 // .. c:function::
-static void
-_ch_chirp_check_closing_cb(uv_prepare_t* handle);
-//
-//    Close chirp when the closing semaphore reaches zero.
-//
-//    TODO params
-//
-// .. c:function::
-static void
-_ch_chirp_close_async_cb(uv_async_t* handle);
-//
-//    Internal callback to close chirp. Makes ch_chirp_close_ts thread-safe
-//
-// .. c:function::
 void
 ch_chirp_close_cb(uv_handle_t* handle);
 //
 //    Reduce callback semaphore.
-//
-//    TODO params
-//
-// .. c:function::
-static void
-_ch_chirp_closing_down_cb(uv_handle_t* handle);
-//
-//    Closing chirp after the check callback has been closed.
 //
 //    TODO params
 //
@@ -162,33 +143,8 @@ ch_chirp_free(
 // .. code-block:: cpp
 //
 {
-    chirp->config->FREE_CB(buf);
+    chirp->_->config.FREE_CB(buf);
 }
-// .. c:function::
-static
-void*
-_ch_chirp_std_alloc(
-        size_t suggested_size,
-        size_t required_size,
-        size_t* provided_size
-);
-//
-//    Standard memory allocator used if no allocator is supplied by the user.
-//
-// .. c:function::
-static
-void
-_ch_chirp_std_free(void* buf);
-//
-//    Standard free if no free is supplied by the user.
-//
-// .. c:function::
-static
-void*
-_ch_chirp_std_realloc(void* buf, size_t new_size);
-//
-//    Standard realloc if no realloc is supplied by the user.
-//
 // .. code-block:: cpp
 
 #endif //ch_chirp_h

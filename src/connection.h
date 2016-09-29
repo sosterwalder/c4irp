@@ -113,14 +113,6 @@ ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
 //
 // .. c:function::
 static
-void
-_ch_cn_shutdown_timeout_cb(uv_timer_t* handle);
-//
-//    Called after shutdown timeout. Closing the connection even though
-//    shutdown was delayed.
-//
-// .. c:function::
-static
 ch_inline
 int
 ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)

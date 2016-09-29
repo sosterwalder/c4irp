@@ -9,6 +9,13 @@
 #include <openssl/ssl.h>
 #include <openssl/crypto.h>
 
+// .. c:var:: _ch_en_manual_openssl
+//
+//    The user will call ch_en_openssl_init() and ch_en_openssl_uninit().
+//    Defaults to 0.
+//
+// .. code-block:: cpp
+//
 static char _ch_en_manual_openssl = 0;
 
 // .. c:function::

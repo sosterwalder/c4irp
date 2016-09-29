@@ -91,26 +91,12 @@ typedef struct ch_chirp_int_s ch_chirp_int_t;
 
 // .. c:type:: ch_chirp_t
 //
-//    Chirp object.
-//  
-//    .. c:member:: char identity[16]
-//
-//       Identity of this chirp node, 16 bytes
-//
-//    .. c:member:: uv_loop_t* loop
-//
-//       libuv event loop used by chirp
-//
-//    .. c:member:: ch_config_t config
-//
-//       config used by chirp (DO NOT CHANGE)
+//    Chirp object. It has no public members. And uses an opaque pointer to its
+//    internal data structures.
 //
 // .. code-block:: cpp
 
 typedef struct ch_chirp_s {
-    unsigned char   identity[16];
-    uv_loop_t*      loop;
-    ch_config_t*    config;
     ch_log_cb_t     _log;
     int             _init;
     ch_chirp_int_t* _;

@@ -16,6 +16,40 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     CH_RECEIPT_CMP
 );
 
+
+// .. c:function::
+static void
+_ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections);
+//
+//    Close and free all remaining connections
+//
+//    TODO params
+//
+// .. c:function::
+static void
+_ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts);
+//
+//    Free all remaining items in a receipts set
+//
+//    TODO params
+//
+// .. c:function::
+static void
+_ch_pr_new_connection_cb(uv_stream_t *server, int status);
+//
+//    Callback from libuv on new connection
+//
+//    TODO params
+//
+// .. c:function::
+static void
+_ch_pr_read_data_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
+//
+//  Callback from libuv when data was read
+//
+//    TODO params
+//
+
 // .. c:function::
 static void
 _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
@@ -140,16 +174,17 @@ ch_pr_start(ch_protocol_t* protocol)
 // .. code-block:: cpp
 //
 {
-    int                   tmp_err;
-    ch_text_address_t     tmp_addr;
-    ch_chirp_t*           chirp;
-    chirp               = protocol->chirp;
-    ch_config_t* config = chirp->config;
+    int tmp_err;
+    ch_text_address_t tmp_addr;
+    ch_chirp_t* chirp = protocol->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    ch_chirp_int_t* ichirp = chirp->_;
+    ch_config_t* config = &ichirp->config;
     // IPv4
     if(config->PORT < -1 || config->PORT > ((1<<16) - 1)) {
         return CH_VALUE_ERROR;
     }
-    uv_tcp_init(chirp->loop, &protocol->serverv4);
+    uv_tcp_init(ichirp->loop, &protocol->serverv4);
     protocol->serverv4.data = chirp;
     if(uv_inet_ntop(
             AF_INET, config->BIND_V4, tmp_addr.data, sizeof(ch_text_address_t)
@@ -194,7 +229,7 @@ ch_pr_start(ch_protocol_t* protocol)
     }
 
     // IPv6, as the dual stack feature doesn't work everywhere we bind both
-    uv_tcp_init(chirp->loop, &protocol->serverv6);
+    uv_tcp_init(ichirp->loop, &protocol->serverv6);
     protocol->serverv6.data = chirp;
     if(uv_inet_ntop(
             AF_INET6, config->BIND_V6, tmp_addr.data, sizeof(ch_text_address_t)
