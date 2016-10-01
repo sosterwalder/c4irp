@@ -98,6 +98,16 @@ typedef struct ch_chirp_s {
     struct ch_chirp_s* _right;
 } ch_chirp_t;
 
+// .. c:type:: ch_identity_t
+//
+//    Struct containing the chirp identity.
+//
+// .. code-block:: cpp
+
+typedef struct ch_identity_s {
+    unsigned char data[16];
+} ch_identity_t;
+
 // .. c:function::
 extern
 void
@@ -116,6 +126,15 @@ ch_chirp_close_ts(ch_chirp_t* chirp);
 //    ignored after calling free.
 //
 //    This function is thread-safe
+//
+//    :param ch_chirp_t chirp: Chirp object
+//
+// .. c:function::
+extern
+ch_identity_t
+ch_chirp_get_identity(ch_chirp_t* chirp);
+//
+//    Get the identity of this chirp instance.
 //
 //    :param ch_chirp_t chirp: Chirp object
 //

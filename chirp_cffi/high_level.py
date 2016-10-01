@@ -58,11 +58,7 @@ typedef enum {
 } ch_error_t;
 
 //callbacks.h
-typedef void* (*ch_alloc_cb_t)(
-        size_t suggested_size,
-        size_t required_size,
-        size_t* provided_size
-);
+typedef void* (*ch_alloc_cb_t)(size_t size);
 typedef void (*ch_free_cb_t)(void* buf);
 typedef void (*ch_log_cb_t)(char msg[]);
 typedef void* (*ch_realloc_cb_t)(void* buf, size_t new_size);
@@ -113,19 +109,21 @@ ch_msg_get_address(
 
 //chirp.h
 
+typedef struct ch_identity_s {
+    unsigned char data[16];
+} ch_identity_t;
+
 typedef struct {
     int             REUSE_TIME;
     float           TIMEOUT;
     int             PORT;
     int             BACKLOG;
     char            CLOSE_ON_SIGINT;
+    uint32_t        BUFFER_SIZE;
     char            BIND_V6[16];
     char            BIND_V4[4];
     unsigned char   IDENTITY[16];
     char*           CERT_CHAIN_PEM;
-    ch_alloc_cb_t   ALLOC_CB;
-    ch_free_cb_t    FREE_CB;
-    ch_realloc_cb_t REALLOC_CB;
 } ch_config_t;
 
 extern "Python" void python_log_cb(char msg[]);
@@ -157,6 +155,10 @@ static
 inline
 int
 ch_run(uv_loop_t* loop);
+
+extern
+ch_identity_t
+ch_chirp_get_identity(ch_chirp_t* chirp);
 
 extern
 ch_error_t

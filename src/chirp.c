@@ -104,7 +104,12 @@ _ch_chirp_check_closing_cb(uv_prepare_t* handle)
     CH_GET_CHIRP(handle);
     ch_chirp_int_t* ichirp = chirp->_;
     A(ichirp->closing_tasks > -1, "Closing semaphore dropped below zero");
-    L(chirp, "Check closing semaphore (%d). ch_chirp_t:%p", ichirp->closing_tasks, chirp);
+    L(
+        chirp,
+        "Check closing semaphore (%d). ch_chirp_t:%p",
+        ichirp->closing_tasks,
+        chirp
+    );
     if(ichirp->closing_tasks == 0) {
         assert(uv_prepare_stop(handle) == CH_SUCCESS);
         uv_close((uv_handle_t*) handle, _ch_chirp_closing_down_cb);
@@ -266,6 +271,21 @@ _ch_chirp_closing_down_cb(uv_handle_t* handle)
     A(chirp, "Chirp reference count dropped below 0");
 }
 
+// .. c:function::
+ch_identity_t
+ch_chirp_get_identity(ch_chirp_t* chirp)
+//    :noindex:
+//
+//    see: :c:func:`_ch_chirp_closing_down_cb`
+//
+// .. code-block:: cpp
+//
+{
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    ch_identity_t id;
+    memcpy(id.data, chirp->_->config.IDENTITY, sizeof(id.data));
+    return id;
+}
 // .. c:function::
 ch_error_t
 ch_chirp_init(
