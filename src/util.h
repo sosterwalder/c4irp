@@ -9,6 +9,47 @@
 #ifndef ch_util_h
 #define ch_util_h
 
+#include "../include/callbacks.h"
+#include "../include/common.h"
+
+ch_alloc_cb_t _ch_alloc_cb;
+ch_free_cb_t _ch_free_cb;
+ch_realloc_cb_t _ch_realloc_cb;
+
+// .. c:function::
+static
+ch_inline
+void*
+ch_alloc(size_t size)
+//
+//    Allocate fixed amount of memory.
+//
+//    :param size_t size: The amount of memory in bytes to allocate
+//
+// .. code-block:: cpp
+//
+{
+    return _ch_alloc_cb(size);
+}
+
+// .. c:function::
+static
+ch_inline
+void
+ch_free(
+        void* buf
+)
+//
+//    Free a memory handle.
+//
+//    :param void* buf: The handle to free
+//
+// .. code-block:: cpp
+//
+{
+    _ch_free_cb(buf);
+}
+
 // .. c:function::
 static
 ch_inline
@@ -58,6 +99,26 @@ _ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
 #endif // _WIN32
 }
 //
+// .. c:function::
+static
+ch_inline
+void*
+ch_realloc(
+        void*  buf,
+        size_t size
+)
+//
+//    Resize allocated memory.
+//
+//    :param void* buf: The handle to resize
+//    :param size_t size: The new size of the memory in bytes
+//
+// .. code-block:: cpp
+//
+{
+    return _ch_realloc_cb(buf, size);
+}
+
 // .. c:function::
 static
 ch_inline

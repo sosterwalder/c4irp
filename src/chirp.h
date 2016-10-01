@@ -11,6 +11,16 @@
 #include "protocol.h"
 #include "encryption.h"
 
+#include "sglib.h"
+
+SGLIB_DEFINE_RBTREE_PROTOTYPES(
+    ch_chirp_t,
+    _left,
+    _right,
+    _color_field,
+    SGLIB_NUMERIC_COMPARATOR
+);
+
 // .. c:type:: ch_chirp_flags_t
 //
 //    Represents chirps flags.
@@ -48,76 +58,16 @@ typedef enum {
 // .. code-block:: cpp
 //
 struct ch_chirp_int_s {
+    ch_config_t     config;
     int             closing_tasks;
     uint8_t         flags;
     uv_async_t      close;
     uv_prepare_t    close_check;
     ch_protocol_t   protocol;
     ch_encryption_t encryption;
-    unsigned char   identity[16];
     uv_loop_t*      loop;
-    ch_config_t     config;
+    unsigned char   identity[16];
 };
-
-// .. c:function::
-static
-ch_inline
-void*
-ch_chirp_alloc(
-        ch_chirp_t* chirp,
-        size_t size
-)
-//
-//   Allocate fixed amount of memory.
-//
-// TODO param
-//
-// .. code-block:: cpp
-//
-{
-    void* handle;
-    size_t provided_size;
-    handle = chirp->_->config.ALLOC_CB(
-        size,
-        size,
-        &provided_size
-    );
-    A(provided_size >= size, "Not enough memory provided by ALLOC_CB");
-    return handle;
-}
-
-// .. c:function::
-static
-ch_inline
-void*
-ch_chirp_alloc_var(
-        ch_chirp_t* chirp,
-        size_t suggested_size,
-        size_t required_size,
-        size_t* provided_size
-)
-//
-//   Allocate variable memory. The user can decide to allocate less memory.
-//   This is the interface provided by libuv, we hand the choice down to our
-//   user.
-//
-// TODO param
-//
-// .. code-block:: cpp
-//
-{
-    void* handle;
-    handle = chirp->_->config.ALLOC_CB(
-        suggested_size,
-        required_size,
-        provided_size
-    );
-    A(
-        *provided_size >= required_size,
-        "Not enough memory provided by ALLOC_CB"
-    );
-    return handle;
-}
 
 // .. c:function::
 void
@@ -127,24 +77,6 @@ ch_chirp_close_cb(uv_handle_t* handle);
 //
 //    TODO params
 //
-// .. c:function::
-static
-ch_inline
-void
-ch_chirp_free(
-        ch_chirp_t* chirp,
-        void* buf
-)
-//
-//   Free a memory handle.
-//
-// TODO param
-//
 // .. code-block:: cpp
 //
-{
-    chirp->_->config.FREE_CB(buf);
-}
-// .. code-block:: cpp
-
 #endif //ch_chirp_h

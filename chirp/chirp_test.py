@@ -47,11 +47,13 @@ def test_init_bind_err():
 def basic_uv():
     """Create a basic libuv context."""
     chirp = ffi.new("ch_chirp_t*")
+    config = ffi.new("ch_config_t*")
     loop = ffi.new("uv_loop_t*")
+    lib.ch_chirp_config_init(config)
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
     error = lib.ch_chirp_init(
         chirp,
-        ffi.addressof(lib.ch_config_defaults),
+        config,
         loop,
         lib.python_log_cb
     )
@@ -78,7 +80,7 @@ def init_bad_port(port):
     chirp = ffi.new("ch_chirp_t*")
     loop = ffi.new("uv_loop_t*")
     config = ffi.new("ch_config_t*")
-    config[0] = lib.ch_config_defaults
+    lib.ch_chirp_config_init(config)
     assert config.PORT == 2998
     config.PORT = port
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
@@ -90,18 +92,20 @@ def init_bad_port(port):
 def test_chirp_run():
     """Test if the do everything ch_chirp_run method works."""
     res = []
-    chirp_p = ffi.new("ch_chirp_t**")
+    chirp = ffi.new("ch_chirp_t**")
+    config = ffi.new("ch_config_t*")
+    lib.ch_chirp_config_init(config)
 
     def run():
         """Run chirp in a thread."""
         res.append(lib.ch_chirp_run(
-            ffi.addressof(lib.ch_config_defaults), chirp_p
+            config, chirp
         ))
 
     thread = threading.Thread(target=run)
     thread.start()
     time.sleep(0.1)
-    lib.ch_chirp_close_ts(chirp_p[0])
+    lib.ch_chirp_close_ts(chirp[0])
     thread.join()
     assert res[0] == lib.CH_SUCCESS
 

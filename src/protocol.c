@@ -94,7 +94,7 @@ _ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts)
             t != NULL;
             t = sglib_ch_receipt_t_it_next(&it) // NOCOV TODO remove
     ) {
-        ch_chirp_free(chirp, t); // NOCOV TODO remove
+        ch_free(t); // NOCOV TODO remove
     } // NOCOV TODO remove
 }
 
@@ -120,28 +120,27 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
         return; // NOCOV TODO
     }
 
-    ch_connection_t* conn = (ch_connection_t*) ch_chirp_alloc( // NOCOV TODO
-        chirp,
+    ch_connection_t* conn = (ch_connection_t*) ch_alloc(
         sizeof(ch_connection_t)
-    ); // NOCOV TODO
+    );
     ch_connection_init(chirp, conn);
-    uv_tcp_t* client = &conn->client; // NOCOV TODO
-    uv_tcp_init(server->loop, client); // NOCOV TODO
+    uv_tcp_t* client = &conn->client;
+    uv_tcp_init(server->loop, client);
     client->data = conn;
-    if (uv_accept(server, (uv_stream_t*) client) == 0) { // NOCOV TODO
+    if (uv_accept(server, (uv_stream_t*) client) == 0) {
         L(chirp, "Accepted connection. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
         sglib_ch_connection_t_add(&protocol->connections, conn);
         uv_read_start(
             (uv_stream_t*) client,
             ch_cn_read_alloc_cb,
             _ch_pr_read_data_cb
-        ); // NOCOV TODO
-    } // NOCOV TODO
+        );
+    }
     else {
         // TODO uv_close on cleanup and, on close and on remove close
-        uv_close((uv_handle_t*) client, ch_cn_close_cb); // NOCOV TODO
+        uv_close((uv_handle_t*) client, ch_cn_close_cb);
     }
-} // NOCOV TODO remove
+}
 
 // .. c:function::
 static void

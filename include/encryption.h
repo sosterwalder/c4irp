@@ -10,6 +10,7 @@
 #include "encryption.h"
 
 // .. c:function::
+extern
 ch_error_t
 ch_en_openssl_init(const ch_config_t* config);
 //
@@ -17,15 +18,17 @@ ch_en_openssl_init(const ch_config_t* config);
 //
 
 // .. c:function::
+extern
 ch_error_t
-ch_en_openssl_uninit();
+ch_en_openssl_uninit(void);
 //
 //    Uninitialize openssl.
 //
 
 // .. c:function::
+extern
 void
-ch_en_set_manual_openssl_init();
+ch_en_set_manual_openssl_init(void);
 //
 //    By default chirp will initialize openssl on the first instance of chirp
 //    and uninitialize openssl on the last instance of chirp. If for some

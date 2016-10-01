@@ -32,23 +32,28 @@
 //
 //       TCP-Listen socket backlog.
 //
+//    .. c:member:: char CLOSE_ON_SIGINT
+//
+//       By default chirp closes on SIGINT (Ctrl-C)
+//
+//    .. c:member:: uint32_t BUFFER_SIZE
+//
+//       Size of the buffer used for a connection. Defaults to 0, which means
+//       use the size requested by libuv. Should not be set below 1024.
+//
 //    .. c:member:: char[16] BIND_V6
 //
 //       Override IPv6 bind address.
 //
-//    .. c:member:: char[16] BIND_V4
+//    .. c:member:: char[4] BIND_V4
 //
 //       Override IPv4 bind address.
 //
-//    .. c:member:: ch_alloc_cb_t ALLOC_CB
+//    .. c:member:: unsigned char[16] IDENTITY
 //
-//       Callback used by chirp to request memory. If NULL: the system malloc
-//       function is used.
+//       Override the IDENTITY. By default all chars are 0, which means chirp
+//       will generate a IDENTITY.
 //
-//    .. c:member:: ch_free_cb_t FREE_CB
-//
-//       Callback used by chirp to free memory. If NULL: the system free
-//       function is used.
 //
 // .. code-block:: cpp
 
@@ -57,26 +62,14 @@ typedef struct {
     float           TIMEOUT;
     int             PORT;
     int             BACKLOG;
+    char            CLOSE_ON_SIGINT;
+    uint32_t        BUFFER_SIZE;
     char            BIND_V6[16];
     char            BIND_V4[4];
+    unsigned char   IDENTITY[16];
     char*           CERT_CHAIN_PEM;
-    ch_alloc_cb_t   ALLOC_CB;
-    ch_free_cb_t    FREE_CB;
-    ch_realloc_cb_t REALLOC_CB;
 } ch_config_t;
 
-
-//
-// .. c:var:: ch_config_defaults
-//    :noindex:
-//
-//    Default config of chirp.
-//
-//    see: :c:type:`ch_config_defaults`
-//
-// .. code-block:: cpp
-
-extern ch_config_t ch_config_defaults;
 
 // .. c:type:: ch_chirp_int_t
 //    :noindex:
@@ -97,11 +90,23 @@ typedef struct ch_chirp_int_s ch_chirp_int_t;
 // .. code-block:: cpp
 
 typedef struct ch_chirp_s {
-    ch_log_cb_t     _log;
-    int             _init;
-    ch_chirp_int_t* _;
+    ch_chirp_int_t*    _;
+    ch_log_cb_t        _log;
+    int                _init;
+    char               _color_field;
+    struct ch_chirp_s* _left;
+    struct ch_chirp_s* _right;
 } ch_chirp_t;
 
+// .. c:function::
+extern
+void
+ch_chirp_config_init(ch_config_t* config);
+//
+//    Initialize chirp config with defaults
+//
+//    :param ch_config_t config: Chirp config
+//
 // .. c:function::
 extern
 ch_error_t
@@ -119,7 +124,7 @@ extern
 ch_error_t
 ch_chirp_init(
         ch_chirp_t* chirp,
-        ch_config_t* config,
+        const ch_config_t* config,
         uv_loop_t* loop,
         ch_log_cb_t log_cb
 );
@@ -151,7 +156,7 @@ ch_chirp_register_log_cb(ch_chirp_t* chirp, ch_log_cb_t log_cb)
 // .. c:function::
 extern
 ch_error_t
-ch_chirp_run(ch_config_t* config, ch_chirp_t** chirp);
+ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp);
 //
 //    Initializes, runs and cleans everything. Everything being:
 //    TODO: Add message callback

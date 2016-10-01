@@ -118,8 +118,10 @@ typedef struct {
     float           TIMEOUT;
     int             PORT;
     int             BACKLOG;
+    char            CLOSE_ON_SIGINT;
     char            BIND_V6[16];
     char            BIND_V4[4];
+    unsigned char   IDENTITY[16];
     char*           CERT_CHAIN_PEM;
     ch_alloc_cb_t   ALLOC_CB;
     ch_free_cb_t    FREE_CB;
@@ -128,15 +130,13 @@ typedef struct {
 
 extern "Python" void python_log_cb(char msg[]);
 
-extern ch_config_t ch_config_defaults;
-
-typedef struct {
-    unsigned char identity[16];
-    uv_loop_t*    loop;
-    ch_config_t*  config;
-    uint8_t       flags;
+typedef struct ch_chirp_s {
     ...;
 } ch_chirp_t;
+
+extern
+void
+ch_chirp_config_init(ch_config_t* config);
 
 static
 inline

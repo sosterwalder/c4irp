@@ -95,6 +95,7 @@ class ChirpPool(object):
         """Fill in the c_config from the config."""
         c_conf = self._c_config
         conf   = self._config
+        lib.ch_chirp_config_init(c_conf)
         folder = __file__.split(os.path.sep)[:-1]
         folder.append("cert.pem")
         conf.CERT_CHAIN_PEM = "%s%s" % (

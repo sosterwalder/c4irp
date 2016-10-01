@@ -22,7 +22,8 @@ main(
 {
     ch_chirp_t chirp;
     uv_loop_t loop;
-    ch_config_t config = ch_config_defaults;
+    ch_config_t config;
+    ch_chirp_config_init(&config);
     ch_loop_init(&loop);
     ch_chirp_init(&chirp, &config, &loop, NULL);
     ch_chirp_set_auto_stop(&chirp);

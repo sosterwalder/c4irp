@@ -56,9 +56,9 @@ ch_cn_close_cb(uv_handle_t* handle)
 
     if(conn->shutdown_tasks == 0) {
         if(conn->buffer) {
-            ch_chirp_free(chirp, conn->buffer);
+            ch_free(conn->buffer);
         }
-        ch_chirp_free(chirp, conn);
+        ch_free(conn);
         L(
             chirp,
             "Closed connection, closing semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
@@ -70,7 +70,11 @@ ch_cn_close_cb(uv_handle_t* handle)
 }
 // .. c:function::
 void
-ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
+ch_cn_read_alloc_cb(
+        uv_handle_t* handle,
+        size_t suggested_size,
+        uv_buf_t* buf
+)
 //    :noindex:
 //
 //    see: :c:func:`ch_cn_read_alloc_cb`
@@ -78,18 +82,18 @@ ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 // .. code-block:: cpp
 //
 {
-    size_t provided_size;
     ch_connection_t* conn = handle->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    ch_chirp_int_t* ichirp = chirp->_;
     if(!conn->buffer) {
-        conn->buffer = ch_chirp_alloc_var(
-            chirp,
-            suggested_size,
-            CH_LIB_UV_MIN_BUFFER,
-            &provided_size
-        );
-        conn->buffer_size = provided_size;
+        if(ichirp->config.BUFFER_SIZE == 0) {
+            conn->buffer      = ch_alloc(suggested_size);
+            conn->buffer_size = suggested_size;
+        } else {
+            conn->buffer      = ch_alloc(ichirp->config.BUFFER_SIZE);
+            conn->buffer_size = ichirp->config.BUFFER_SIZE;
+        }
         conn->flags |= CH_CN_BUF_USED;
     } else {
         A(!(conn->flags & CH_CN_BUF_USED), "Buffer still used");
