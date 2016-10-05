@@ -24,6 +24,7 @@ main(
     uv_loop_t loop;
     ch_config_t config;
     ch_chirp_config_init(&config);
+    config.CERT_CHAIN_PEM = "./chirp/cert.pem";
     ch_loop_init(&loop);
     ch_chirp_init(&chirp, &config, &loop, NULL);
     ch_chirp_set_auto_stop(&chirp);

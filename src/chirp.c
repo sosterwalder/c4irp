@@ -609,7 +609,7 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
     );
     V(
         chirp,
-        conf->BUFFER_SIZE > CH_LIB_UV_MIN_BUFFER,
+        conf->BUFFER_SIZE > CH_LIB_UV_MIN_BUFFER || conf->BUFFER_SIZE == 0,
         "Config: buffer size must be > %d (%d)",
         CH_LIB_UV_MIN_BUFFER,
         conf->BUFFER_SIZE
