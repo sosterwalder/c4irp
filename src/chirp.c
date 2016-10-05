@@ -283,9 +283,24 @@ ch_chirp_get_identity(ch_chirp_t* chirp)
 {
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_identity_t id;
-    memcpy(id.data, chirp->_->config.IDENTITY, sizeof(id.data));
+    memcpy(id.data, chirp->_->identity, sizeof(id.data));
     return id;
 }
+
+// .. c:function::
+uv_loop_t*
+ch_chirp_get_loop(ch_chirp_t* chirp)
+//    :noindex:
+//
+//    see: :c:func:`_ch_chirp_closing_down_cb`
+//
+// .. code-block:: cpp
+//
+{
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    return chirp->_->loop;
+}
+
 // .. c:function::
 ch_error_t
 ch_chirp_init(
@@ -323,7 +338,7 @@ ch_chirp_init(
             tmp_conf->IDENTITY[i] == 0
     ) i += 1;
     if(tmp_conf->IDENTITY[i] == 0)
-        _ch_random_ints_to_bytes(ichirp->identity, sizeof(tmp_conf->IDENTITY));
+        _ch_random_ints_to_bytes(ichirp->identity, sizeof(ichirp->identity));
     else
         *ichirp->identity = *tmp_conf->IDENTITY;
 

@@ -161,6 +161,10 @@ ch_identity_t
 ch_chirp_get_identity(ch_chirp_t* chirp);
 
 extern
+uv_loop_t*
+ch_chirp_get_loop(ch_chirp_t* chirp);
+
+extern
 ch_error_t
 ch_chirp_init(
         ch_chirp_t* chirp,

@@ -72,12 +72,12 @@ libuv: libuv.a
 libchirp: libchirp.a
 
 libchirp.a: $(OBJS) $(COMMON) | libchirp-depends
-	ar $(ARFLAGS) $@ $^
+	ar $(ARFLAGS) $@ $(OBJS)
 ifneq ($(MODE),debug)
 ifeq ($(UNAME_S),Darwin)
-	strip -S $^
+	strip -S $(OBJS)
 else
-	strip --strip-debug $^
+	strip --strip-debug $(OBJS)
 endif
 endif
 

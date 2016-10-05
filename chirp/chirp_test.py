@@ -148,7 +148,7 @@ def init_chirp(c=None):
     assert ffi.string(
         lib.ch_chirp_get_identity(chirp._chirp).data
     ) != b''
-    assert chirp._chirp.loop != ffi.NULL
+    assert lib.ch_chirp_get_loop(chirp._chirp) is not ffi.NULL
     return chirp
 
 if __name__ == "__main__":  # pragma: no cover

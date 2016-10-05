@@ -140,6 +140,15 @@ ch_chirp_get_identity(ch_chirp_t* chirp);
 //
 // .. c:function::
 extern
+uv_loop_t*
+ch_chirp_get_loop(ch_chirp_t* chirp);
+//
+//    Get the loop of the chirp object.
+//
+//    :param ch_chirp_t chirp: Chirp object
+//
+// .. c:function::
+extern
 ch_error_t
 ch_chirp_init(
         ch_chirp_t* chirp,
