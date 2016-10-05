@@ -56,7 +56,6 @@ ch_en_openssl_uninit(void)
 // .. code-block:: cpp
 //
 {
-    return CH_SUCCESS;
     FIPS_mode_set(0);
     ENGINE_cleanup();
     CONF_modules_unload(1);
