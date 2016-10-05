@@ -7,7 +7,6 @@
 #include "encryption.h"
 #include "chirp.h"
 
-#include <openssl/ssl.h>
 #include <openssl/crypto.h>
 #include <openssl/engine.h>
 #include <openssl/conf.h>
@@ -100,6 +99,43 @@ ch_en_start(ch_encryption_t* enc)
         );
         return ch_en_openssl_init(&ichirp->config);
     }
+    const SSL_METHOD* method = TLSv1_2_method();
+    if(method == NULL) {
+        L(
+            chirp,
+            "Error: Could not get the TLSv1_2_method. ch_chirp_t:%p",
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
+    enc->ssl_ctx = SSL_CTX_new(method);
+    if(enc->ssl_ctx == NULL) {
+        L(
+            chirp,
+            "Error: Could create the SSL_CTX. ch_chirp_t:%p",
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
+    SSL_CTX_set_verify(
+            enc->ssl_ctx,
+            SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
+            NULL
+    );
+    SSL_CTX_set_verify_depth(enc->ssl_ctx, 5);
+    if(SSL_CTX_load_verify_locations(
+                enc->ssl_ctx,
+                ichirp->config.CERT_CHAIN_PEM,
+                NULL
+    ) != 1) {
+        L(
+            chirp,
+            "Error: Could not set the certificate %s. ch_chirp_t:%p",
+            ichirp->config.CERT_CHAIN_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
     return CH_SUCCESS;
 }
 
@@ -126,5 +162,6 @@ ch_en_stop(ch_encryption_t* enc)
             return ch_en_openssl_uninit();
         }
     }
+    SSL_CTX_free(enc->ssl_ctx);
     return CH_SUCCESS;
 }

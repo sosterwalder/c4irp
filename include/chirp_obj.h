@@ -58,10 +58,10 @@
 // .. code-block:: cpp
 
 typedef struct {
-    int             REUSE_TIME;
+    float           REUSE_TIME;
     float           TIMEOUT;
-    int             PORT;
-    int             BACKLOG;
+    uint16_t        PORT;
+    uint8_t         BACKLOG;
     char            CLOSE_ON_SIGINT;
     uint32_t        BUFFER_SIZE;
     char            BIND_V6[16];

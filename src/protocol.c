@@ -180,9 +180,6 @@ ch_pr_start(ch_protocol_t* protocol)
     ch_chirp_int_t* ichirp = chirp->_;
     ch_config_t* config = &ichirp->config;
     // IPv4
-    if(config->PORT < -1 || config->PORT > ((1<<16) - 1)) {
-        return CH_VALUE_ERROR;
-    }
     uv_tcp_init(ichirp->loop, &protocol->serverv4);
     protocol->serverv4.data = chirp;
     if(uv_inet_ntop(

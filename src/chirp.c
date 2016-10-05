@@ -9,6 +9,7 @@
 
 #include <time.h>
 #include <signal.h>
+#include <unistd.h>
 
 SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     ch_chirp_t,
@@ -89,6 +90,13 @@ void
 _ch_chirp_sig_handler(int);
 //
 //    Closes all chirp instances on sig int.
+//
+// .. c:function::
+static
+void
+_ch_chirp_verify_cfg(const ch_config_t* conf);
+//
+//   Verifies the configuration.
 //
 
 // .. c:function::
@@ -332,6 +340,7 @@ ch_chirp_init(
 //
 {
     int tmp_err;
+    _ch_chirp_verify_cfg(config);
     memset(chirp, 0, sizeof(ch_chirp_t));
     chirp->_init            = CH_CHIRP_MAGIC;
     ch_chirp_int_t* ichirp  = ch_alloc(sizeof(ch_chirp_int_t));
@@ -522,4 +531,67 @@ _ch_chirp_sig_handler(int signo)
         if(t->_->config.CLOSE_ON_SIGINT)
             ch_chirp_close_ts(t);
     }
+}
+// .. c:function::
+static
+void
+_ch_chirp_verify_cfg(const ch_config_t* conf)
+//    :noindex:
+//
+//    see: :c:func:`_ch_chirp_sig_handler`
+//
+// .. code-block:: cpp
+//
+{
+    B(
+        conf->CERT_CHAIN_PEM != NULL,
+        "Config: CERT_CHAIN_PEM must be set."
+    );    
+    B(
+        access(conf->CERT_CHAIN_PEM, F_OK ) != -1,
+        "Config: cert %s does not exist.",
+        conf->CERT_CHAIN_PEM
+    );
+    B(
+        conf->PORT > 1024,
+        "Config: port must be > 1042. (%d)",
+        conf->PORT
+    );
+    B(
+        conf->BACKLOG < 128,
+        "Config: backlog must be < 128. (%d)",
+        conf->BACKLOG
+    );
+    B(
+        conf->TIMEOUT <= 60,
+        "Config: timeout must be <= 60. (%f)",
+        conf->TIMEOUT
+    );
+    B(
+        conf->TIMEOUT >= 0.1,
+        "Config: timeout must be >= 0.1. (%f)",
+        conf->TIMEOUT
+    );
+    B(
+        conf->REUSE_TIME >= 2,
+        "Config: resuse time must be => 2. (%f)",
+        conf->REUSE_TIME
+    );
+    B(
+        conf->REUSE_TIME <= 3600,
+        "Config: resuse time must be <= 3600. (%f)",
+        conf->REUSE_TIME
+    );
+    B(
+        conf->TIMEOUT <= conf->REUSE_TIME,
+        "Config: timeout must be <= reuse time. (%f, %f)",
+        conf->TIMEOUT,
+        conf->REUSE_TIME
+    );
+    B(
+        conf->BUFFER_SIZE > CH_LIB_UV_MIN_BUFFER,
+        "Config: buffer size must be > %d (%d)",
+        CH_LIB_UV_MIN_BUFFER,
+        conf->BUFFER_SIZE
+    );
 }

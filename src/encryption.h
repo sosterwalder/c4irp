@@ -9,6 +9,8 @@
 
 #include "../include/chirp_obj.h"
 
+#include <openssl/ssl.h>
+
 // .. c:type:: ch_encryption_t
 //
 //    Encryption object.
@@ -21,6 +23,7 @@
 
 typedef struct ch_encryption_s {
     ch_chirp_t* chirp;
+    SSL_CTX* ssl_ctx;
 } ch_encryption_t;
 
 // .. c:function::

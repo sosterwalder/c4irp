@@ -28,10 +28,22 @@
 // The logging macro L(chirp, message, ...) behaves like printf and allows to
 // log to a custom callback. Usually used to log into pythons logging facility.
 //
-// The assert macro A(condition, message, ...) behaves like printf and allows to
-// print a message with the assertion
+// The assert macro A(condition, message, ...) behaves like printf and allows
+// to print a message with the assertion
+//
+// The bailout macro B(condition, message, ...) behaves like printf and allows
+// to print a message with the assertion, it will always exit with an error,
+// even in release mode.
 //
 // .. code-block:: cpp
+//
+#define B(condition, ...) do { \
+    if(!(condition)) { \
+        fprintf(stderr, ##__VA_ARGS__); \
+        fprintf(stderr, "\n"); \
+        exit(1); \
+    } \
+} while(0)
 
 #ifndef NDEBUG
 #   ifdef CH_LOG_TO_STDERR
