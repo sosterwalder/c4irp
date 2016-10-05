@@ -31,21 +31,38 @@
 // The assert macro A(condition, message, ...) behaves like printf and allows
 // to print a message with the assertion
 //
-// The bailout macro B(condition, message, ...) behaves like printf and allows
-// to print a message with the assertion, it will always exit with an error,
-// even in release mode.
+// The validate macro V(chirp, condition, message, ...) behaves like printf and allows
+// to print a message with the assertion, it will print the message and return
+// CH_VALUE_ERROR, even in release mode.
 //
 // .. code-block:: cpp
 //
-#define B(condition, ...) do { \
-    if(!(condition)) { \
-        fprintf(stderr, ##__VA_ARGS__); \
-        fprintf(stderr, "\n"); \
-        exit(1); \
-    } \
-} while(0)
 
 #ifndef NDEBUG
+#   define V(chirp, condition, message, ...) do { \
+        if(!(condition)) { \
+            if(chirp->_log != NULL) { \
+                char buf[1024]; \
+                snprintf( \
+                    buf, \
+                    1024, \
+                    "%s:%d " message, \
+                    __FILE__, \
+                    __LINE__, \
+                    ##__VA_ARGS__ \
+                ); \
+                chirp->_log(buf); \
+            } \
+            fprintf( \
+                stderr, \
+                "%s:%d " message "\n", \
+                __FILE__, \
+                __LINE__, \
+                ##__VA_ARGS__ \
+            ); \
+            return CH_VALUE_ERROR; \
+        } \
+    } while(0)
 #   ifdef CH_LOG_TO_STDERR
 #       define L(chirp, message, ...) fprintf( \
             stderr, \
@@ -75,18 +92,52 @@
             fprintf(stderr, ##__VA_ARGS__); \
             fprintf(stderr, "\n"); \
             assert(condition); \
+            /* Since we check the condition twice, check for bad asserts*/ \
+            fprintf(stderr, "Bad assert: condition not stable\n"); \
+            assert(0); \
         } \
     } while(0)
 #else //NDEBUG
+#   define V(chirp, condition, message, ...) do { \
+        if(!(condition)) { \
+            if(chirp->_log != NULL) { \
+                char buf[1024]; \
+                snprintf( \
+                    buf, \
+                    1024, \
+                    "%s:%d " message, \
+                    __FILE__, \
+                    __LINE__, \
+                    ##__VA_ARGS__ \
+                ); \
+                chirp->_log(buf); \
+            } \
+            fprintf( \
+                stderr, \
+                "%s:%d " message "\n", \
+                __FILE__, \
+                __LINE__, \
+                ##__VA_ARGS__ \
+            ); \
+            assert(condition); \
+            /* Since we check the condition twice, check for bad asserts*/ \
+            fprintf(stderr, "Bad assert: condition not stable\n"); \
+            assert(0); \
+        } \
+    } while(0)
 #   define L(chrip, message, ...) (void)(chirp); (void)(message)
 #   define A(condition, ...) (void)(condition)
 #endif
+
 
 #ifndef A
 #   error Assert macro not defined
 #endif
 #ifndef L
 #   error Log macro not defined
+#endif
+#ifndef V
+#   error Validate macro not defined
 #endif
 
 #define CH_CHIRP_MAGIC 42429

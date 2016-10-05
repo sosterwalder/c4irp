@@ -93,8 +93,8 @@ _ch_chirp_sig_handler(int);
 //
 // .. c:function::
 static
-void
-_ch_chirp_verify_cfg(const ch_config_t* conf);
+ch_error_t
+_ch_chirp_verify_cfg(const ch_chirp_t* chirp);
 //
 //   Verifies the configuration.
 //
@@ -340,7 +340,6 @@ ch_chirp_init(
 //
 {
     int tmp_err;
-    _ch_chirp_verify_cfg(config);
     memset(chirp, 0, sizeof(ch_chirp_t));
     chirp->_init            = CH_CHIRP_MAGIC;
     ch_chirp_int_t* ichirp  = ch_alloc(sizeof(ch_chirp_int_t));
@@ -353,6 +352,11 @@ ch_chirp_init(
     chirp->_                = ichirp;
     if(log_cb != NULL)
         ch_chirp_register_log_cb(chirp, log_cb);
+    tmp_err = _ch_chirp_verify_cfg(chirp);
+    if(tmp_err != CH_SUCCESS) {
+        chirp->_init = 0;
+        return tmp_err;
+    }
 
     // rand
     srand((unsigned int) time(NULL));
@@ -374,6 +378,7 @@ ch_chirp_init(
             chirp
         );
         ch_free(ichirp);
+        chirp->_init = 0;
         return CH_UV_ERROR; // NOCOV
     }
 
@@ -387,6 +392,7 @@ ch_chirp_init(
             chirp
         );
         ch_free(ichirp);
+        chirp->_init = 0;
         return tmp_err;
     }
     ch_en_init(chirp, enc);
@@ -399,6 +405,7 @@ ch_chirp_init(
             chirp
         );
         ch_free(ichirp);
+        chirp->_init = 0;
         return tmp_err;
     }
 
@@ -502,6 +509,7 @@ ch_chirp_set_auto_stop(ch_chirp_t* chirp)
 // .. code-block:: cpp
 //
 {
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     chirp->_->flags |= CH_CHIRP_AUTO_STOP;
 }
 
@@ -534,8 +542,8 @@ _ch_chirp_sig_handler(int signo)
 }
 // .. c:function::
 static
-void
-_ch_chirp_verify_cfg(const ch_config_t* conf)
+ch_error_t
+_ch_chirp_verify_cfg(const ch_chirp_t* chirp)
 //    :noindex:
 //
 //    see: :c:func:`_ch_chirp_sig_handler`
@@ -543,55 +551,68 @@ _ch_chirp_verify_cfg(const ch_config_t* conf)
 // .. code-block:: cpp
 //
 {
-    B(
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    ch_config_t* conf = &chirp->_->config;
+    V(
+        chirp,
         conf->CERT_CHAIN_PEM != NULL,
         "Config: CERT_CHAIN_PEM must be set."
     );    
-    B(
+    V(
+        chirp,
         access(conf->CERT_CHAIN_PEM, F_OK ) != -1,
         "Config: cert %s does not exist.",
         conf->CERT_CHAIN_PEM
     );
-    B(
+    V(
+        chirp,
         conf->PORT > 1024,
         "Config: port must be > 1042. (%d)",
         conf->PORT
     );
-    B(
+    V(
+        chirp,
         conf->BACKLOG < 128,
         "Config: backlog must be < 128. (%d)",
         conf->BACKLOG
     );
-    B(
+    V(
+        chirp,
         conf->TIMEOUT <= 60,
         "Config: timeout must be <= 60. (%f)",
         conf->TIMEOUT
     );
-    B(
+    V(
+        chirp,
         conf->TIMEOUT >= 0.1,
         "Config: timeout must be >= 0.1. (%f)",
         conf->TIMEOUT
     );
-    B(
+    V(
+        chirp,
         conf->REUSE_TIME >= 2,
         "Config: resuse time must be => 2. (%f)",
         conf->REUSE_TIME
     );
-    B(
+    V(
+        chirp,
         conf->REUSE_TIME <= 3600,
         "Config: resuse time must be <= 3600. (%f)",
         conf->REUSE_TIME
     );
-    B(
+    V(
+        chirp,
         conf->TIMEOUT <= conf->REUSE_TIME,
         "Config: timeout must be <= reuse time. (%f, %f)",
         conf->TIMEOUT,
         conf->REUSE_TIME
     );
-    B(
+    V(
+        chirp,
         conf->BUFFER_SIZE > CH_LIB_UV_MIN_BUFFER,
         "Config: buffer size must be > %d (%d)",
         CH_LIB_UV_MIN_BUFFER,
         conf->BUFFER_SIZE
     );
+    return CH_SUCCESS;
 }
