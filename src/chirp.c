@@ -138,6 +138,14 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
 //
 {
     CH_GET_CHIRP(handle);
+    if(chirp->_ == NULL) {
+        L(
+            chirp,
+            "Error: chirp closing callback called on closed. ch_chirp_t:%p",
+            chirp
+        );
+        return;
+    }
     ch_chirp_int_t* ichirp = chirp->_;
     if(ichirp->flags & CH_CHIRP_CLOSED) {
         L(
@@ -198,6 +206,8 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 // .. code-block:: cpp
 //
 {
+    char chirp_closed = 0;
+    ch_chirp_int_t* ichirp;
     L(chirp, "Closing chirp via callback. ch_chirp_t:%p", chirp);
     if(chirp == NULL || chirp->_init != CH_CHIRP_MAGIC) {
         fprintf(
@@ -210,8 +220,13 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
         return CH_UNINIT; // NOCOV  TODO can be tested
     }
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    ch_chirp_int_t* ichirp = chirp->_;
-    if(ichirp->flags & CH_CHIRP_CLOSED) {
+    if(chirp->_ != NULL) {
+        ichirp = chirp->_;
+        if(ichirp->flags & CH_CHIRP_CLOSED)
+            chirp_closed = 1;
+    } else
+        chirp_closed = 1;
+    if(chirp_closed) {
         fprintf(
             stderr,
             "%s:%d Fatal: chirp is already closed. ch_chirp_t:%p\n",
@@ -255,8 +270,8 @@ _ch_chirp_closing_down_cb(uv_handle_t* handle)
             chirp
         );
     }
+    chirp->_ = NULL;
     ch_free(ichirp);
-    ichirp->flags |= CH_CHIRP_CLOSED;
     L(chirp, "Closed. ch_chirp_t:%p", chirp);
     if(sglib_ch_chirp_t_is_member(_ch_chirp_instances, chirp))
         sglib_ch_chirp_t_delete(&_ch_chirp_instances, chirp);
@@ -380,11 +395,7 @@ ch_chirp_init(
 
     L(
         chirp,
-        "Chirp initialized id: %x %x %x %x. ch_chirp_t:%p, uv_loop_t:%p",
-        (uint32_t) ichirp->identity[0],
-        (uint32_t) ichirp->identity[3],
-        (uint32_t) ichirp->identity[7],
-        (uint32_t) ichirp->identity[11],
+        "Chirp initialized. ch_chirp_t:%p, uv_loop_t:%p",
         chirp,
         loop
     );

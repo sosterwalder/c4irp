@@ -41,6 +41,7 @@ ch_en_openssl_init(const ch_config_t* config)
 {
     SSL_library_init();
     SSL_load_error_strings();
+    OPENSSL_config("chirp");
 
     return CH_SUCCESS;
 }
