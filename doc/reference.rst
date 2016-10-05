@@ -30,7 +30,6 @@ Internal C API
    :maxdepth: 2
    :includehidden:
 
-   src/array.h.rst
    src/chirp.h.rst
    src/chirp.c.rst
    src/connection.h.rst
@@ -42,6 +41,7 @@ Internal C API
    src/protocol.h.rst
    src/protocol.c.rst
    src/util.h.rst
+   src/util.c.rst
 
 Public Python API
 =================
@@ -68,8 +68,6 @@ Test binaries
    :maxdepth: 2
    :includehidden:
 
-   src/alloc_etest.c.rst
-   src/array_etest.c.rst
    src/chirp_etest.c.rst
 
 External Libs
