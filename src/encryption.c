@@ -130,8 +130,38 @@ ch_en_start(ch_encryption_t* enc)
     ) != 1) {
         L(
             chirp,
+            "Error: Could not set the verification certificate "
+            "%s. ch_chirp_t:%p",
+            ichirp->config.CERT_CHAIN_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
+    if(SSL_CTX_use_certificate_chain_file(
+                enc->ssl_ctx,
+                ichirp->config.CERT_CHAIN_PEM
+    ) != 1) {
+        L(
+            chirp,
             "Error: Could not set the certificate %s. ch_chirp_t:%p",
             ichirp->config.CERT_CHAIN_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
+    if(SSL_CTX_set_cipher_list(
+            enc->ssl_ctx,
+            "-ALL:"
+            "TLS_RSA_WITH_AES_256_CBC_SHA256:"
+            "TLS_DH_RSA_WITH_AES_256_CBC_SHA256:"
+            "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384:"
+            "TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384:"
+            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384:"
+            "TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384:"
+    ) != 1) {
+        L(
+            chirp,
+            "Error: Could not set the cipher list. ch_chirp_t:%p",
             chirp
         );
         return CH_TLS_ERROR;

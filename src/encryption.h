@@ -23,7 +23,7 @@
 
 typedef struct ch_encryption_s {
     ch_chirp_t* chirp;
-    SSL_CTX* ssl_ctx;
+    SSL_CTX*    ssl_ctx;
 } ch_encryption_t;
 
 // .. c:function::

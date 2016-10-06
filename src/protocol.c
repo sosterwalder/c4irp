@@ -70,7 +70,7 @@ _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
             t != NULL;
             t = sglib_ch_connection_t_it_next(&it) // NOCOV TODO remove
     ) {
-        ch_cn_shutdown(t);
+        ch_cn_shutdown_end(t);
     } // NOCOV TODO remove
 }
 
@@ -138,7 +138,7 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
     }
     else {
         // TODO uv_close on cleanup and, on close and on remove close
-        uv_close((uv_handle_t*) client, ch_cn_close_cb);
+        // uv_close((uv_handle_t*) client, ch_cn_close_cb);
     }
 }
 
@@ -159,6 +159,21 @@ _ch_pr_read_data_cb(
     ch_connection_t* conn = stream->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    ch_protocol_t* protocol = &chirp->_->protocol;
+    if(nread == UV_EOF) {
+        ch_cn_shutdown(conn);
+        if(sglib_ch_connection_t_is_member(protocol->connections, conn))
+            sglib_ch_connection_t_delete(&protocol->connections, conn);
+        else {
+            L(
+                chirp,
+                "Error: closing unknown connection. ch_connection_t:%p "
+                "ch_chirp_t:%p",
+                conn,
+                chirp
+            );
+        }
+    }
     conn->flags &= ~CH_CN_BUF_USED;
     // ch_chirp_close_ts(chirp);
 }

@@ -11,6 +11,8 @@
 
 #include "sglib.h"
 
+#include <openssl/bio.h>
+
 // .. c:type:: ch_cn_flags_t
 //
 //    Represents connection flags.
@@ -58,6 +60,8 @@ typedef struct ch_connection_s {
     uv_timer_t              shutdown_timeout;
     int8_t                  shutdown_tasks;
     uint8_t                 flags;
+    BIO*                    bio_ssl;
+    BIO*                    bio_app;
     char                    color_field;
     struct ch_connection_s* left;
     struct ch_connection_s* right;
@@ -80,14 +84,6 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
 
 // .. c:function::
 void
-ch_cn_close_cb(uv_handle_t* handle);
-//
-//    Called by libuv after closing a handle.
-//
-//    TODO params
-//
-// .. c:function::
-void
 ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
 //
 //    Allocates a buffer on the connection and reuses it for each subsequent
@@ -104,10 +100,10 @@ ch_cn_shutdown(ch_connection_t* conn);
 //    TODO params
 //
 // .. c:function::
-void
-ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
+ch_error_t
+ch_cn_shutdown_end(ch_connection_t* conn);
 //
-//    Called by libuv after shutting a connection down.
+//    Shutdown this connection. Used when closing chirp.
 //
 //    TODO params
 //
