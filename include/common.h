@@ -60,6 +60,12 @@
                 __LINE__, \
                 ##__VA_ARGS__ \
             ); \
+            if(chirp->_log == NULL) { \
+                assert(condition); \
+                /* Since we check the condition twice, check for bad asserts*/ \
+                fprintf(stderr, "Bad assert: condition not stable\n"); \
+                assert(0); \
+            } \
             return CH_VALUE_ERROR; \
         } \
     } while(0)
@@ -119,10 +125,7 @@
                 __LINE__, \
                 ##__VA_ARGS__ \
             ); \
-            assert(condition); \
-            /* Since we check the condition twice, check for bad asserts*/ \
-            fprintf(stderr, "Bad assert: condition not stable\n"); \
-            assert(0); \
+            return CH_VALUE_ERROR; \
         } \
     } while(0)
 #   define L(chrip, message, ...) (void)(chirp); (void)(message)

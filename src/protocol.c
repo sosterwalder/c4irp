@@ -213,9 +213,10 @@ ch_pr_start(ch_protocol_t* protocol)
     if(tmp_err != CH_SUCCESS) {
         fprintf(
             stderr,
-            "%s:%d Fatal: cannot bind port (ipv4). ch_chirp_t:%p\n",
+            "%s:%d Fatal: cannot bind port (ipv4:%d). ch_chirp_t:%p\n",
             __FILE__,
             __LINE__,
+            config->PORT,
             chirp
         );
         return tmp_err;  // NOCOV UV_EADDRINUSE can happen in tcp_bind or
@@ -231,9 +232,10 @@ ch_pr_start(ch_protocol_t* protocol)
     ) < 0) {
         fprintf(
             stderr,
-            "%s:%d Fatal: cannot listen port (ipv4). ch_chirp_t:%p\n",
+            "%s:%d Fatal: cannot listen port (ipv4:%d). ch_chirp_t:%p\n",
             __FILE__,
             __LINE__,
+            config->PORT,
             chirp
         );
         return CH_EADDRINUSE;
@@ -258,9 +260,10 @@ ch_pr_start(ch_protocol_t* protocol)
     if(tmp_err != CH_SUCCESS) {
         fprintf(
             stderr,
-            "%s:%d Fatal: cannot bind port (ipv6). ch_chirp_t:%p\n",
+            "%s:%d Fatal: cannot bind port (ipv6:%d). ch_chirp_t:%p\n",
             __FILE__,
             __LINE__,
+            config->PORT,
             chirp
         );
         return tmp_err; // NOCOV errors happend for IPV4
@@ -275,9 +278,10 @@ ch_pr_start(ch_protocol_t* protocol)
     ) < 0) {
         fprintf(
             stderr,
-            "%s:%d Fatal: cannot listen port (ipv6). ch_chirp_t:%p\n",
+            "%s:%d Fatal: cannot listen port (ipv6:%d). ch_chirp_t:%p\n",
             __FILE__,
             __LINE__,
+            config->PORT,
             chirp
         );
         return CH_EADDRINUSE; // NOCOV errors happend for IPV4

@@ -50,6 +50,7 @@ class ChirpPool(object):
         self._c_config  = ffi.new("ch_config_t*")
         self._chirp     = ffi.new("ch_chirp_t*")
         self._loop      = ffi.new("uv_loop_t*")
+        self._cert_str  = None
         self._thread    = None
         self._pool      = None
         self._uv_ret    = 0
@@ -116,9 +117,10 @@ class ChirpPool(object):
                     std_attr,
                 )
             )
-        c_conf.CERT_CHAIN_PEM = ffi.new(
+        self._cert_str = ffi.new(
             "char[]", conf.CERT_CHAIN_PEM.encode("UTF-8")
         )
+        c_conf.CERT_CHAIN_PEM = self._cert_str
 
 if sys.version_info > (3, 4):
 

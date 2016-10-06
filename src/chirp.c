@@ -120,6 +120,7 @@ _ch_chirp_check_closing_cb(uv_prepare_t* handle)
     );
     if(ichirp->closing_tasks == 0) {
         assert(uv_prepare_stop(handle) == CH_SUCCESS);
+        assert(ch_en_stop(&ichirp->encryption) == CH_SUCCESS);
         uv_close((uv_handle_t*) handle, _ch_chirp_closing_down_cb);
     }
 }
@@ -165,7 +166,6 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
     }
     L(chirp, "Chirp closing callback called. ch_chirp_t:%p", chirp);
     assert(ch_pr_stop(&ichirp->protocol) == CH_SUCCESS);
-    assert(ch_en_stop(&ichirp->encryption) == CH_SUCCESS);
     uv_close((uv_handle_t*) &ichirp->close, ch_chirp_close_cb);
     ichirp->closing_tasks += 1;
     assert(uv_prepare_init(ichirp->loop, &ichirp->close_check) == CH_SUCCESS);

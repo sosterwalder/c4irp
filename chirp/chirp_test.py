@@ -1,4 +1,6 @@
 """Testing the chirp object."""
+import os
+import pytest
 import threading
 import time
 from contextlib import contextmanager
@@ -50,6 +52,16 @@ def basic_uv():
     config = ffi.new("ch_config_t*")
     loop = ffi.new("uv_loop_t*")
     lib.ch_chirp_config_init(config)
+    folder = __file__.split(os.path.sep)[:-1]
+    folder.append("cert.pem")
+    cert = "%s%s" % (
+        os.path.sep,
+        os.path.join(*folder)
+    )
+    cert_str = ffi.new(
+        "char[]", cert.encode("UTF-8")
+    )
+    config.CERT_CHAIN_PEM = cert_str
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
     error = lib.ch_chirp_init(
         chirp,
@@ -57,7 +69,8 @@ def basic_uv():
         loop,
         lib.python_log_cb
     )
-    lib.ch_chirp_set_auto_stop(chirp)
+    if error == lib.CH_SUCCESS:
+        lib.ch_chirp_set_auto_stop(chirp)
     yield error
     if error == lib.CH_SUCCESS:
         assert lib.ch_chirp_close_ts(chirp) == lib.CH_SUCCESS
@@ -67,12 +80,13 @@ def basic_uv():
 
 def test_init_bad_port_low():
     """Test if init with bad port throws CH_VALUE_ERROR."""
-    init_bad_port(-123)
+    init_bad_port(123)
 
 
 def test_init_bad_port_high():
     """Test if init with bad port throws CH_VALUE_ERROR."""
-    init_bad_port(65536)
+    with pytest.raises(OverflowError):
+        init_bad_port(65536)
 
 
 def init_bad_port(port):
@@ -81,6 +95,16 @@ def init_bad_port(port):
     loop = ffi.new("uv_loop_t*")
     config = ffi.new("ch_config_t*")
     lib.ch_chirp_config_init(config)
+    folder = __file__.split(os.path.sep)[:-1]
+    folder.append("cert.pem")
+    cert = "%s%s" % (
+        os.path.sep,
+        os.path.join(*folder)
+    )
+    cert_str = ffi.new(
+        "char[]", cert.encode("UTF-8")
+    )
+    config.CERT_CHAIN_PEM = cert_str
     assert config.PORT == 2998
     config.PORT = port
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
@@ -95,6 +119,16 @@ def test_chirp_run():
     chirp = ffi.new("ch_chirp_t**")
     config = ffi.new("ch_config_t*")
     lib.ch_chirp_config_init(config)
+    folder = __file__.split(os.path.sep)[:-1]
+    folder.append("cert.pem")
+    cert = "%s%s" % (
+        os.path.sep,
+        os.path.join(*folder)
+    )
+    cert_str = ffi.new(
+        "char[]", cert.encode("UTF-8")
+    )
+    config.CERT_CHAIN_PEM = cert_str
 
     def run():
         """Run chirp in a thread."""
