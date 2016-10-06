@@ -41,6 +41,13 @@
 #ifndef NDEBUG
 #   define V(chirp, condition, message, ...) do { \
         if(!(condition)) { \
+            fprintf( \
+                stderr, \
+                "%s:%d " message "\n", \
+                __FILE__, \
+                __LINE__, \
+                ##__VA_ARGS__ \
+            ); \
             if(chirp->_log != NULL) { \
                 char buf[1024]; \
                 snprintf( \
@@ -52,15 +59,7 @@
                     ##__VA_ARGS__ \
                 ); \
                 chirp->_log(buf); \
-            } \
-            fprintf( \
-                stderr, \
-                "%s:%d " message "\n", \
-                __FILE__, \
-                __LINE__, \
-                ##__VA_ARGS__ \
-            ); \
-            if(chirp->_log == NULL) { \
+            } else { \
                 assert(condition); \
                 /* Since we check the condition twice, check for bad asserts*/ \
                 fprintf(stderr, "Bad assert: condition not stable\n"); \
@@ -106,6 +105,13 @@
 #else //NDEBUG
 #   define V(chirp, condition, message, ...) do { \
         if(!(condition)) { \
+            fprintf( \
+                stderr, \
+                "%s:%d " message "\n", \
+                __FILE__, \
+                __LINE__, \
+                ##__VA_ARGS__ \
+            ); \
             if(chirp->_log != NULL) { \
                 char buf[1024]; \
                 snprintf( \
@@ -118,13 +124,6 @@
                 ); \
                 chirp->_log(buf); \
             } \
-            fprintf( \
-                stderr, \
-                "%s:%d " message "\n", \
-                __FILE__, \
-                __LINE__, \
-                ##__VA_ARGS__ \
-            ); \
             return CH_VALUE_ERROR; \
         } \
     } while(0)
