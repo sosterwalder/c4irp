@@ -36,6 +36,54 @@ _ch_cn_close_cb(uv_handle_t* handle);
 static
 ch_inline
 void
+_ch_cn_shutdown_gen_cb(
+        uv_shutdown_t* req,
+        int status,
+        uv_close_cb close_cb
+);
+//
+//    Generic version of the shutdown callback, called by ch_cn_shutdown_cb and
+//    ch_ch_shutdown_end_cb.
+//
+//    :param uv_shutdown_t* req: Shutdown request type, holding the
+//                               connection handle
+//    :param int status: The status after the shutdown. 0 in case of
+//                       success, < 0 otherwise
+//    :param uv_close_cb close_cb: Callback which will be called
+//                                 asynchronously after uv_close
+//                                 has been called
+
+// .. c:function::
+static
+void
+_ch_cn_shutdown_timeout_cb(uv_timer_t* handle);
+//
+//    Called after shutdown timeout. Closing the connection even though
+//    shutdown was delayed.
+//
+//    :param uv_timer_t* handle: Timer handle to schedule callback
+
+// .. c:function::
+static
+ch_inline
+void
+_ch_cn_shutdown_timeout_gen_cb(
+                               uv_timer_t* handle,
+                               uv_shutdown_cb shutdown_cb
+                               );
+//
+//    Generic version of the shutdown callback, called by
+//    _ch_cn_shutdown_timeout_cb and _ch_cn_shutdown_timeout_end_cb.
+//
+//    :param uv_timer_t* handle: Timer handle to schedule callback
+//    :param uv_shutdown_cb shutdown_cb: Callback which gets called
+//                                       after the shutdown is
+//                                       complete
+
+// .. c:function::
+static
+ch_inline
+void
 _ch_cn_close_cb(uv_handle_t* handle)
 //    :noindex:
 //
@@ -75,26 +123,6 @@ _ch_cn_close_cb(uv_handle_t* handle)
     }
 }
 
-// .. c:function::
-static
-ch_inline
-void
-_ch_cn_shutdown_gen_cb(
-        uv_shutdown_t* req,
-        int status,
-        uv_close_cb close_cb
-);
-//
-//    Generic version of the shutdown callback, called by ch_cn_shutdown_cb and
-//    ch_ch_shutdown_end_cb.
-//
-//    :param uv_shutdown_t* req: Shutdown request type, holding the
-//                               connection handle
-//    :param int status: The status after the shutdown. 0 in case of
-//                       success, < 0 otherwise
-//    :param uv_close_cb close_cb: Callback which will be called
-//                                 asynchronously after uv_close
-//                                 has been called
 
 // .. c:function:
 static
@@ -289,22 +317,26 @@ _ch_cn_shutdown_gen(
     return CH_SUCCESS;
 }
 
-// .. c:function::
+// .. c:function:
 static
-ch_inline
 void
-_ch_cn_shutdown_timeout_gen_cb(
-        uv_timer_t* handle,
-        uv_shutdown_cb shutdown_cb
-);
+_ch_cn_shutdown_timeout_cb(uv_timer_t* handle)
+//    :noindex:
 //
-//    Generic version of the shutdown callback, called by
-//    _ch_cn_shutdown_timeout_cb and _ch_cn_shutdown_timeout_end_cb.
+//    see: :c:func:`_ch_cn_shutdown_timeout_cb`
 //
-//    :param uv_timer_t* handle: Timer handle to schedule callback
-//    :param uv_shutdown_cb shutdown_cb: Callback which gets called
-//                                       after the shutdown is
-//                                       complete
+// .. code-block:: cpp
+//
+{
+  ch_connection_t* conn = handle->data;
+  ch_chirp_t* chirp = conn->chirp;
+  A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+  return _ch_cn_shutdown_timeout_gen_cb(
+                                        handle,
+                                        _ch_cn_shutdown_cb
+                                        );
+
+}
 
 // .. c:function:
 static
@@ -340,38 +372,6 @@ _ch_cn_shutdown_timeout_gen_cb(
         );
     }
     L(chirp, "Shutdown timed out closing. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
-}
-
-// .. c:function::
-static
-void
-_ch_cn_shutdown_timeout_cb(uv_timer_t* handle);
-//
-//    Called after shutdown timeout. Closing the connection even though
-//    shutdown was delayed.
-//
-//    :param uv_timer_t* handle: Timer handle to schedule callback
-
-
-// .. c:function:
-static
-void
-_ch_cn_shutdown_timeout_cb(uv_timer_t* handle)
-//    :noindex:
-//
-//    see: :c:func:`_ch_cn_shutdown_timeout_cb`
-//
-// .. code-block:: cpp
-//
-{
-    ch_connection_t* conn = handle->data;
-    ch_chirp_t* chirp = conn->chirp;
-    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    return _ch_cn_shutdown_timeout_gen_cb(
-        handle,
-        _ch_cn_shutdown_cb
-    );
-
 }
 
 // .. c:function::
