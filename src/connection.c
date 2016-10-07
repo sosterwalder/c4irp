@@ -21,6 +21,9 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     CH_CONNECTION_CMP
 );
 
+// Declarations
+// ============
+
 // .. c:function::
 static
 ch_inline
@@ -31,6 +34,41 @@ _ch_cn_close_cb(uv_handle_t* handle);
 //
 //    :param uv_handle_t* handle: The libuv handle holding the
 //                                connection
+
+// .. c:function::
+static
+void
+_ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
+//
+//    Called by libuv after shutting a connection down.
+//
+//    :param uv_shutdown_t* req: Shutdown request type, holding the
+//                               connection handle
+//    :param int status: The status after the shutdown. 0 in case of
+//                       success, < 0 otherwise
+
+// .. c:function::
+static
+ch_inline
+ch_error_t
+_ch_cn_shutdown_gen(
+    ch_connection_t* conn,
+    uv_shutdown_cb shutdown_cb,
+    uv_timer_cb timer_cb
+);
+//
+//    Generic version of shutdown, called by ch_cn_shutdown and
+//    ch_ch_shutdown_end.
+//
+//    :param ch_connection_t* conn: Connection dictionary holding a
+//                                  chirp instance.
+//    :param uv_shutdown_cb shutdown_cb: Callback which gets called
+//                                       after the shutdown is
+//                                       complete
+//    :param uv_timer_cb timer_cb: Callback which gets called after
+//                                 the timer has reached 0
+//    :return: A chirp error. see: :c:type:`ch_error_t`
+//    :rtype: ch_error_t
 
 // .. c:function::
 static
@@ -79,6 +117,9 @@ _ch_cn_shutdown_timeout_gen_cb(
 //    :param uv_shutdown_cb shutdown_cb: Callback which gets called
 //                                       after the shutdown is
 //                                       complete
+
+// Definitions
+// ===========
 
 // .. c:function::
 static
@@ -183,18 +224,6 @@ _ch_cn_shutdown_gen_cb(
     }
 }
 
-// .. c:function::
-static
-void
-_ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
-//
-//    Called by libuv after shutting a connection down.
-//
-//    :param uv_shutdown_t* req: Shutdown request type, holding the
-//                               connection handle
-//    :param int status: The status after the shutdown. 0 in case of
-//                       success, < 0 otherwise
-
 // .. c:function:
 static
 void
@@ -215,29 +244,6 @@ _ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
                                 _ch_cn_close_cb
                                 );
 }
-
-// .. c:function::
-static
-ch_inline
-ch_error_t
-_ch_cn_shutdown_gen(
-    ch_connection_t* conn,
-    uv_shutdown_cb shutdown_cb,
-    uv_timer_cb timer_cb
-);
-//
-//    Generic version of shutdown, called by ch_cn_shutdown and
-//    ch_ch_shutdown_end.
-//
-//    :param ch_connection_t* conn: Connection dictionary holding a
-//                                  chirp instance.
-//    :param uv_shutdown_cb shutdown_cb: Callback which gets called
-//                                       after the shutdown is
-//                                       complete
-//    :param uv_timer_cb timer_cb: Callback which gets called after
-//                                 the timer has reached 0
-//    :return: A chirp error. see: :c:type:`ch_error_t`
-//    :rtype: ch_error_t
 
 // .. c:function:
 static

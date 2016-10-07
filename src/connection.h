@@ -7,16 +7,16 @@
 #ifndef ch_connection_h
 #define ch_connection_h
 
+// ================
+// Project includes
+// ================
+#include "../include/message.h"
+
 // ===============
 // System includes
 // ===============
 #include <openssl/bio.h>
 #include "sglib.h"
-
-// ================
-// Project includes
-// ================
-#include "../include/message.h"
 
 // .. c:type:: ch_cn_flags_t
 //
