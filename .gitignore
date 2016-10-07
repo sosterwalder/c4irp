@@ -1,4 +1,5 @@
 /.deps
+/tags
 /.python-version
 __pycache__
 *.o
