@@ -3,15 +3,20 @@
 // =================
 //
 // .. code-block:: cpp
-
+//
 #ifndef ch_connection_h
 #define ch_connection_h
 
-#include "../include/message.h"
-
+// ===============
+// System includes
+// ===============
+#include <openssl/bio.h>
 #include "sglib.h"
 
-#include <openssl/bio.h>
+// ================
+// Project includes
+// ================
+#include "../include/message.h"
 
 // .. c:type:: ch_cn_flags_t
 //
@@ -89,16 +94,26 @@ ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
 //    Allocates a buffer on the connection and reuses it for each subsequent
 //    reads.
 //
-//    TODO params
-//
+//    :param uv_handle_t* handle: The libuv handle holding the
+//                                connection
+//    :param size_ti suggested_size: The size of the connection buffer
+//                                   in bit (unsigned integer, at
+//                                   least 16 bit). This is used if
+//                                   the buffer needs to be allocated
+//    :param uv_buf_t* buf: Libuv buffer which will hold the
+//                          connection
+
 // .. c:function::
 ch_error_t
 ch_cn_shutdown(ch_connection_t* conn);
 //
 //    Shutdown this connection.
 //
-//    TODO params
-//
+//    :param ch_connection_t* conn: Connection dictionary holding a
+//                                  chirp instance.
+//    :return: A chirp error. see: :c:type:`ch_error_t`
+//    :rtype: ch_error_t
+
 // .. c:function::
 static
 ch_inline
@@ -107,8 +122,13 @@ ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
 //
 //    Compare operator for connections.
 //
-//    :param ch_connection_t* x: x
-//    :param ch_connection_t* y: y
+//    :param ch_connection_t* x: First connection instance to compare
+//    :param ch_connection_t* y: Second connection instance to compare
+//    :return: the comparision between
+//                 - the IP protocols, if they are not the same, or
+//                 - the addresses, if they are not the same, or
+//                 - the ports
+//    :rtype: int
 //
 // .. code-block:: cpp
 //
@@ -124,6 +144,7 @@ ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
         }
     }
 }
+
 // .. c:function::
 static
 ch_inline
