@@ -195,7 +195,7 @@ ch_chirp_close_cb(uv_handle_t* handle)
     chirp->_->closing_tasks -= 1;
     L(
         chirp,
-        "Decr closing semaphore to (%d). uv_handle_t:%p, ch_chirp_t:%p",
+        "Closing semaphore (%d). uv_handle_t:%p, ch_chirp_t:%p",
         chirp->_->closing_tasks,
         handle,
         chirp

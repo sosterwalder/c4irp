@@ -70,7 +70,7 @@ _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
             t != NULL;
             t = sglib_ch_connection_t_it_next(&it) // NOCOV TODO remove
     ) {
-        ch_cn_shutdown_end(t);
+        ch_cn_shutdown(t);
     } // NOCOV TODO remove
 }
 

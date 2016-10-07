@@ -100,14 +100,6 @@ ch_cn_shutdown(ch_connection_t* conn);
 //    TODO params
 //
 // .. c:function::
-ch_error_t
-ch_cn_shutdown_end(ch_connection_t* conn);
-//
-//    Shutdown this connection. Used when closing chirp.
-//
-//    TODO params
-//
-// .. c:function::
 static
 ch_inline
 int

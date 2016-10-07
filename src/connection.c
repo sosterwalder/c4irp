@@ -23,24 +23,11 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
 
 // .. c:function::
 static
-void
-_ch_cn_close_end_cb(uv_handle_t* handle);
-//
-//    Called by libuv after closing a handle. Used when closing chirp.
-//
-//    TODO params
-//
-// .. c:function::
-static
 ch_inline
 void
-_ch_cn_close_gen_cb(
-        uv_handle_t* handle,
-        char is_ending
-);
+_ch_cn_close_cb(uv_handle_t* handle);
 //
-//    Generic version of close cb. Called by _ch_cn_close_cb and
-//    _ch_cn_close_end_cb
+//    Called by libuv after closing a connection handle.
 //
 //    TODO params
 //
@@ -55,23 +42,12 @@ _ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
 //
 // .. c:function::
 static
-void
-_ch_cn_shutdown_end_cb(uv_shutdown_t* req, int status);
-//
-//    Called by libuv after shutting a connection down. Used when closing
-//    chirp.
-//
-//    TODO params
-//
-// .. c:function::
-static
 ch_inline
 ch_error_t
 _ch_cn_shutdown_gen(
     ch_connection_t* conn,
     uv_shutdown_cb shutdown_cb,
-    uv_timer_cb timer_cb,
-    char is_ending
+    uv_timer_cb timer_cb
 );
 //
 //    Generic version of shutdown, called by ch_cn_shutdown and
@@ -84,8 +60,7 @@ void
 _ch_cn_shutdown_gen_cb(
         uv_shutdown_t* req,
         int status,
-        uv_close_cb close_cb,
-        char is_ending
+        uv_close_cb close_cb
 );
 //
 //    Generic version of the shutdown callback, called by ch_cn_shutdown_cb and
@@ -112,8 +87,7 @@ ch_inline
 void
 _ch_cn_shutdown_timeout_gen_cb(
         uv_timer_t* handle,
-        uv_shutdown_cb shutdown_cb,
-        char is_ending
+        uv_shutdown_cb shutdown_cb
 );
 //
 //    Generic version of the shutdown callback, called by
@@ -126,7 +100,7 @@ void
 _ch_cn_close_cb(uv_handle_t* handle)
 //    :noindex:
 //
-//    see: :c:func:`ch_cn_close_cb`
+//    see: :c:func:`_ch_cn_close_cb`
 //
 // .. code-block:: cpp
 //
@@ -134,42 +108,8 @@ _ch_cn_close_cb(uv_handle_t* handle)
     ch_connection_t* conn = handle->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    return _ch_cn_close_gen_cb(handle, 0);
-}
-// .. c:function::
-static
-void
-_ch_cn_close_end_cb(uv_handle_t* handle)
-//    :noindex:
-//
-//    see: :c:func:`ch_cn_close_end_cb`
-//
-// .. code-block:: cpp
-//
-{
-    ch_connection_t* conn = handle->data;
-    ch_chirp_t* chirp = conn->chirp;
-    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    return _ch_cn_close_gen_cb(handle, 1);
-}
-// .. c:function::
-static
-ch_inline
-void
-_ch_cn_close_gen_cb(
-        uv_handle_t* handle,
-        char is_ending
-)
-//    :noindex:
-//
-//    see: :c:func:`_ch_cn_close_gen_cb`
-//
-// .. code-block:: cpp
-//
-{
-    ch_connection_t* conn = handle->data;
-    ch_chirp_t* chirp = conn->chirp;
-    if(is_ending)
+    ch_chirp_int_t* ichirp = chirp->_;
+    if(ichirp->flags & CH_CHIRP_CLOSING)
         chirp->_->closing_tasks -= 1;
     conn->shutdown_tasks -= 1;
     A(conn->shutdown_tasks > -1, "Shutdown semaphore dropped below zero");
@@ -244,8 +184,7 @@ ch_cn_shutdown(ch_connection_t* conn)
     return _ch_cn_shutdown_gen(
         conn,
         _ch_cn_shutdown_cb,
-        _ch_cn_shutdown_timeout_cb,
-        0
+        _ch_cn_shutdown_timeout_cb
     );
 }
 
@@ -266,27 +205,7 @@ _ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
     return _ch_cn_shutdown_gen_cb(
         req,
         status,
-        _ch_cn_close_cb,
-        0
-    );
-}
-// .. c:function::
-ch_error_t
-ch_cn_shutdown_end(ch_connection_t* conn)
-//    :noindex:
-//
-//    see: :c:func:`ch_cn_shutdown_end`
-//
-// .. code-block:: cpp
-//
-{
-    ch_chirp_t* chirp = conn->chirp;
-    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    return _ch_cn_shutdown_gen(
-        conn,
-        _ch_cn_shutdown_end_cb,
-        _ch_cn_shutdown_timeout_end_cb,
-        1
+        _ch_cn_close_cb
     );
 }
 
@@ -297,10 +216,9 @@ ch_error_t
 _ch_cn_shutdown_gen(
     ch_connection_t* conn,
     uv_shutdown_cb shutdown_cb,
-    uv_timer_cb timer_cb,
-    char is_ending
+    uv_timer_cb timer_cb
 )
-//    :noindex:
+//
 //
 //    see: :c:func:`_ch_cn_shutdown_gen`
 //
@@ -347,7 +265,7 @@ _ch_cn_shutdown_gen(
             chirp
         );
     }
-    if(is_ending)
+    if(ichirp->flags & CH_CHIRP_CLOSING)
         chirp->_->closing_tasks += 1;
     conn->shutdown_timeout.data = conn;
     tmp_err = uv_timer_start(
@@ -372,34 +290,12 @@ _ch_cn_shutdown_gen(
 
 // .. c:function:
 static
-void
-_ch_cn_shutdown_end_cb(uv_shutdown_t* req, int status)
-//    :noindex:
-//
-//    see: :c:func:`_ch_cn_shutdown_end_cb`
-//
-// .. code-block:: cpp
-//
-{
-    ch_connection_t* conn = req->handle->data;
-    ch_chirp_t* chirp = conn->chirp;
-    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    return _ch_cn_shutdown_gen_cb(
-        req,
-        status,
-        _ch_cn_close_end_cb,
-        1
-    );
-}
-// .. c:function:
-static
 ch_inline
 void
 _ch_cn_shutdown_gen_cb(
         uv_shutdown_t* req,
         int status,
-        uv_close_cb close_cb,
-        char is_ending
+        uv_close_cb close_cb
 )
 //    :noindex:
 //
@@ -411,6 +307,7 @@ _ch_cn_shutdown_gen_cb(
     int tmp_err;
     ch_connection_t* conn = req->handle->data;
     ch_chirp_t* chirp = conn->chirp;
+    ch_chirp_int_t* ichirp = chirp->_;
     L(chirp, "Shutdown callback called. ch_connection_t:%p, ch_chirp_t:%p", conn,  chirp);
     tmp_err = uv_timer_stop(&conn->shutdown_timeout);
     if(tmp_err != CH_SUCCESS) {
@@ -425,7 +322,7 @@ _ch_cn_shutdown_gen_cb(
     }
     uv_handle_t* handle = (uv_handle_t*) req->handle;
     if(uv_is_closing(handle)) {
-        if(is_ending)
+        if(ichirp->flags & CH_CHIRP_CLOSING)
             chirp->_->closing_tasks -= 1;
         L(
             chirp,
@@ -437,7 +334,7 @@ _ch_cn_shutdown_gen_cb(
     } else {
         uv_close((uv_handle_t*) req->handle, close_cb);
         uv_close((uv_handle_t*) &conn->shutdown_timeout, close_cb);
-        if(is_ending)
+        if(ichirp->flags & CH_CHIRP_CLOSING)
             chirp->_->closing_tasks += 1;
         conn->shutdown_tasks += 2;
         L(
@@ -465,40 +362,18 @@ _ch_cn_shutdown_timeout_cb(uv_timer_t* handle)
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     return _ch_cn_shutdown_timeout_gen_cb(
         handle,
-        _ch_cn_shutdown_cb,
-        0
+        _ch_cn_shutdown_cb
     );
 
 }
-// .. c:function:
-static
-void
-_ch_cn_shutdown_timeout_end_cb(uv_timer_t* handle)
-//    :noindex:
-//
-//    see: :c:func:`ch_cn_shutdown_timeout_end_cb`
-//
-// .. code-block:: cpp
-//
-{
-    ch_connection_t* conn = handle->data;
-    ch_chirp_t* chirp = conn->chirp;
-    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    return _ch_cn_shutdown_timeout_gen_cb(
-        handle,
-        _ch_cn_shutdown_end_cb,
-        1
-    );
 
-}
 // .. c:function:
 static
 ch_inline
 void
 _ch_cn_shutdown_timeout_gen_cb(
         uv_timer_t* handle,
-        uv_shutdown_cb shutdown_cb,
-        char is_ending
+        uv_shutdown_cb shutdown_cb
 )
 //    :noindex:
 //
@@ -510,7 +385,8 @@ _ch_cn_shutdown_timeout_gen_cb(
     int tmp_err;
     ch_connection_t* conn = handle->data;
     ch_chirp_t* chirp = conn->chirp;
-    if(is_ending)
+    ch_chirp_int_t* ichirp = chirp->_;
+    if(ichirp->flags & CH_CHIRP_CLOSING)
         chirp->_->closing_tasks -= 1;
     shutdown_cb(&conn->shutdown_req, 1);
     tmp_err = uv_cancel((uv_req_t*) &conn->shutdown_req);
