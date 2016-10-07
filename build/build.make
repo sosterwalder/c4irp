@@ -65,7 +65,11 @@ endif
 endif
 
 clean-coverage: $(OBJS) $(COMMON) libchirp.a
+ifeq ($(UNAME_S),Darwin)
+	find . -name "*.gcda" -print0 | xargs -0 rm
+else
 	find . -name "*.gcda" -print0 | xargs -r -0 rm
+endif
 
 libuv.a: $(LIBUVD)/.libs/libuv.a
 	cp  $(LIBUVD)/.libs/libuv.a libuv.a
