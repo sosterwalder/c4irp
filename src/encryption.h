@@ -94,4 +94,5 @@ ch_en_stop(ch_encryption_t* enc);
 //    TODO params
 //
 // .. code-block:: cpp
+//
 #endif //ch_encryption_h
