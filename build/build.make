@@ -41,7 +41,7 @@ else
 endif
 OBJS=$(SRCS:.c=.o)
 
-build: $(BUILDS)
+build: $(BUILDS) clean-coverage
 
 libchirp-depends: | libuv
 
@@ -63,6 +63,9 @@ else
 	strip --strip-debug $@
 endif
 endif
+
+clean-coverage: $(OBJS) $(COMMON) libchirp.a
+	find . -name "*.gcda" -print0 | xargs -0 rm
 
 libuv.a: $(LIBUVD)/.libs/libuv.a
 	cp  $(LIBUVD)/.libs/libuv.a libuv.a
