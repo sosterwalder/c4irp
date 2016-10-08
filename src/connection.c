@@ -165,7 +165,7 @@ _ch_cn_close_cb(uv_handle_t* handle)
 }
 
 
-// .. c:function:
+// .. c:function::
 static
 ch_inline
 void
@@ -224,7 +224,7 @@ _ch_cn_shutdown_gen_cb(
     }
 }
 
-// .. c:function:
+// .. c:function::
 static
 void
 _ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
@@ -245,7 +245,7 @@ _ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
                                 );
 }
 
-// .. c:function:
+// .. c:function::
 static
 ch_inline
 ch_error_t
@@ -323,7 +323,7 @@ _ch_cn_shutdown_gen(
     return CH_SUCCESS;
 }
 
-// .. c:function:
+// .. c:function::
 static
 void
 _ch_cn_shutdown_timeout_cb(uv_timer_t* handle)
@@ -344,7 +344,7 @@ _ch_cn_shutdown_timeout_cb(uv_timer_t* handle)
 
 }
 
-// .. c:function:
+// .. c:function::
 static
 ch_inline
 void
