@@ -1,5 +1,5 @@
 // =============
-// Common header
+// Common Header
 // =============
 //
 // I know common headers aren't good style but Windows is forcing me.
