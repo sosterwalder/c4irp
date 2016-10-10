@@ -8,6 +8,8 @@
 #include "chirp.h"
 #include "util.h"
 
+#include <openssl/err.h>
+
 // Sglib Prototypes
 // ================
 //
@@ -393,6 +395,7 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn)
     conn->chirp = chirp;
     conn->ssl = SSL_new(ichirp->encryption.ssl_ctx);
     if(conn->ssl == NULL) {
+        ERR_print_errors_fp(stderr);
         E(
             chirp,
             "Could not create SSL. ch_chirp_t:%p, ch_connection_t:%p",
@@ -402,6 +405,7 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn)
         return CH_TLS_ERROR;
     }
     if(BIO_new_bio_pair(&(conn->bio_ssl), 0, &(conn->bio_app), 0) != 1) {
+        ERR_print_errors_fp(stderr);
         E(
             chirp,
             "Could not create BIO pair. ch_chirp_t:%p, ch_connection_t:%p",
