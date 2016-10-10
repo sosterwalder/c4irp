@@ -26,7 +26,10 @@ main(
     ch_chirp_config_init(&config);
     config.CERT_CHAIN_PEM = "./chirp/cert.pem";
     ch_loop_init(&loop);
-    ch_chirp_init(&chirp, &config, &loop, NULL);
+    if(ch_chirp_init(&chirp, &config, &loop, NULL) != CH_SUCCESS) {
+        printf("ch_chirp_init error\n");
+        return 1;
+    }
     ch_chirp_set_auto_stop(&chirp);
     ch_run(&loop);
     return ch_loop_close(&loop);

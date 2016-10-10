@@ -7,6 +7,8 @@
 #include "chirp.h"
 #include "util.h"
 
+#include <openssl/err.h>
+
 #include <time.h>
 #include <signal.h>
 #include <unistd.h>
@@ -407,6 +409,7 @@ ch_chirp_init(
     ch_en_init(chirp, enc);
     tmp_err = ch_en_start(enc);
     if(tmp_err != CH_SUCCESS) {
+        ERR_print_errors_fp(stderr);
         E(
             chirp,
             "Could not start encryption: %d. ch_chirp_t:%p",

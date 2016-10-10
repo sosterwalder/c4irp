@@ -353,9 +353,12 @@ ch_cn_close_cb(uv_handle_t* handle)
     // In production we allow the semaphore to drop below 0, but we log an
     // error
     if(conn->shutdown_tasks < 1) {
-        if(conn->buffer) {
+        if(conn->buffer != NULL)
             ch_free(conn->buffer);
-        }
+        if(conn->ssl != NULL)
+            SSL_free(conn->ssl); // The doc says this frees conn->bio_ssl
+        if(conn->bio_app != NULL)
+            BIO_free(conn->bio_app);
         ch_free(conn);
         L(
             chirp,
@@ -384,14 +387,28 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn)
 // .. code-block:: cpp
 //
 {
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    ch_chirp_int_t* ichirp = chirp->_;
     memset(conn, 0, sizeof(ch_connection_t));
     conn->chirp = chirp;
+    conn->ssl = SSL_new(ichirp->encryption.ssl_ctx);
+    if(conn->ssl == NULL) {
+        E(
+            chirp,
+            "Could not create SSL. ch_chirp_t:%p, ch_connection_t:%p",
+            chirp,
+            conn
+         );
+        return CH_TLS_ERROR;
+    }
     if(BIO_new_bio_pair(&(conn->bio_ssl), 0, &(conn->bio_app), 0) != 1) {
         E(
             chirp,
-            "Could not create BIO pair. ch_chirp_t:%p",
-            chirp
+            "Could not create BIO pair. ch_chirp_t:%p, ch_connection_t:%p",
+            chirp,
+            conn
          );
+        SSL_free(conn->ssl);
         return CH_TLS_ERROR;
     }
     return CH_SUCCESS;

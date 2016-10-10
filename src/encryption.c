@@ -87,6 +87,7 @@ ch_en_start(ch_encryption_t* enc)
 // .. code-block:: cpp
 //
 { 
+    int tmp_err;
     ch_chirp_t* chirp = enc->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_chirp_int_t* ichirp = chirp->_;
@@ -97,7 +98,15 @@ ch_en_start(ch_encryption_t* enc)
             "Initializing the OpenSSL library. ch_chirp_t:%p",
             chirp
         );
-        return ch_en_openssl_init(&ichirp->config);
+        tmp_err = ch_en_openssl_init(&ichirp->config);
+        if(tmp_err != CH_SUCCESS) {
+            L(
+                chirp,
+                "Could not initialize the OpenSSL library. ch_chirp_t:%p",
+                chirp
+            );
+            return tmp_err;
+        }
     }
     const SSL_METHOD* method = TLSv1_2_method();
     if(method == NULL) {
@@ -152,12 +161,12 @@ ch_en_start(ch_encryption_t* enc)
     if(SSL_CTX_set_cipher_list(
             enc->ssl_ctx,
             "-ALL:"
-            "TLS_RSA_WITH_AES_256_CBC_SHA256:"
-            "TLS_DH_RSA_WITH_AES_256_CBC_SHA256:"
-            "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384:"
-            "TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384:"
-            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384:"
-            "TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384:"
+            "DHE-DSS-AES256-GCM-SHA384:"
+            "DHE-RSA-AES256-GCM-SHA384:"
+            "DHE-RSA-AES256-SHA256:"
+            "DHE-DSS-AES256-SHA256:"
+            "AES256-GCM-SHA384:"
+            "AES256-SHA256"
     ) != 1) {
         E(
             chirp,
@@ -166,6 +175,11 @@ ch_en_start(ch_encryption_t* enc)
         );
         return CH_TLS_ERROR;
     }
+    L(
+        chirp,
+        "Created SSL context for chirp. ch_chirp_t:%p",
+        chirp
+    );
     return CH_SUCCESS;
 }
 
