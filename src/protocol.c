@@ -123,7 +123,7 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
     ch_connection_t* conn = (ch_connection_t*) ch_alloc(
         sizeof(ch_connection_t)
     );
-    ch_connection_init(chirp, conn);
+    ch_cn_init(chirp, conn);
     uv_tcp_t* client = &conn->client;
     uv_tcp_init(server->loop, client);
     client->data = conn;
@@ -137,8 +137,8 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
         );
     }
     else {
-        // TODO uv_close on cleanup and, on close and on remove close
-        // uv_close((uv_handle_t*) client, ch_cn_close_cb);
+        conn->shutdown_tasks = 1;
+        uv_close((uv_handle_t*) client, ch_cn_close_cb);
     }
 }
 

@@ -9,7 +9,8 @@
 
 // Project includes
 // ================
-#include "../include/message.h"
+#include "../include/chirp_obj.h"
+#include "message.h"
 
 // System includes
 // ===============
@@ -36,8 +37,6 @@ typedef enum {
 } ch_cn_flags_t;
 
 
-struct ch_chirp_s;
-
 // .. c:type:: ch_connection_t
 //
 //    Connection dictionary implemented as rbtree.
@@ -58,7 +57,7 @@ typedef struct ch_connection_s {
     uv_tcp_t                client;
     void*                   buffer;
     size_t                  buffer_size;
-    struct ch_chirp_s*      chirp;
+    ch_chirp_t*             chirp;
     uv_shutdown_t           shutdown_req;
     uv_timer_t              shutdown_timeout;
     int8_t                  shutdown_tasks;
@@ -84,6 +83,16 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
     color_field,
     CH_CONNECTION_CMP
 );
+
+// .. c:function::
+void
+ch_cn_close_cb(uv_handle_t* handle);
+//
+//    Called by libuv after closing a connection handle.
+//
+//    :param uv_handle_t* handle: The libuv handle holding the
+//                                connection
+
 
 // .. c:function::
 void
@@ -144,10 +153,8 @@ ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
 }
 
 // .. c:function::
-static
-ch_inline
-void
-ch_connection_init(struct ch_chirp_s* chirp, ch_connection_t* conn)
+ch_error_t
+ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn);
 //
 //    Initialize a connection.
 //
@@ -156,9 +163,5 @@ ch_connection_init(struct ch_chirp_s* chirp, ch_connection_t* conn)
 //
 // .. code-block:: cpp
 //
-{
-    memset(conn, 0, sizeof(ch_connection_t));
-    conn->chirp = chirp;
-}
 
 #endif //ch_connection_h

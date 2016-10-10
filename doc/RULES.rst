@@ -26,7 +26,7 @@ RULES
   - Use natural names and _cb will indicated that it probably happened AFTER
 
 * Callback types end in _cb_t
-* Sort symbols alphabetically ignoring underscores "_"
+* Sort symbols alphabetically including underscores "_"
   - When independent
   - Forward declarations go directly before being used
 

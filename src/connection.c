@@ -26,17 +26,6 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
 
 // .. c:function::
 static
-ch_inline
-void
-_ch_cn_close_cb(uv_handle_t* handle);
-//
-//    Called by libuv after closing a connection handle.
-//
-//    :param uv_handle_t* handle: The libuv handle holding the
-//                                connection
-
-// .. c:function::
-static
 void
 _ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
 //
@@ -52,9 +41,9 @@ static
 ch_inline
 ch_error_t
 _ch_cn_shutdown_gen(
-    ch_connection_t* conn,
-    uv_shutdown_cb shutdown_cb,
-    uv_timer_cb timer_cb
+        ch_connection_t* conn,
+        uv_shutdown_cb shutdown_cb,
+        uv_timer_cb timer_cb
 );
 //
 //    Generic version of shutdown, called by ch_cn_shutdown and
@@ -106,9 +95,9 @@ static
 ch_inline
 void
 _ch_cn_shutdown_timeout_gen_cb(
-                               uv_timer_t* handle,
-                               uv_shutdown_cb shutdown_cb
-                               );
+        uv_timer_t* handle,
+        uv_shutdown_cb shutdown_cb
+);
 //
 //    Generic version of the shutdown callback, called by
 //    _ch_cn_shutdown_timeout_cb and _ch_cn_shutdown_timeout_end_cb.
@@ -122,13 +111,11 @@ _ch_cn_shutdown_timeout_gen_cb(
 // ===========
 
 // .. c:function::
-static
-ch_inline
 void
-_ch_cn_close_cb(uv_handle_t* handle)
+ch_cn_close_cb(uv_handle_t* handle)
 //    :noindex:
 //
-//    see: :c:func:`_ch_cn_close_cb`
+//    see: :c:func:`ch_cn_close_cb`
 //
 // .. code-block:: cpp
 //
@@ -148,8 +135,9 @@ _ch_cn_close_cb(uv_handle_t* handle)
         conn,
         chirp
     );
-
-    if(conn->shutdown_tasks == 0) {
+    // In production we allow the semaphore to drop below 0, but we log an
+    // error
+    if(conn->shutdown_tasks < 1) {
         if(conn->buffer) {
             ch_free(conn->buffer);
         }
@@ -159,6 +147,13 @@ _ch_cn_close_cb(uv_handle_t* handle)
             "Closed connection, closing semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
             chirp->_->closing_tasks,
             conn,
+            chirp
+        );
+    }
+    if(conn->shutdown_tasks < 0) {
+        E(
+            chirp,
+            "Shutdown semaphore dropped blow 0. ch_chirp_t:%p",
             chirp
         );
     }
@@ -235,14 +230,14 @@ _ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
 // .. code-block:: cpp
 //
 {
-  ch_connection_t* conn = req->handle->data;
-  ch_chirp_t* chirp = conn->chirp;
-  A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-  return _ch_cn_shutdown_gen_cb(
-                                req,
-                                status,
-                                _ch_cn_close_cb
-                                );
+    ch_connection_t* conn = req->handle->data;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    return _ch_cn_shutdown_gen_cb(
+        req,
+        status,
+        ch_cn_close_cb
+    );
 }
 
 // .. c:function::
@@ -334,14 +329,13 @@ _ch_cn_shutdown_timeout_cb(uv_timer_t* handle)
 // .. code-block:: cpp
 //
 {
-  ch_connection_t* conn = handle->data;
-  ch_chirp_t* chirp = conn->chirp;
-  A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-  return _ch_cn_shutdown_timeout_gen_cb(
-                                        handle,
-                                        _ch_cn_shutdown_cb
-                                        );
-
+    ch_connection_t* conn = handle->data;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    return _ch_cn_shutdown_timeout_gen_cb(
+        handle,
+        _ch_cn_shutdown_cb
+    );
 }
 
 // .. c:function::
@@ -377,7 +371,27 @@ _ch_cn_shutdown_timeout_gen_cb(
             chirp
         );
     }
-    L(chirp, "Shutdown timed out closing. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
+    L(
+        chirp,
+        "Shutdown timed out closing. ch_connection_t:%p, ch_chirp_t:%p",
+        conn,
+        chirp
+    );
+}
+
+// .. c:function::
+ch_error_t
+ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn)
+//    :noindex:
+//
+//    see: :c:func:`ch_cn_init`
+//
+// .. code-block:: cpp
+//
+{
+    memset(conn, 0, sizeof(ch_connection_t));
+    conn->chirp = chirp;
+    return CH_SUCCESS;
 }
 
 // .. c:function::
