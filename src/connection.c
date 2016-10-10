@@ -111,54 +111,22 @@ _ch_cn_shutdown_timeout_gen_cb(
 // ===========
 
 // .. c:function::
+static
 void
-ch_cn_close_cb(uv_handle_t* handle)
+_ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
 //    :noindex:
 //
-//    see: :c:func:`ch_cn_close_cb`
+//    see: :c:func:`_ch_cn_shutdown_cb`
 //
 // .. code-block:: cpp
 //
 {
-    ch_connection_t* conn = handle->data;
-    ch_chirp_t* chirp = conn->chirp;
-    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    ch_chirp_int_t* ichirp = chirp->_;
-    if(ichirp->flags & CH_CHIRP_CLOSING)
-        chirp->_->closing_tasks -= 1;
-    conn->shutdown_tasks -= 1;
-    A(conn->shutdown_tasks > -1, "Shutdown semaphore dropped below zero");
-    L(
-        chirp,
-        "Shutdown semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
-        conn->shutdown_tasks,
-        conn,
-        chirp
+    return _ch_cn_shutdown_gen_cb(
+        req,
+        status,
+        ch_cn_close_cb
     );
-    // In production we allow the semaphore to drop below 0, but we log an
-    // error
-    if(conn->shutdown_tasks < 1) {
-        if(conn->buffer) {
-            ch_free(conn->buffer);
-        }
-        ch_free(conn);
-        L(
-            chirp,
-            "Closed connection, closing semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
-            chirp->_->closing_tasks,
-            conn,
-            chirp
-        );
-    }
-    if(conn->shutdown_tasks < 0) {
-        E(
-            chirp,
-            "Shutdown semaphore dropped blow 0. ch_chirp_t:%p",
-            chirp
-        );
-    }
 }
-
 
 // .. c:function::
 static
@@ -221,27 +189,6 @@ _ch_cn_shutdown_gen_cb(
 
 // .. c:function::
 static
-void
-_ch_cn_shutdown_cb(uv_shutdown_t* req, int status)
-//    :noindex:
-//
-//    see: :c:func:`_ch_cn_shutdown_cb`
-//
-// .. code-block:: cpp
-//
-{
-    ch_connection_t* conn = req->handle->data;
-    ch_chirp_t* chirp = conn->chirp;
-    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    return _ch_cn_shutdown_gen_cb(
-        req,
-        status,
-        ch_cn_close_cb
-    );
-}
-
-// .. c:function::
-static
 ch_inline
 ch_error_t
 _ch_cn_shutdown_gen(
@@ -258,6 +205,7 @@ _ch_cn_shutdown_gen(
 {
     int tmp_err;
     ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_chirp_int_t* ichirp = chirp->_;
     if(conn->flags & CH_CN_SHUTTING_DOWN) {
         E(
@@ -329,9 +277,6 @@ _ch_cn_shutdown_timeout_cb(uv_timer_t* handle)
 // .. code-block:: cpp
 //
 {
-    ch_connection_t* conn = handle->data;
-    ch_chirp_t* chirp = conn->chirp;
-    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     return _ch_cn_shutdown_timeout_gen_cb(
         handle,
         _ch_cn_shutdown_cb
@@ -353,9 +298,10 @@ _ch_cn_shutdown_timeout_gen_cb(
 // .. code-block:: cpp
 //
 {
-    int tmp_err;
     ch_connection_t* conn = handle->data;
+    int tmp_err;
     ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_chirp_int_t* ichirp = chirp->_;
     if(ichirp->flags & CH_CHIRP_CLOSING)
         chirp->_->closing_tasks -= 1;
@@ -380,6 +326,55 @@ _ch_cn_shutdown_timeout_gen_cb(
 }
 
 // .. c:function::
+void
+ch_cn_close_cb(uv_handle_t* handle)
+//    :noindex:
+//
+//    see: :c:func:`ch_cn_close_cb`
+//
+// .. code-block:: cpp
+//
+{
+    ch_connection_t* conn = handle->data;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    ch_chirp_int_t* ichirp = chirp->_;
+    if(ichirp->flags & CH_CHIRP_CLOSING)
+        chirp->_->closing_tasks -= 1;
+    conn->shutdown_tasks -= 1;
+    A(conn->shutdown_tasks > -1, "Shutdown semaphore dropped below zero");
+    L(
+        chirp,
+        "Shutdown semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
+        conn->shutdown_tasks,
+        conn,
+        chirp
+    );
+    // In production we allow the semaphore to drop below 0, but we log an
+    // error
+    if(conn->shutdown_tasks < 1) {
+        if(conn->buffer) {
+            ch_free(conn->buffer);
+        }
+        ch_free(conn);
+        L(
+            chirp,
+            "Closed connection, closing semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
+            chirp->_->closing_tasks,
+            conn,
+            chirp
+        );
+    }
+    if(conn->shutdown_tasks < 0) {
+        E(
+            chirp,
+            "Shutdown semaphore dropped blow 0. ch_chirp_t:%p",
+            chirp
+        );
+    }
+}
+
+// .. c:function::
 ch_error_t
 ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn)
 //    :noindex:
@@ -391,6 +386,14 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn)
 {
     memset(conn, 0, sizeof(ch_connection_t));
     conn->chirp = chirp;
+    if(BIO_new_bio_pair(&(conn->bio_ssl), 0, &(conn->bio_app), 0) != 1) {
+        E(
+            chirp,
+            "Could not create BIO pair. ch_chirp_t:%p",
+            chirp
+         );
+        return CH_TLS_ERROR;
+    }
     return CH_SUCCESS;
 }
 
@@ -438,8 +441,6 @@ ch_cn_shutdown(ch_connection_t* conn)
 // .. code-block:: cpp
 //
 {
-    ch_chirp_t* chirp = conn->chirp;
-    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     return _ch_cn_shutdown_gen(
         conn,
         _ch_cn_shutdown_cb,

@@ -15,6 +15,7 @@
 // System includes
 // ===============
 #include <openssl/bio.h>
+#include <openssl/ssl.h>
 #include "sglib.h"
 
 // .. c:type:: ch_cn_flags_t
@@ -62,6 +63,7 @@ typedef struct ch_connection_s {
     uv_timer_t              shutdown_timeout;
     int8_t                  shutdown_tasks;
     uint8_t                 flags;
+    SSL                     ssl;
     BIO*                    bio_ssl;
     BIO*                    bio_app;
     char                    color_field;

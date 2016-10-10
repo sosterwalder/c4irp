@@ -123,7 +123,15 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
     ch_connection_t* conn = (ch_connection_t*) ch_alloc(
         sizeof(ch_connection_t)
     );
-    ch_cn_init(chirp, conn);
+    if(ch_cn_init(chirp, conn) != CH_SUCCESS) {
+        E(
+            chirp,
+            "Could not initialize connection. ch_chirp_t:%p",
+            chirp
+         );
+        ch_free(conn);
+        return;
+    }
     uv_tcp_t* client = &conn->client;
     uv_tcp_init(server->loop, client);
     client->data = conn;
