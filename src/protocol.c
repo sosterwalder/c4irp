@@ -165,9 +165,9 @@ _ch_pr_read_data_cb(
         if(sglib_ch_connection_t_is_member(protocol->connections, conn))
             sglib_ch_connection_t_delete(&protocol->connections, conn);
         else {
-            L(
+            E(
                 chirp,
-                "Error: closing unknown connection. ch_connection_t:%p "
+                "Closing unknown connection. ch_connection_t:%p "
                 "ch_chirp_t:%p",
                 conn,
                 chirp

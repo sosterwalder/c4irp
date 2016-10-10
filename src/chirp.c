@@ -118,10 +118,19 @@ _ch_chirp_check_closing_cb(uv_prepare_t* handle)
         ichirp->closing_tasks,
         chirp
     );
-    if(ichirp->closing_tasks == 0) {
+    // In production we allow the semaphore to drop below zero but log it as an
+    // error
+    if(ichirp->closing_tasks < 1) {
         assert(uv_prepare_stop(handle) == CH_SUCCESS);
         assert(ch_en_stop(&ichirp->encryption) == CH_SUCCESS);
         uv_close((uv_handle_t*) handle, _ch_chirp_closing_down_cb);
+    }
+    if(ichirp->closing_tasks < 0) {
+        E(
+            chirp,
+            "Check closing semaphore dropped blow 0. ch_chirp_t:%p",
+            chirp
+        );
     }
 }
 // .. c:function::
@@ -148,18 +157,18 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
 {
     CH_GET_CHIRP(handle);
     if(chirp->_ == NULL) {
-        L(
+        E(
             chirp,
-            "Error: chirp closing callback called on closed. ch_chirp_t:%p",
+            "Chirp closing callback called on closed. ch_chirp_t:%p",
             chirp
         );
         return;
     }
     ch_chirp_int_t* ichirp = chirp->_;
     if(ichirp->flags & CH_CHIRP_CLOSED) {
-        L(
+        E(
             chirp,
-            "Error: chirp closing callback called on closed. ch_chirp_t:%p",
+            "Chirp closing callback called on closed. ch_chirp_t:%p",
             chirp
         );
         return;
@@ -245,13 +254,13 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
         return CH_FATAL;
     }
     if(ichirp->flags & CH_CHIRP_CLOSING) {
-        L(chirp, "Error: close already in progress. ch_chirp_t:%p", chirp);
+        E(chirp, "Close already in progress. ch_chirp_t:%p", chirp);
         return CH_IN_PRORESS;
     }
     ichirp->flags |= CH_CHIRP_CLOSING;
     ichirp->close.data = chirp;
     if(uv_async_send(&ichirp->close) < 0) {
-        L(chirp, "Error: could not call close callback. ch_chirp_t:%p", chirp);
+        E(chirp, "Could not call close callback. ch_chirp_t:%p", chirp);
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this
     }
     return CH_SUCCESS;
@@ -284,9 +293,9 @@ _ch_chirp_closing_down_cb(uv_handle_t* handle)
     if(sglib_ch_chirp_t_is_member(_ch_chirp_instances, chirp))
         sglib_ch_chirp_t_delete(&_ch_chirp_instances, chirp);
     else {
-        L(
+        E(
             chirp,
-            "Error: closing unknown chirp instance. ch_chirp_t:%p",
+            "Closing unknown chirp instance. ch_chirp_t:%p",
             chirp
         );
     }
@@ -372,9 +381,9 @@ ch_chirp_init(
 
 
     if(uv_async_init(loop, &ichirp->close, _ch_chirp_close_async_cb) < 0) {
-        L(
+        E(
             chirp,
-            "Error: Could not initialize close callback. ch_chirp_t:%p",
+            "Could not initialize close callback. ch_chirp_t:%p",
             chirp
         );
         ch_free(ichirp);
@@ -385,9 +394,9 @@ ch_chirp_init(
     ch_pr_init(chirp, protocol);
     tmp_err = ch_pr_start(protocol);
     if(tmp_err != CH_SUCCESS) {
-        L(
+        E(
             chirp,
-            "Error: Could not start protocol: %d. ch_chirp_t:%p",
+            "Could not start protocol: %d. ch_chirp_t:%p",
             tmp_err,
             chirp
         );
@@ -398,9 +407,9 @@ ch_chirp_init(
     ch_en_init(chirp, enc);
     tmp_err = ch_en_start(enc);
     if(tmp_err != CH_SUCCESS) {
-        L(
+        E(
             chirp,
-            "Error: Could not start protocol: %d. ch_chirp_t:%p",
+            "Could not start encryption: %d. ch_chirp_t:%p",
             tmp_err,
             chirp
         );
@@ -417,9 +426,9 @@ ch_chirp_init(
     );
     if(!_ch_chirp_sig_init) {
        if(signal(SIGINT, _ch_chirp_sig_handler) == SIG_ERR) {
-            L(
+            E(
                 chirp,
-                "Error: Unable to set SIGINT handler. ch_chirp_t:%p",
+                "Unable to set SIGINT handler. ch_chirp_t:%p",
                 chirp
             );
        }
@@ -451,9 +460,9 @@ ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp_out)
 
     tmp_err = _ch_uv_error_map(ch_loop_init(&loop));
     if(tmp_err != CH_SUCCESS) {
-        L(
+        E(
             (&chirp),
-            "Error: Could not init loop: %d. uv_loop_t:%p",
+            "Could not init loop: %d. uv_loop_t:%p",
             tmp_err,
             &loop
         );
@@ -461,9 +470,9 @@ ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp_out)
     }
     tmp_err = ch_chirp_init(&chirp, config, &loop, NULL);
     if(tmp_err != CH_SUCCESS) {
-        L(
+        E(
             (&chirp),
-            "Error: Could not init chirp: %d ch_chirp_t:%p",
+            "Could not init chirp: %d ch_chirp_t:%p",
             tmp_err,
             &chirp
         );
@@ -483,9 +492,9 @@ ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp_out)
     tmp_err = ch_run(&loop);
     *chirp_out = NULL;
     if(tmp_err != 0) {
-        L(
+        E(
             (&chirp),
-            "Error: uv_run returned with error: %d, uv_loop_t:%p",
+            "uv_run returned with error: %d, uv_loop_t:%p",
             tmp_err,
             &loop
         );

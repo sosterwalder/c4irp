@@ -25,6 +25,11 @@
 // Logging and assert macros
 // =========================
 //
+// The error macro E(chirp, message, ...) behaves like printf and allows to
+// log to a custom callback. Usually used to log into pythons logging facility.
+// On the callback it sets the argument error to true and it will log to stderr
+// if no callback is set.
+//
 // The logging macro L(chirp, message, ...) behaves like printf and allows to
 // log to a custom callback. Usually used to log into pythons logging facility.
 //
@@ -38,16 +43,32 @@
 // .. code-block:: cpp
 //
 
+#define E(chirp, message, ...) do { \
+    if(chirp->_log != NULL) { \
+        char buf[1024]; \
+        snprintf( \
+            buf, \
+            1024, \
+            "%s:%d " message, \
+            __FILE__, \
+            __LINE__, \
+            ##__VA_ARGS__ \
+        ); \
+        chirp->_log(buf, 1); \
+    } else { \
+        fprintf( \
+            stderr, \
+            "%s:%d Error:" message "\n", \
+            __FILE__, \
+            __LINE__, \
+            ##__VA_ARGS__ \
+        ); \
+    } \
+} while(0)
+
 #ifndef NDEBUG
 #   define V(chirp, condition, message, ...) do { \
         if(!(condition)) { \
-            fprintf( \
-                stderr, \
-                "%s:%d " message "\n", \
-                __FILE__, \
-                __LINE__, \
-                ##__VA_ARGS__ \
-            ); \
             if(chirp->_log != NULL) { \
                 char buf[1024]; \
                 snprintf( \
@@ -58,8 +79,15 @@
                     __LINE__, \
                     ##__VA_ARGS__ \
                 ); \
-                chirp->_log(buf); \
+                chirp->_log(buf, 1); \
             } else { \
+                fprintf( \
+                    stderr, \
+                    "%s:%d " message "\n", \
+                    __FILE__, \
+                    __LINE__, \
+                    ##__VA_ARGS__ \
+                ); \
                 assert(condition); \
                 /* Since we check the condition twice, check for bad asserts*/ \
                 fprintf(stderr, "Bad assert: condition not stable\n"); \
@@ -68,30 +96,28 @@
             return CH_VALUE_ERROR; \
         } \
     } while(0)
-#   ifdef CH_LOG_TO_STDERR
-#       define L(chirp, message, ...) fprintf( \
-            stderr, \
-            "%s:%d " message "\n", \
-            __FILE__, \
-            __LINE__, \
-            ##__VA_ARGS__ \
-        )
-#   else  //CH_LOG_TO_STDERR
-#       define L(chirp, message, ...) do { \
-            if(chirp->_log != NULL) { \
-                char buf[1024]; \
-                snprintf( \
-                    buf, \
-                    1024, \
-                    "%s:%d " message, \
-                    __FILE__, \
-                    __LINE__, \
-                    ##__VA_ARGS__ \
-                ); \
-                chirp->_log(buf); \
-            } \
-        } while(0)
-#   endif
+#   define L(chirp, message, ...) do { \
+        if(chirp->_log != NULL) { \
+            char buf[1024]; \
+            snprintf( \
+                buf, \
+                1024, \
+                "%s:%d " message, \
+                __FILE__, \
+                __LINE__, \
+                ##__VA_ARGS__ \
+            ); \
+            chirp->_log(buf, 0); \
+        } else { \
+            fprintf( \
+                stderr, \
+                "%s:%d " message "\n", \
+                __FILE__, \
+                __LINE__, \
+                ##__VA_ARGS__ \
+            ); \
+        } \
+    } while(0)
 #   define A(condition, ...) do { \
         if(!(condition)) { \
             fprintf(stderr, ##__VA_ARGS__); \
@@ -105,13 +131,6 @@
 #else //NDEBUG
 #   define V(chirp, condition, message, ...) do { \
         if(!(condition)) { \
-            fprintf( \
-                stderr, \
-                "%s:%d " message "\n", \
-                __FILE__, \
-                __LINE__, \
-                ##__VA_ARGS__ \
-            ); \
             if(chirp->_log != NULL) { \
                 char buf[1024]; \
                 snprintf( \
@@ -122,7 +141,15 @@
                     __LINE__, \
                     ##__VA_ARGS__ \
                 ); \
-                chirp->_log(buf); \
+                chirp->_log(buf, 1); \
+            } else { \
+                fprintf( \
+                    stderr, \
+                    "%s:%d " message "\n", \
+                    __FILE__, \
+                    __LINE__, \
+                    ##__VA_ARGS__ \
+                ); \
             } \
             return CH_VALUE_ERROR; \
         } \

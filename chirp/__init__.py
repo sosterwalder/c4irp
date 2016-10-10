@@ -14,8 +14,11 @@ if sys.version_info > (3, 4):  # noqa
 
 
 @ffi.def_extern()
-def python_log_cb(msg):
+def python_log_cb(msg, error):
     """Used as a callback from libchirp to log into python."""
-    LG.debug(ffi.string(msg).decode("UTF-8"))
+    if error:
+        LG.error(ffi.string(msg).decode("UTF-8"))
+    else:
+        LG.debug(ffi.string(msg).decode("UTF-8"))
 
 del python_log_cb

@@ -188,9 +188,9 @@ _ch_cn_shutdown_gen_cb(
     L(chirp, "Shutdown callback called. ch_connection_t:%p, ch_chirp_t:%p", conn,  chirp);
     tmp_err = uv_timer_stop(&conn->shutdown_timeout);
     if(tmp_err != CH_SUCCESS) {
-        L(
+        E(
             chirp,
-            "Error: Stopping shutdown timeout failed: %d. ch_connection_t:%p,"
+            "Stopping shutdown timeout failed: %d. ch_connection_t:%p,"
             " ch_chirp_t:%p",
             tmp_err,
             conn,
@@ -201,9 +201,9 @@ _ch_cn_shutdown_gen_cb(
     if(uv_is_closing(handle)) {
         if(ichirp->flags & CH_CHIRP_CLOSING)
             chirp->_->closing_tasks -= 1;
-        L(
+        E(
             chirp,
-            "Error: connection already closed after shutdown. "
+            "Connection already closed after shutdown. "
             "ch_connection_t:%p, ch_chirp_t:%p",
             conn,
             chirp
@@ -265,9 +265,9 @@ _ch_cn_shutdown_gen(
     ch_chirp_t* chirp = conn->chirp;
     ch_chirp_int_t* ichirp = chirp->_;
     if(conn->flags & CH_CN_SHUTTING_DOWN) {
-        L(
+        E(
             chirp,
-            "Error: Shutdown in progress. ch_connection_t:%p, ch_chirp_t:%p",
+            "Shutdown in progress. ch_connection_t:%p, ch_chirp_t:%p",
             conn,
             chirp
         );
@@ -280,9 +280,9 @@ _ch_cn_shutdown_gen(
         shutdown_cb
     );
     if(tmp_err != CH_SUCCESS) {
-        L(
+        E(
             chirp,
-            "Error: uv_shutdown returned error: %d. ch_connection_t:%p, ch_chirp_t:%p",
+            "uv_shutdown returned error: %d. ch_connection_t:%p, ch_chirp_t:%p",
             tmp_err,
             conn,
             chirp
@@ -291,9 +291,9 @@ _ch_cn_shutdown_gen(
     }
     tmp_err = uv_timer_init(ichirp->loop, &conn->shutdown_timeout);
     if(tmp_err != CH_SUCCESS) {
-        L(
+        E(
             chirp,
-            "Error: Initializing shutdown timeout failed: %d. ch_connection_t:%p,"
+            "Initializing shutdown timeout failed: %d. ch_connection_t:%p,"
             " ch_chirp_t:%p",
             tmp_err,
             conn,
@@ -310,9 +310,9 @@ _ch_cn_shutdown_gen(
         0
     );
     if(tmp_err != CH_SUCCESS) {
-        L(
+        E(
             chirp,
-            "Error: Starting shutdown timeout failed: %d. ch_connection_t:%p,"
+            "Starting shutdown timeout failed: %d. ch_connection_t:%p,"
             " ch_chirp_t:%p",
             tmp_err,
             conn,
@@ -368,9 +368,9 @@ _ch_cn_shutdown_timeout_gen_cb(
     shutdown_cb(&conn->shutdown_req, 1);
     tmp_err = uv_cancel((uv_req_t*) &conn->shutdown_req);
     if(tmp_err != CH_SUCCESS) {
-        L(
+        E(
             chirp,
-            "Error: Candling shutdown timeout failed: %d. ch_connection_t:%p,"
+            "Canceling shutdown timeout failed: %d. ch_connection_t:%p,"
             " ch_chirp_t:%p",
             tmp_err,
             conn,

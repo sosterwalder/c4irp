@@ -101,18 +101,18 @@ ch_en_start(ch_encryption_t* enc)
     }
     const SSL_METHOD* method = TLSv1_2_method();
     if(method == NULL) {
-        L(
+        E(
             chirp,
-            "Error: Could not get the TLSv1_2_method. ch_chirp_t:%p",
+            "Could not get the TLSv1_2_method. ch_chirp_t:%p",
             chirp
         );
         return CH_TLS_ERROR;
     }
     enc->ssl_ctx = SSL_CTX_new(method);
     if(enc->ssl_ctx == NULL) {
-        L(
+        E(
             chirp,
-            "Error: Could create the SSL_CTX. ch_chirp_t:%p",
+            "Could create the SSL_CTX. ch_chirp_t:%p",
             chirp
         );
         return CH_TLS_ERROR;
@@ -128,9 +128,9 @@ ch_en_start(ch_encryption_t* enc)
                 ichirp->config.CERT_CHAIN_PEM,
                 NULL
     ) != 1) {
-        L(
+        E(
             chirp,
-            "Error: Could not set the verification certificate "
+            "Could not set the verification certificate "
             "%s. ch_chirp_t:%p",
             ichirp->config.CERT_CHAIN_PEM,
             chirp
@@ -141,9 +141,9 @@ ch_en_start(ch_encryption_t* enc)
                 enc->ssl_ctx,
                 ichirp->config.CERT_CHAIN_PEM
     ) != 1) {
-        L(
+        E(
             chirp,
-            "Error: Could not set the certificate %s. ch_chirp_t:%p",
+            "Could not set the certificate %s. ch_chirp_t:%p",
             ichirp->config.CERT_CHAIN_PEM,
             chirp
         );
@@ -159,9 +159,9 @@ ch_en_start(ch_encryption_t* enc)
             "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384:"
             "TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384:"
     ) != 1) {
-        L(
+        E(
             chirp,
-            "Error: Could not set the cipher list. ch_chirp_t:%p",
+            "Could not set the cipher list. ch_chirp_t:%p",
             chirp
         );
         return CH_TLS_ERROR;

@@ -60,7 +60,7 @@ typedef enum {
 //callbacks.h
 typedef void* (*ch_alloc_cb_t)(size_t size);
 typedef void (*ch_free_cb_t)(void* buf);
-typedef void (*ch_log_cb_t)(char msg[]);
+typedef void (*ch_log_cb_t)(char msg[], char error);
 typedef void* (*ch_realloc_cb_t)(void* buf, size_t new_size);
 
 //message.h
