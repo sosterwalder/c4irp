@@ -415,6 +415,7 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn)
         SSL_free(conn->ssl);
         return CH_TLS_ERROR;
     }
+    SSL_set_bio(conn->ssl, conn->bio_ssl, conn->bio_ssl);
     return CH_SUCCESS;
 }
 
