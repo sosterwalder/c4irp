@@ -47,7 +47,27 @@ _ch_pr_new_connection_cb(uv_stream_t *server, int status);
 static void
 _ch_pr_read_data_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
 //
-//  Callback from libuv when data was read
+//    Callback from libuv when data was read
+//
+//    TODO params
+//
+
+// .. c:function::
+static
+void
+_ch_pr_send_if_pending(ch_connection_t* conn, void* buf, size_t size);
+//
+//    Send all pending data from SSL
+//
+//    TODO params
+//
+//
+// .. c:function::
+static
+void
+_ch_pr_send_pending_cb(uv_write_t* req, int status);
+//
+//    Called by libuv when pending data has been sent
 //
 //    TODO params
 //
@@ -171,6 +191,9 @@ _ch_pr_read_data_cb(
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_protocol_t* protocol = &chirp->_->protocol;
+#   ifndef NDEBUG
+        conn->flags &= ~CH_CN_BUF_USED;
+#   endif
     if(nread == UV_EOF) {
         ch_cn_shutdown(conn);
         if(sglib_ch_connection_t_is_member(protocol->connections, conn))
@@ -199,13 +222,23 @@ _ch_pr_read_data_cb(
         if(SSL_is_init_finished(conn->ssl))
             // Continue handshake
             tmp_err = SSL_do_handshake(conn->ssl);
-        else
+        else {
             // Handshake done, normal operation
             tmp_err = SSL_read(
                 conn->ssl,
                 conn->buffer_tls,
                 conn->buffer_size
             );
+            if(tmp_err > 0) {
+                L(
+                    chirp,
+                    "Read %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+                    tmp_err,
+                    chirp,
+                    conn
+                );
+            }
+        }
         if(tmp_err < 1) {
             ch_cn_shutdown(conn);
             if(tmp_err < 0) {
@@ -226,7 +259,80 @@ _ch_pr_read_data_cb(
             }
         }
     }
-    conn->flags &= ~CH_CN_BUF_USED;
+}
+
+// .. c:function::
+static
+void
+_ch_pr_send_if_pending(ch_connection_t* conn, void* buf, size_t size)
+//    :noindex:
+//
+//    see: :c:func:`_ch_pr_send_if_pending`
+//
+// .. code-block:: cpp
+//
+{
+    A(!(conn->flags & CH_CN_WRITE_PENDING), "Another write is still pending");
+#   ifdef NDEBUG
+        conn->flags |= CH_CN_WRITE_PENDING;
+#   endif
+    int pending = BIO_pending(conn->bio_app);
+    if(pending < 1)
+        return;
+    A(!(conn->flags & CH_CN_BUF_USED), "The uv buffer is still used");
+#   ifdef NDEBUG
+        conn->flags |= CH_CN_BUF_USED;
+#   endif
+    int read = BIO_read(conn->bio_app, buf, size);
+    conn->uv_buf.base = buf;
+    conn->uv_buf.len = read;
+    conn->write_req.data = conn;
+    uv_write(
+        &conn->write_req,
+        (uv_stream_t*) &conn->client,
+        &conn->uv_buf,
+        1,
+        NULL
+    );
+}
+
+
+// .. c:function::
+static
+void
+_ch_pr_send_pending_cb(uv_write_t* req, int status)
+//    :noindex:
+//
+//    see: :c:func:`_ch_pr_send_pending_cb`
+//
+// .. code-block:: cpp
+//
+{
+    ch_connection_t* conn = req->data;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+#   ifdef NDEBUG
+        conn->flags &= ~CH_CN_WRITE_PENDING;
+        conn->flags &= ~CH_CN_BUF_USED;
+#   endif
+    if(status < 0) {
+        ch_cn_shutdown(conn);
+        L(
+            chirp,
+            "Sending pending data failed. ch_chirp_t:%p, ch_connection_t:%p",
+            chirp,
+            conn
+        );
+        return;
+    }
+    L(
+        chirp,
+        "Wrote %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+        (int) req->bufs->len,
+        chirp,
+        conn
+    );
+    _ch_pr_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
 }
 
 // .. c:function::

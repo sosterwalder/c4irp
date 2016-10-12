@@ -103,6 +103,10 @@ Performance
      statement is important for simpleness and robustness and the second
      statement makes flow-control possible.
 
+   - Since we the error condition sent to the user is a timeout on the ack. We
+     can react on all other errors accordingly, but do not have to report back
+     to the user. Which saves extremely complex callback structures. Yey!
+
 * Since chirp is meant for multiprocessing, our performance goals refer to this
   configuration
 

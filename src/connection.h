@@ -35,6 +35,7 @@
 typedef enum {
     CH_CN_BUF_USED       = 1 << 0,
     CH_CN_SHUTTING_DOWN  = 1 << 1,
+    CH_CN_WRITE_PENDING  = 1 << 2,
 } ch_cn_flags_t;
 
 
@@ -61,6 +62,8 @@ typedef struct ch_connection_s {
     size_t                  buffer_size;
     ch_chirp_t*             chirp;
     uv_shutdown_t           shutdown_req;
+    uv_buf_t                uv_buf;
+    uv_write_t              write_req;
     uv_timer_t              shutdown_timeout;
     int8_t                  shutdown_tasks;
     uint8_t                 flags;

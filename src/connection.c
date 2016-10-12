@@ -361,6 +361,8 @@ ch_cn_close_cb(uv_handle_t* handle)
         }
         if(conn->ssl != NULL)
             SSL_free(conn->ssl); // The doc says this frees conn->bio_ssl
+                                 // I tested it. let's hope they never change
+                                 // that.
         if(conn->bio_app != NULL)
             BIO_free(conn->bio_app);
         ch_free(conn);
@@ -451,7 +453,9 @@ ch_cn_read_alloc_cb(
             conn->buffer_tls  = ch_alloc(ichirp->config.BUFFER_SIZE);
             conn->buffer_size = ichirp->config.BUFFER_SIZE;
         }
-        conn->flags |= CH_CN_BUF_USED;
+#       ifndef NDEBUG
+            conn->flags |= CH_CN_BUF_USED;
+#       endif
     } else {
         A(!(conn->flags & CH_CN_BUF_USED), "Buffer still used");
     }
