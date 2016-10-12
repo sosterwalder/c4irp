@@ -36,6 +36,7 @@ _cn_en_free(void* buf, const char* file, int line);
 //    :param void* buf: Buffer to free
 //    :param const char* file: File the allocation came from
 //    :param int line: The line the allocation came from
+
 // .. c:function::
 static
 ch_inline

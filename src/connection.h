@@ -56,7 +56,8 @@ typedef struct ch_connection_s {
     uint8_t                 address[16];
     int32_t                 port;
     uv_tcp_t                client;
-    void*                   buffer;
+    void*                   buffer_uv;
+    void*                   buffer_tls;
     size_t                  buffer_size;
     ch_chirp_t*             chirp;
     uv_shutdown_t           shutdown_req;
@@ -100,8 +101,9 @@ ch_cn_close_cb(uv_handle_t* handle);
 void
 ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
 //
-//    Allocates a buffer on the connection and reuses it for each subsequent
-//    reads.
+//    Allocates buffers on the connection and reuses it for each subsequent
+//    reads. Also allocates the buffer for TLS since it has to be the same
+//    size.
 //
 //    :param uv_handle_t* handle: The libuv handle holding the
 //                                connection

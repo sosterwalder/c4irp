@@ -126,6 +126,11 @@ ch_en_start(ch_encryption_t* enc)
         );
         return CH_TLS_ERROR;
     }
+    SSL_CTX_set_mode(
+        enc->ssl_ctx,
+        SSL_MODE_AUTO_RETRY |
+        SSL_MODE_ENABLE_PARTIAL_WRITE
+    );
     SSL_CTX_set_verify(
             enc->ssl_ctx,
             SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,

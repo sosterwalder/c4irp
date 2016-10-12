@@ -355,8 +355,10 @@ ch_cn_close_cb(uv_handle_t* handle)
     // In production we allow the semaphore to drop below 0, but we log an
     // error
     if(conn->shutdown_tasks < 1) {
-        if(conn->buffer != NULL)
-            ch_free(conn->buffer);
+        if(conn->buffer_uv != NULL) {
+            ch_free(conn->buffer_uv);
+            ch_free(conn->buffer_tls);
+        }
         if(conn->ssl != NULL)
             SSL_free(conn->ssl); // The doc says this frees conn->bio_ssl
         if(conn->bio_app != NULL)
@@ -437,19 +439,23 @@ ch_cn_read_alloc_cb(
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_chirp_int_t* ichirp = chirp->_;
-    if(!conn->buffer) {
+    if(!conn->buffer_uv) {
+        // We also allocate the TLS buffer, because they have to be of the same
+        // size
         if(ichirp->config.BUFFER_SIZE == 0) {
-            conn->buffer      = ch_alloc(suggested_size);
+            conn->buffer_uv   = ch_alloc(suggested_size);
+            conn->buffer_tls  = ch_alloc(suggested_size);
             conn->buffer_size = suggested_size;
         } else {
-            conn->buffer      = ch_alloc(ichirp->config.BUFFER_SIZE);
+            conn->buffer_uv   = ch_alloc(ichirp->config.BUFFER_SIZE);
+            conn->buffer_tls  = ch_alloc(ichirp->config.BUFFER_SIZE);
             conn->buffer_size = ichirp->config.BUFFER_SIZE;
         }
         conn->flags |= CH_CN_BUF_USED;
     } else {
         A(!(conn->flags & CH_CN_BUF_USED), "Buffer still used");
     }
-    buf->base = conn->buffer;
+    buf->base = conn->buffer_uv;
     buf->len = conn->buffer_size;
 }
 

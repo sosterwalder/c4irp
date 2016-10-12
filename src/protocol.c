@@ -8,6 +8,8 @@
 #include "chirp.h"
 #include "util.h"
 
+#include <openssl/err.h>
+
 SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     ch_receipt_t,
     left,
@@ -138,6 +140,7 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
     if (uv_accept(server, (uv_stream_t*) client) == 0) {
         L(chirp, "Accepted connection. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
         sglib_ch_connection_t_add(&protocol->connections, conn);
+        SSL_set_accept_state(conn->ssl);
         uv_read_start(
             (uv_stream_t*) client,
             ch_cn_read_alloc_cb,
@@ -182,8 +185,48 @@ _ch_pr_read_data_cb(
             );
         }
     }
+    if(BIO_write(conn->bio_app, buf, nread) < 1) {
+        ch_cn_shutdown(conn);
+        E(
+            chirp,
+            "SSL error writing to BIO, shutting down connection. "
+            "ch_connection_t:%p ch_chirp_t:%p",
+            conn,
+            chirp
+        );
+    } else {
+        int tmp_err = 1;
+        if(SSL_is_init_finished(conn->ssl))
+            // Continue handshake
+            tmp_err = SSL_do_handshake(conn->ssl);
+        else
+            // Handshake done, normal operation
+            tmp_err = SSL_read(
+                conn->ssl,
+                conn->buffer_tls,
+                conn->buffer_size
+            );
+        if(tmp_err < 1) {
+            ch_cn_shutdown(conn);
+            if(tmp_err < 0) {
+                ERR_print_errors_fp(stderr);
+                E(
+                    chirp,
+                    "SSL operation fatal error. ch_chirp_t:%p, ch_connection_t:%p",
+                    chirp,
+                    conn
+                );
+            } else {
+                L(
+                    chirp,
+                    "SSL operation failed. ch_chirp_t:%p, ch_connection_t:%p",
+                    chirp,
+                    conn
+                );
+            }
+        }
+    }
     conn->flags &= ~CH_CN_BUF_USED;
-    // ch_chirp_close_ts(chirp);
 }
 
 // .. c:function::
