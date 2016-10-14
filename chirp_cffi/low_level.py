@@ -33,20 +33,49 @@ struct uv_timer_s {
 };
 typedef struct uv_timer_s uv_timer_t;
 
-struct ch_chirp_s;
+struct ch_chirp_s {
+    ...;
+};
+typedef struct ch_chirp_s ch_chirp_t;
+
+struct uv_buf_s {
+    ...;
+};
+typedef struct uv_buf_s uv_buf_t;
+
+struct uv_write_s {
+    ...;
+};
+typedef struct uv_write_s uv_write_t;
+
+struct SSL_s {
+    ...;
+};
+typedef struct SSL_s SSL;
+
+struct BIO_s {
+    ...;
+};
+typedef struct BIO_s BIO;
 
 typedef struct ch_connection_s {
     uint8_t                 ip_protocol;
     uint8_t                 address[16];
     int32_t                 port;
     uv_tcp_t                client;
-    void*                   buffer;
+    void*                   buffer_uv;
+    void*                   buffer_tls;
     size_t                  buffer_size;
-    struct ch_chirp_s*      chirp;
+    ch_chirp_t*             chirp;
     uv_shutdown_t           shutdown_req;
+    uv_buf_t                uv_buf;
+    uv_write_t              write_req;
     uv_timer_t              shutdown_timeout;
     int8_t                  shutdown_tasks;
     uint8_t                 flags;
+    SSL*                    ssl;
+    BIO*                    bio_ssl;
+    BIO*                    bio_app;
     char                    color_field;
     struct ch_connection_s* left;
     struct ch_connection_s* right;

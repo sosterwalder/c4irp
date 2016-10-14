@@ -126,7 +126,7 @@ typedef struct {
     char*           CERT_CHAIN_PEM;
 } ch_config_t;
 
-extern "Python" void python_log_cb(char msg[]);
+extern "Python" void python_log_cb(char msg[], char msg);
 
 typedef struct ch_chirp_s {
     ...;
