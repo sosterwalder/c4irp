@@ -48,8 +48,7 @@ _ch_cn_shutdown_gen(
         uv_timer_cb timer_cb
 );
 //
-//    Generic version of shutdown, called by ch_cn_shutdown and
-//    ch_ch_shutdown_end.
+//    Generic version of shutdown, called by ch_cn_shutdown.
 //
 //    :param ch_connection_t* conn: Connection dictionary holding a
 //                                  chirp instance.
@@ -71,8 +70,7 @@ _ch_cn_shutdown_gen_cb(
         uv_close_cb close_cb
 );
 //
-//    Generic version of the shutdown callback, called by ch_cn_shutdown_cb and
-//    ch_ch_shutdown_end_cb.
+//    Generic version of the shutdown callback, called by ch_cn_shutdown_cb.
 //
 //    :param uv_shutdown_t* req: Shutdown request type, holding the
 //                               connection handle
@@ -102,7 +100,7 @@ _ch_cn_shutdown_timeout_gen_cb(
 );
 //
 //    Generic version of the shutdown callback, called by
-//    _ch_cn_shutdown_timeout_cb and _ch_cn_shutdown_timeout_end_cb.
+//    _ch_cn_shutdown_timeout_cb.
 //
 //    :param uv_timer_t* handle: Timer handle to schedule callback
 //    :param uv_shutdown_cb shutdown_cb: Callback which gets called

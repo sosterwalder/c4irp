@@ -195,7 +195,6 @@ _ch_pr_read_data_cb(
         conn->flags &= ~CH_CN_BUF_USED;
 #   endif
     if(nread == UV_EOF) {
-        ch_cn_shutdown(conn);
         if(sglib_ch_connection_t_is_member(protocol->connections, conn))
             sglib_ch_connection_t_delete(&protocol->connections, conn);
         else {
@@ -207,9 +206,9 @@ _ch_pr_read_data_cb(
                 chirp
             );
         }
-    }
-    if(BIO_write(conn->bio_app, buf, nread) < 1) {
         ch_cn_shutdown(conn);
+    }
+    if(BIO_write(conn->bio_app, buf->base, nread) < 1) {
         E(
             chirp,
             "SSL error writing to BIO, shutting down connection. "
@@ -217,12 +216,10 @@ _ch_pr_read_data_cb(
             conn,
             chirp
         );
+        ch_cn_shutdown(conn);
     } else {
         int tmp_err = 1;
-        if(SSL_is_init_finished(conn->ssl))
-            // Continue handshake
-            tmp_err = SSL_do_handshake(conn->ssl);
-        else {
+        if(SSL_is_init_finished(conn->ssl)) {
             // Handshake done, normal operation
             tmp_err = SSL_read(
                 conn->ssl,
@@ -238,9 +235,10 @@ _ch_pr_read_data_cb(
                     conn
                 );
             }
-        }
+        } else
+            // Continue handshake
+            tmp_err = SSL_do_handshake(conn->ssl);
         if(tmp_err < 1) {
-            ch_cn_shutdown(conn);
             if(tmp_err < 0) {
                 ERR_print_errors_fp(stderr);
                 E(
@@ -257,6 +255,7 @@ _ch_pr_read_data_cb(
                     conn
                 );
             }
+            ch_cn_shutdown(conn);
         }
     }
 }
@@ -316,13 +315,13 @@ _ch_pr_send_pending_cb(uv_write_t* req, int status)
         conn->flags &= ~CH_CN_BUF_USED;
 #   endif
     if(status < 0) {
-        ch_cn_shutdown(conn);
         L(
             chirp,
             "Sending pending data failed. ch_chirp_t:%p, ch_connection_t:%p",
             chirp,
             conn
         );
+        ch_cn_shutdown(conn);
         return;
     }
     L(

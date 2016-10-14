@@ -16,6 +16,9 @@ DOCRST=$(DOCC:.c=.c.rst) $(DOCH:.h=.h.rst)
 debug:  ## Build the project in debug mode
 	MODE=debug make -f build/build.make
 
+dmod: debug  ## Build the python module in debug mode
+	MODE=debug rm *.so; pip install -v -e .
+
 vi:  ## Start a vim editing the imporant files
 	vim *.rst src/*.c src/*.h chirp/*.py chirp_cffi/*.py include/*.h doc/ref/* build/config.defs.h
 
