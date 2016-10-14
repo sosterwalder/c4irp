@@ -1,8 +1,9 @@
 """Message-passing and actor-based programming for everyone."""
 import logging
 import sys
+import ssl  # noqa
 
-from _chirp_cffi import ffi
+from _chirp_cffi import lib, ffi
 
 from .chirp import ChirpPool  # noqa
 from .const import Config  # noqa
@@ -11,6 +12,8 @@ LG = logging.getLogger("chirp")
 
 if sys.version_info > (3, 4):  # noqa
     from .chirp import ChirpAsync  # noqa # pragma: no cover
+
+lib.ch_en_set_manual_openssl_init()
 
 
 @ffi.def_extern()

@@ -74,7 +74,7 @@ ch_en_set_manual_openssl_init(void)
 // .. code-block:: cpp
 //
 {
-    _ch_en_manual_openssl = 0;
+    _ch_en_manual_openssl = 1;
 }
 
 // .. c:function::

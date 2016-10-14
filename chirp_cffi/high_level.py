@@ -184,6 +184,11 @@ ch_chirp_close_ts(ch_chirp_t* chirp);
 extern
 void
 ch_chirp_set_auto_stop(ch_chirp_t* chirp);
+
+// encryption.h
+extern
+void
+ch_en_set_manual_openssl_init(void);
 """)
 
 
