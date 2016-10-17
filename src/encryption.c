@@ -39,6 +39,7 @@ ch_en_openssl_init(const ch_config_t* config)
 //
 {
     SSL_library_init();
+    OpenSSL_add_all_algorithms();
     SSL_load_error_strings();
     OPENSSL_config("chirp");
 
@@ -163,6 +164,28 @@ ch_en_start(ch_encryption_t* enc)
         );
         return CH_TLS_ERROR;
     }
+    if(SSL_CTX_use_PrivateKey_file(
+                enc->ssl_ctx,
+                ichirp->config.CERT_CHAIN_PEM,
+                SSL_FILETYPE_PEM
+    ) != 1) {
+        E(
+            chirp,
+            "Could not set the private key %s. ch_chirp_t:%p",
+            ichirp->config.CERT_CHAIN_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
+    if(SSL_CTX_check_private_key(enc->ssl_ctx) != 1) {
+        E(
+            chirp,
+            "Private key is not valid %s. ch_chirp_t:%p",
+            ichirp->config.CERT_CHAIN_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
     DH *dh = NULL;
     FILE *paramfile;
     paramfile = fopen(ichirp->config.DH_PARAMS_PEM, "r");
@@ -196,7 +219,7 @@ ch_en_start(ch_encryption_t* enc)
         );
         return CH_TLS_ERROR;
     }
-/*    if(SSL_CTX_set_cipher_list(
+    if(SSL_CTX_set_cipher_list(
             enc->ssl_ctx,
             "-ALL:"
             "DHE-DSS-AES256-GCM-SHA384:"
@@ -210,7 +233,7 @@ ch_en_start(ch_encryption_t* enc)
             chirp
         );
         return CH_TLS_ERROR;
-    }*/
+    }
     L(
         chirp,
         "Created SSL context for chirp. ch_chirp_t:%p",

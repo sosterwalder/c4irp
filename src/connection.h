@@ -30,12 +30,21 @@
 //
 //       The connection is shutting down
 //
+//    .. c:member:: CH_CN_WRITE_PENDING
+//
+//       There is a write pending.
+//
+//    .. c:member:: CH_CN_HANDSHAKE
+//
+//       Handshake is running.
+//
 // .. code-block:: cpp
 //
 typedef enum {
     CH_CN_BUF_USED       = 1 << 0,
     CH_CN_SHUTTING_DOWN  = 1 << 1,
     CH_CN_WRITE_PENDING  = 1 << 2,
+    CH_CN_HANDSHAKE      = 1 << 3,
 } ch_cn_flags_t;
 
 
@@ -70,6 +79,7 @@ typedef struct ch_connection_s {
     SSL*                    ssl;
     BIO*                    bio_ssl;
     BIO*                    bio_app;
+    int                     handshake_state;
     char                    color_field;
     struct ch_connection_s* left;
     struct ch_connection_s* right;

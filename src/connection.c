@@ -352,6 +352,13 @@ ch_cn_close_cb(uv_handle_t* handle)
     );
     // In production we allow the semaphore to drop below 0, but we log an
     // error
+    if(conn->shutdown_tasks < 0) {
+        E(
+            chirp,
+            "Shutdown semaphore dropped blow 0. ch_chirp_t:%p",
+            chirp
+        );
+    }
     if(conn->shutdown_tasks < 1) {
         if(conn->buffer_uv != NULL) {
             ch_free(conn->buffer_uv);
@@ -369,13 +376,6 @@ ch_cn_close_cb(uv_handle_t* handle)
             "Closed connection, closing semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
             chirp->_->closing_tasks,
             conn,
-            chirp
-        );
-    }
-    if(conn->shutdown_tasks < 0) {
-        E(
-            chirp,
-            "Shutdown semaphore dropped blow 0. ch_chirp_t:%p",
             chirp
         );
     }

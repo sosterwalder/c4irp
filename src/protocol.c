@@ -20,7 +20,9 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
 
 
 // .. c:function::
-static void
+static
+ch_inline
+void
 _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections);
 //
 //    Close and free all remaining connections
@@ -28,7 +30,19 @@ _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections);
 //    TODO params
 //
 // .. c:function::
-static void
+static
+ch_inline
+void
+_ch_pr_do_handshake(ch_connection_t* conn);
+//
+//    Doing handshake
+//
+//    TODO params
+//
+// .. c:function::
+static
+ch_inline
+void
 _ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts);
 //
 //    Free all remaining items in a receipts set
@@ -36,7 +50,8 @@ _ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts);
 //    TODO params
 //
 // .. c:function::
-static void
+static
+void
 _ch_pr_new_connection_cb(uv_stream_t *server, int status);
 //
 //    Callback from libuv on new connection
@@ -44,7 +59,18 @@ _ch_pr_new_connection_cb(uv_stream_t *server, int status);
 //    TODO params
 //
 // .. c:function::
-static void
+static
+ch_inline
+void
+_ch_pr_read(ch_connection_t* conn);
+//
+//    Reading data
+//
+//    TODO params
+//
+// .. c:function::
+static
+void
 _ch_pr_read_data_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
 //
 //    Callback from libuv when data was read
@@ -54,6 +80,7 @@ _ch_pr_read_data_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
 
 // .. c:function::
 static
+ch_inline
 void
 _ch_pr_send_if_pending(ch_connection_t* conn, void* buf, size_t size);
 //
@@ -73,7 +100,9 @@ _ch_pr_send_pending_cb(uv_write_t* req, int status);
 //
 
 // .. c:function::
-static void
+static
+ch_inline
+void
 _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
 //    :noindex:
 //
@@ -97,7 +126,40 @@ _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
 }
 
 // .. c:function::
-static void
+static
+ch_inline
+void
+_ch_pr_do_handshake(ch_connection_t* conn)
+//    :noindex:
+//
+//    see: :c:func:`_ch_pr_do_handshake`
+//
+// .. code-block:: cpp
+//
+{
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    if(SSL_is_init_finished(conn->ssl)) {
+        conn->flags &= ~CH_CN_HANDSHAKE;
+        if(conn->handshake_state == 1)
+            _ch_pr_read(conn);
+        else {
+            ERR_print_errors_fp(stderr);
+            E(
+                chirp,
+                "SSL Handshake failed. ch_chirp_t:%p, ch_connection_t:%p",
+                chirp,
+                conn
+            );
+        }
+    } else
+        conn->handshake_state = SSL_do_handshake(conn->ssl);
+}
+
+// .. c:function::
+static
+ch_inline
+void
 _ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts)
 //    :noindex:
 //
@@ -121,7 +183,8 @@ _ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts)
 }
 
 // .. c:function::
-static void
+static
+void
 _ch_pr_new_connection_cb(uv_stream_t* server, int status)
 //    :noindex:
 //
@@ -166,6 +229,7 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
             ch_cn_read_alloc_cb,
             _ch_pr_read_data_cb
         );
+        conn->flags |= CH_CN_HANDSHAKE;
     }
     else {
         conn->shutdown_tasks = 1;
@@ -174,7 +238,58 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
 }
 
 // .. c:function::
-static void
+static
+ch_inline
+void
+_ch_pr_read(ch_connection_t* conn)
+//    :noindex:
+//
+//    see: :c:func:`_ch_pr_read`
+//
+// .. code-block:: cpp
+//
+{
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    int tmp_err = 1;
+    // Handshake done, normal operation
+    tmp_err = SSL_read(
+        conn->ssl,
+        conn->buffer_tls,
+        conn->buffer_size
+    );
+    if(tmp_err > 0) {
+        L(
+            chirp,
+            "Read %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+            tmp_err,
+            chirp,
+            conn
+        );
+    } else {
+        if(tmp_err < 0) {
+            ERR_print_errors_fp(stderr);
+            E(
+                chirp,
+                "SSL operation fatal error. ch_chirp_t:%p, "
+                "ch_connection_t:%p",
+                chirp,
+                conn
+            );
+        } else {
+            L(
+                chirp,
+                "SSL operation failed. ch_chirp_t:%p, ch_connection_t:%p",
+                chirp,
+                conn
+            );
+        }
+        ch_cn_shutdown(conn);
+    }
+}
+// .. c:function::
+static
+void
 _ch_pr_read_data_cb(
         uv_stream_t* stream,
         ssize_t nread,
@@ -207,7 +322,15 @@ _ch_pr_read_data_cb(
             );
         }
         ch_cn_shutdown(conn);
+        return;
     }
+    L(
+        chirp,
+        "%d available bytes. ch_chirp_t:%p, ch_connection_t:%p",
+        (int) nread,
+        chirp,
+        conn
+    );
     if(BIO_write(conn->bio_app, buf->base, nread) < 1) {
         E(
             chirp,
@@ -217,53 +340,18 @@ _ch_pr_read_data_cb(
             chirp
         );
         ch_cn_shutdown(conn);
-    } else {
-        int tmp_err = 1;
-        if(SSL_is_init_finished(conn->ssl)) {
-            // Handshake done, normal operation
-            tmp_err = SSL_read(
-                conn->ssl,
-                conn->buffer_tls,
-                conn->buffer_size
-            );
-            if(tmp_err > 0) {
-                L(
-                    chirp,
-                    "Read %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
-                    tmp_err,
-                    chirp,
-                    conn
-                );
-            }
-        } else
-            // Continue handshake
-            tmp_err = SSL_do_handshake(conn->ssl);
-        if(tmp_err < 1) {
-            if(tmp_err < 0) {
-                ERR_print_errors_fp(stderr);
-                E(
-                    chirp,
-                    "SSL operation fatal error. ch_chirp_t:%p, ch_connection_t:%p",
-                    chirp,
-                    conn
-                );
-            } else {
-                L(
-                    chirp,
-                    "SSL operation failed. ch_chirp_t:%p, ch_connection_t:%p",
-                    chirp,
-                    conn
-                );
-            }
-            ch_cn_shutdown(conn);
-        }
-        else
-            _ch_pr_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
+        return;
     }
+    if(conn->flags & CH_CN_HANDSHAKE)
+        _ch_pr_do_handshake(conn);
+    else
+        _ch_pr_read(conn);
+    _ch_pr_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
 }
 
 // .. c:function::
 static
+ch_inline
 void
 _ch_pr_send_if_pending(ch_connection_t* conn, void* buf, size_t size)
 //    :noindex:

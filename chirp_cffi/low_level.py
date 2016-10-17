@@ -76,6 +76,7 @@ typedef struct ch_connection_s {
     SSL*                    ssl;
     BIO*                    bio_ssl;
     BIO*                    bio_app;
+    int                     handshake_state;
     char                    color_field;
     struct ch_connection_s* left;
     struct ch_connection_s* right;
