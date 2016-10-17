@@ -410,7 +410,9 @@ ch_chirp_init(
     ch_en_init(chirp, enc);
     tmp_err = ch_en_start(enc);
     if(tmp_err != CH_SUCCESS) {
-        ERR_print_errors_fp(stderr);
+#       ifndef NDEBUG
+            ERR_print_errors_fp(stderr);
+#       endif
         E(
             chirp,
             "Could not start encryption: %d. ch_chirp_t:%p",

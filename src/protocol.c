@@ -144,13 +144,16 @@ _ch_pr_do_handshake(ch_connection_t* conn)
         if(conn->handshake_state == 1)
             _ch_pr_read(conn);
         else {
-            ERR_print_errors_fp(stderr);
+#           ifndef NDEBUG
+                ERR_print_errors_fp(stderr);
+#           endif
             E(
                 chirp,
                 "SSL Handshake failed. ch_chirp_t:%p, ch_connection_t:%p",
                 chirp,
                 conn
             );
+            ch_cn_shutdown(conn);
         }
     } else
         conn->handshake_state = SSL_do_handshake(conn->ssl);
@@ -268,7 +271,9 @@ _ch_pr_read(ch_connection_t* conn)
         );
     } else {
         if(tmp_err < 0) {
-            ERR_print_errors_fp(stderr);
+#           ifndef NDEBUG
+                ERR_print_errors_fp(stderr);
+#           endif
             E(
                 chirp,
                 "SSL operation fatal error. ch_chirp_t:%p, "
