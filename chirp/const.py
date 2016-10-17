@@ -69,6 +69,13 @@ class Config(object):
     """Do not use TLS encryption. Not recommended."""
     LOCALHOST_OPT = True
     """Optimize localhost connections by disabling TLS"""
+    DH_PARAMS_PEM  = None
+    """Diffie-hellmann parameters used for perfect forward secrecy.
+
+    .. code-block:: bash
+
+        openssl dhparam -out dh.pem 2048
+    """
     CERT_CHAIN_PEM = None
     """Set a certification chain for TLS. If you don't set this a default
     self-sign cert is used, which is not recommended.  Create a certication

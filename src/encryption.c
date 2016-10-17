@@ -163,6 +163,39 @@ ch_en_start(ch_encryption_t* enc)
         );
         return CH_TLS_ERROR;
     }
+    DH *dh = NULL;
+    FILE *paramfile;
+    paramfile = fopen(ichirp->config.DH_PARAMS_PEM, "r");
+    if(paramfile == NULL) {
+        E(
+            chirp,
+            "Could not open the dh-params %s. ch_chirp_t:%p",
+            ichirp->config.DH_PARAMS_PEM,
+            chirp
+        );
+        fclose(paramfile);
+        return CH_TLS_ERROR;
+    }
+    dh = PEM_read_DHparams(paramfile, NULL, NULL, NULL);
+    fclose(paramfile);
+    if(dh == NULL) {
+        E(
+            chirp,
+            "Could not load the dh-params %s. ch_chirp_t:%p",
+            ichirp->config.DH_PARAMS_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
+    if(SSL_CTX_set_tmp_dh(enc->ssl_ctx, dh) != 1) {
+        E(
+            chirp,
+            "Could not set the dh-params %s. ch_chirp_t:%p",
+            ichirp->config.DH_PARAMS_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
 /*    if(SSL_CTX_set_cipher_list(
             enc->ssl_ctx,
             "-ALL:"

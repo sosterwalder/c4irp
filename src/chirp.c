@@ -38,6 +38,7 @@ static ch_config_t _ch_config_defaults = {
     .BIND_V4         = {0, 0, 0, 0},
     .IDENTITY        = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     .CERT_CHAIN_PEM  = NULL,
+    .DH_PARAMS_PEM   = NULL,
 };
 
 // .. c:var:: int _ch_chirp_ref_count
@@ -565,6 +566,11 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
 {
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_config_t* conf = &chirp->_->config;
+    V(
+        chirp,
+        conf->DH_PARAMS_PEM != NULL,
+        "Config: DH_PARAMS_PEM must be set."
+    );
     V(
         chirp,
         conf->CERT_CHAIN_PEM != NULL,

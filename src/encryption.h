@@ -11,6 +11,35 @@
 
 #include <openssl/ssl.h>
 
+// .. c:type:: ch_en_tls_ops_t
+//
+//    Represents tls operations
+//
+//    .. c:member:: CH_EN_OP_HANDSHAKE
+//
+//       Continue with handshake
+//
+//    .. c:member:: CH_EN_OP_READ
+//
+//       Read data from remote
+//
+//    .. c:member:: CH_EN_OP_WRITE
+//
+//       Write data to remote
+//
+//    .. c:member:: CH_EN_OP_SHUTDOWN
+//
+//       Continue with shutdown
+//
+// .. code-block:: cpp
+//
+typedef enum {
+    CH_EN_OP_HANDSHAKE   = 0,
+    CH_EN_OP_READ        = 1,
+    CH_EN_OP_WRITE       = 2,
+    CH_EN_OP_SHUTDOWN    = 3,
+} ch_en_tls_ops_t;
+
 // .. c:type:: ch_encryption_t
 //
 //    Encryption object.

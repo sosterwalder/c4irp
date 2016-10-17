@@ -68,6 +68,7 @@ typedef struct {
     char            BIND_V4[4];
     unsigned char   IDENTITY[16];
     char*           CERT_CHAIN_PEM;
+    char*           DH_PARAMS_PEM;
 } ch_config_t;
 
 

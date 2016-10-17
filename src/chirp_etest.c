@@ -25,6 +25,7 @@ main(
     ch_config_t config;
     ch_chirp_config_init(&config);
     config.CERT_CHAIN_PEM = "./chirp/cert.pem";
+    config.DH_PARAMS_PEM = "./chirp/dh.pem";
     ch_loop_init(&loop);
     if(ch_chirp_init(&chirp, &config, &loop, NULL) != CH_SUCCESS) {
         printf("ch_chirp_init error\n");

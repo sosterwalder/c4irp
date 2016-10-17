@@ -53,15 +53,26 @@ def basic_uv():
     loop = ffi.new("uv_loop_t*")
     lib.ch_chirp_config_init(config)
     folder = __file__.split(os.path.sep)[:-1]
-    folder.append("cert.pem")
+    cert   = list(folder)
+    dh     = list(folder)
+    cert.append("cert.pem")
+    dh.append("dh.pem")
     cert = "%s%s" % (
         os.path.sep,
-        os.path.join(*folder)
+        os.path.join(*cert)
+    )
+    dh = "%s%s" % (
+        os.path.sep,
+        os.path.join(*dh)
     )
     cert_str = ffi.new(
         "char[]", cert.encode("UTF-8")
     )
+    dh_str = ffi.new(
+        "char[]", dh.encode("UTF-8")
+    )
     config.CERT_CHAIN_PEM = cert_str
+    config.DH_PARAMS_PEM = dh_str
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
     error = lib.ch_chirp_init(
         chirp,
@@ -120,15 +131,26 @@ def test_chirp_run():
     config = ffi.new("ch_config_t*")
     lib.ch_chirp_config_init(config)
     folder = __file__.split(os.path.sep)[:-1]
-    folder.append("cert.pem")
+    cert   = list(folder)
+    dh     = list(folder)
+    cert.append("cert.pem")
+    dh.append("dh.pem")
     cert = "%s%s" % (
         os.path.sep,
-        os.path.join(*folder)
+        os.path.join(*cert)
+    )
+    dh = "%s%s" % (
+        os.path.sep,
+        os.path.join(*dh)
     )
     cert_str = ffi.new(
         "char[]", cert.encode("UTF-8")
     )
+    dh_str = ffi.new(
+        "char[]", dh.encode("UTF-8")
+    )
     config.CERT_CHAIN_PEM = cert_str
+    config.DH_PARAMS_PEM  = dh_str
 
     def run():
         """Run chirp in a thread."""
