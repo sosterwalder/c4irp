@@ -25,6 +25,14 @@ def connect_ssl():
     )
     context.load_verify_locations(cert)
     context.load_cert_chain(cert)
+#    context.set_ciphers(
+#        "-ALL:"
+#        "DHE-DSS-AES256-GCM-SHA384:"
+#        "DHE-RSA-AES256-GCM-SHA384:"
+#        "DHE-RSA-AES256-SHA256:"
+#        "DHE-DSS-AES256-SHA256:"
+#    )
+
     conn = context.wrap_socket(socket.socket(socket.AF_INET))
     conn.connect(('localhost', 2998))
     conn.sendall(b'huhu')

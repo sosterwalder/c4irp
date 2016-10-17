@@ -257,6 +257,8 @@ _ch_pr_read_data_cb(
             }
             ch_cn_shutdown(conn);
         }
+        else
+            _ch_pr_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
     }
 }
 

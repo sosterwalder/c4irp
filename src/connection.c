@@ -418,6 +418,18 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn)
         return CH_TLS_ERROR;
     }
     SSL_set_bio(conn->ssl, conn->bio_ssl, conn->bio_ssl);
+#   ifdef CH_CN_PRINT_CIPHERS
+    STACK_OF(SSL_CIPHER)* ciphers = SSL_get_ciphers(conn->ssl);
+    while(sk_SSL_CIPHER_num(ciphers) > 0) {
+        fprintf(
+            stderr,
+            "%s\n",
+            SSL_CIPHER_get_name(sk_SSL_CIPHER_pop(ciphers))
+        );
+    }
+    sk_SSL_CIPHER_free(ciphers);
+
+#   endif
     return CH_SUCCESS;
 }
 

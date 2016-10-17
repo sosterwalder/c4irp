@@ -163,15 +163,13 @@ ch_en_start(ch_encryption_t* enc)
         );
         return CH_TLS_ERROR;
     }
-    if(SSL_CTX_set_cipher_list(
+/*    if(SSL_CTX_set_cipher_list(
             enc->ssl_ctx,
             "-ALL:"
             "DHE-DSS-AES256-GCM-SHA384:"
             "DHE-RSA-AES256-GCM-SHA384:"
             "DHE-RSA-AES256-SHA256:"
             "DHE-DSS-AES256-SHA256:"
-            "AES256-GCM-SHA384:"
-            "AES256-SHA256"
     ) != 1) {
         E(
             chirp,
@@ -179,7 +177,7 @@ ch_en_start(ch_encryption_t* enc)
             chirp
         );
         return CH_TLS_ERROR;
-    }
+    }*/
     L(
         chirp,
         "Created SSL context for chirp. ch_chirp_t:%p",
