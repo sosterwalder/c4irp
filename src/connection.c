@@ -277,7 +277,7 @@ _ch_cn_shutdown_gen(
     }
     // If we have a valid SSL connection send a shutdown to the remote
     if(SSL_is_init_finished(conn->ssl)) {
-        if(SSL_shutdown(conn->ssl) < 0if(SSL_is_init_finished(conn->ssl)) {) {
+        if(SSL_shutdown(conn->ssl) < 0) {
             E(
                 chirp,
                 "Could not shutdown SSL connection. "
@@ -559,15 +559,13 @@ ch_cn_send_if_pending(ch_connection_t* conn, void* buf, size_t size)
 //
 {
     A(!(conn->flags & CH_CN_WRITE_PENDING), "Another write is still pending");
-#   ifdef NDEBUG
-        conn->flags |= CH_CN_WRITE_PENDING;
-#   endif
     int pending = BIO_pending(conn->bio_app);
     if(pending < 1)
         return;
     A(!(conn->flags & CH_CN_BUF_USED), "The uv buffer is still used");
 #   ifdef NDEBUG
         conn->flags |= CH_CN_BUF_USED;
+        conn->flags |= CH_CN_WRITE_PENDING;
 #   endif
     int read = BIO_read(conn->bio_app, buf, size);
     conn->uv_buf.base = buf;
