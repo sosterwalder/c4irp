@@ -217,6 +217,17 @@ _ch_cn_shutdown_gen(
         return CH_IN_PRORESS;
     }
     conn->flags |= CH_CN_SHUTTING_DOWN;
+    tmp_err = SSL_get_verify_result(conn->ssl);
+    if(tmp_err != X509_V_OK) {
+        E(
+            chirp,
+            "Connection has cert verification error: %d. "
+            "ch_connection_t:%p, ch_chirp_t:%p",
+            tmp_err,
+            conn,
+            chirp
+        );
+    }
     tmp_err = uv_shutdown(
         &conn->shutdown_req,
         (uv_stream_t*) &conn->client,

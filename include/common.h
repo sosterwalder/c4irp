@@ -58,7 +58,7 @@
     } else { \
         fprintf( \
             stderr, \
-            "%s:%d Error:" message "\n", \
+            "%s:%d Error: " message "\n", \
             __FILE__, \
             __LINE__, \
             ##__VA_ARGS__ \
