@@ -178,7 +178,16 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn);
 //    :param ch_chirp_t* chirp: Chirp instance
 //    :param ch_connection_t* conn: Connection to initialize
 //
-// .. code-block:: cpp
+
+// .. c:function::
+void
+ch_cn_send_if_pending(ch_connection_t* conn, void* buf, size_t size);
 //
+//    Send all pending data from SSL
+//
+//    TODO params
+//
+//
+// .. code-block:: cpp
 
 #endif //ch_connection_h

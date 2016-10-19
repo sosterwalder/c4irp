@@ -29,6 +29,16 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
 // .. c:function::
 static
 void
+_ch_cn_send_pending_cb(uv_write_t* req, int status);
+//
+//    Called by libuv when pending data has been sent
+//
+//    TODO params
+//
+
+// .. c:function::
+static
+void
 _ch_cn_shutdown_cb(uv_shutdown_t* req, int status);
 //
 //    Called by libuv after shutting a connection down.
@@ -109,6 +119,43 @@ _ch_cn_shutdown_timeout_gen_cb(
 
 // Definitions
 // ===========
+
+// .. c:function::
+static
+void
+_ch_cn_send_pending_cb(uv_write_t* req, int status)
+//    :noindex:
+//
+//    see: :c:func:`_ch_cn_send_pending_cb`
+//
+// .. code-block:: cpp
+//
+{
+    ch_connection_t* conn = req->data;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+#   ifdef NDEBUG
+        conn->flags &= ~CH_CN_WRITE_PENDING;
+        conn->flags &= ~CH_CN_BUF_USED;
+#   endif
+    if(status < 0) {
+        L(
+            chirp,
+            "Sending pending data failed. ch_chirp_t:%p, ch_connection_t:%p",
+            chirp,
+            conn
+        );
+        ch_cn_shutdown(conn);
+        return;
+    }
+    L(
+        chirp,
+        "Write to connection successful. ch_chirp_t:%p, ch_connection_t:%p",
+        chirp,
+        conn
+    );
+    ch_cn_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
+}
 
 // .. c:function::
 static
@@ -227,6 +274,19 @@ _ch_cn_shutdown_gen(
             conn,
             chirp
         );
+    }
+    // If we have a valid SSL connection send a shutdown to the remote
+    if(SSL_is_init_finished(conn->ssl)) {
+        if(SSL_shutdown(conn->ssl) < 0if(SSL_is_init_finished(conn->ssl)) {) {
+            E(
+                chirp,
+                "Could not shutdown SSL connection. "
+                "ch_connection_t:%p, ch_chirp_t:%p",
+                conn,
+                chirp
+            );
+        } else
+            ch_cn_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
     }
     tmp_err = uv_shutdown(
         &conn->shutdown_req,
@@ -486,6 +546,40 @@ ch_cn_read_alloc_cb(
     }
     buf->base = conn->buffer_uv;
     buf->len = conn->buffer_size;
+}
+
+// .. c:function::
+void
+ch_cn_send_if_pending(ch_connection_t* conn, void* buf, size_t size)
+//    :noindex:
+//
+//    see: :c:func:`ch_cn_send_if_pending`
+//
+// .. code-block:: cpp
+//
+{
+    A(!(conn->flags & CH_CN_WRITE_PENDING), "Another write is still pending");
+#   ifdef NDEBUG
+        conn->flags |= CH_CN_WRITE_PENDING;
+#   endif
+    int pending = BIO_pending(conn->bio_app);
+    if(pending < 1)
+        return;
+    A(!(conn->flags & CH_CN_BUF_USED), "The uv buffer is still used");
+#   ifdef NDEBUG
+        conn->flags |= CH_CN_BUF_USED;
+#   endif
+    int read = BIO_read(conn->bio_app, buf, size);
+    conn->uv_buf.base = buf;
+    conn->uv_buf.len = read;
+    conn->write_req.data = conn;
+    uv_write(
+        &conn->write_req,
+        (uv_stream_t*) &conn->client,
+        &conn->uv_buf,
+        1,
+        _ch_cn_send_pending_cb
+    );
 }
 
 // .. c:function::
