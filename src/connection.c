@@ -630,6 +630,7 @@ ch_cn_write(
 //    see: :c:func:`ch_cn_write`
 //
 // .. code-block:: cpp
+//
 {
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");

@@ -84,6 +84,7 @@ ch_rd_init(ch_reader_t* reader)
 //    :param ch_reader_t* reader: The reader
 //
 // .. code-block:: cpp
+//
 {
     reader->state = CH_RD_START;
 }
