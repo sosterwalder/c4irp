@@ -193,7 +193,7 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
     ch_connection_t* conn = (ch_connection_t*) ch_alloc(
         sizeof(ch_connection_t)
     );
-    if(ch_cn_init(chirp, conn) != CH_SUCCESS) {
+    if(ch_cn_init(chirp, conn, CH_CN_ENCRYPTED) != CH_SUCCESS) {
         E(
             chirp,
             "Could not initialize connection. ch_chirp_t:%p",
@@ -208,13 +208,15 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
     if (uv_accept(server, (uv_stream_t*) client) == 0) {
         L(chirp, "Accepted connection. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
         sglib_ch_connection_t_add(&protocol->connections, conn);
-        SSL_set_accept_state(conn->ssl);
+        if(conn->flags & CH_CN_ENCRYPTED) {
+            SSL_set_accept_state(conn->ssl);
+            conn->flags |= CH_CN_HANDSHAKE;
+        };
         uv_read_start(
             (uv_stream_t*) client,
             ch_cn_read_alloc_cb,
             _ch_pr_read_data_cb
         );
-        conn->flags |= CH_CN_HANDSHAKE;
     }
     else {
         conn->shutdown_tasks = 1;
@@ -251,6 +253,7 @@ _ch_pr_read(ch_connection_t* conn)
             chirp,
             conn
         );
+        ch_rd_read(conn, conn->buffer_tls, tmp_err);
     } else {
         if(tmp_err < 0) {
 #           ifndef NDEBUG
@@ -319,21 +322,24 @@ _ch_pr_read_data_cb(
         chirp,
         conn
     );
-    if(BIO_write(conn->bio_app, buf->base, nread) < 1) {
-        E(
-            chirp,
-            "SSL error writing to BIO, shutting down connection. "
-            "ch_connection_t:%p ch_chirp_t:%p",
-            conn,
-            chirp
-        );
-        ch_cn_shutdown(conn);
-        return;
-    }
-    if(conn->flags & CH_CN_HANDSHAKE)
-        _ch_pr_do_handshake(conn);
-    else
-        _ch_pr_read(conn);
+    if(conn->flags & CH_CN_ENCRYPTED) {
+        if(BIO_write(conn->bio_app, buf->base, nread) < 1) {
+            E(
+                chirp,
+                "SSL error writing to BIO, shutting down connection. "
+                "ch_connection_t:%p ch_chirp_t:%p",
+                conn,
+                chirp
+            );
+            ch_cn_shutdown(conn);
+            return;
+        }
+        if(conn->flags & CH_CN_HANDSHAKE)
+            _ch_pr_do_handshake(conn);
+        else
+            _ch_pr_read(conn);
+    } else
+        ch_rd_read(conn, buf->base, nread);
 }
 
 

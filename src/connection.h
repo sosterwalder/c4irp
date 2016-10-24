@@ -46,6 +46,7 @@ typedef enum {
     CH_CN_SHUTTING_DOWN  = 1 << 1,
     CH_CN_WRITE_PENDING  = 1 << 2,
     CH_CN_HANDSHAKE      = 1 << 3,
+    CH_CN_ENCRYPTED      = 1 << 4,
 } ch_cn_flags_t;
 
 
@@ -173,9 +174,21 @@ ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
 
 // .. c:function::
 ch_error_t
-ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn);
+ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn, uint8_t flags);
 //
 //    Initialize a connection.
+//
+//    :param ch_chirp_t* chirp: Chirp instance
+//    :param ch_connection_t* conn: Connection to initialize
+//    :param uint8_t flags: Pass CH_CN_ENCRYPTED for a encrypted connection, 0
+//                          otherwise
+//
+
+// .. c:function::
+ch_error_t
+ch_cn_init_enc(ch_chirp_t* chirp, ch_connection_t* conn);
+//
+//    Initialize encryption.
 //
 //    :param ch_chirp_t* chirp: Chirp instance
 //    :param ch_connection_t* conn: Connection to initialize

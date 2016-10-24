@@ -7,7 +7,7 @@
 #ifndef ch_reader_h
 #define ch_reader_h
 
-#include <stdlib.h>
+#include "../include/common.h"
 
 struct ch_connection_s;
 
@@ -48,6 +48,21 @@ typedef enum {
     CH_RD_WAIT  = 1,
     CH_RD_SIZE  = 2
 } ch_rd_state_t;
+
+// .. c:function::
+static
+ch_inline
+void
+ch_rd_init(ch_reader_t* reader)
+//
+//    Initialize the reader structure
+//
+//    :param ch_reader_t* reader: The reader
+//
+// .. code-block:: cpp
+{
+    reader->state = CH_RD_START;
+}
 
 // .. c:function::
 void

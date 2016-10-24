@@ -264,29 +264,31 @@ _ch_cn_shutdown_gen(
         return CH_IN_PRORESS;
     }
     conn->flags |= CH_CN_SHUTTING_DOWN;
-    tmp_err = SSL_get_verify_result(conn->ssl);
-    if(tmp_err != X509_V_OK) {
-        E(
-            chirp,
-            "Connection has cert verification error: %d. "
-            "ch_connection_t:%p, ch_chirp_t:%p",
-            tmp_err,
-            conn,
-            chirp
-        );
-    }
-    // If we have a valid SSL connection send a shutdown to the remote
-    if(SSL_is_init_finished(conn->ssl)) {
-        if(SSL_shutdown(conn->ssl) < 0) {
+    if(conn->flags & CH_CN_ENCRYPTED) {
+        tmp_err = SSL_get_verify_result(conn->ssl);
+        if(tmp_err != X509_V_OK) {
             E(
                 chirp,
-                "Could not shutdown SSL connection. "
+                "Connection has cert verification error: %d. "
                 "ch_connection_t:%p, ch_chirp_t:%p",
+                tmp_err,
                 conn,
                 chirp
             );
-        } else
-            ch_cn_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
+        }
+        // If we have a valid SSL connection send a shutdown to the remote
+        if(SSL_is_init_finished(conn->ssl)) {
+            if(SSL_shutdown(conn->ssl) < 0) {
+                E(
+                    chirp,
+                    "Could not shutdown SSL connection. "
+                    "ch_connection_t:%p, ch_chirp_t:%p",
+                    conn,
+                    chirp
+                );
+            } else
+                ch_cn_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
+        }
     }
     tmp_err = uv_shutdown(
         &conn->shutdown_req,
@@ -454,7 +456,7 @@ ch_cn_close_cb(uv_handle_t* handle)
 
 // .. c:function::
 ch_error_t
-ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn)
+ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn, uint8_t flags)
 //    :noindex:
 //
 //    see: :c:func:`ch_cn_init`
@@ -463,9 +465,27 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn)
 //
 {
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    ch_chirp_int_t* ichirp = chirp->_;
     memset(conn, 0, sizeof(ch_connection_t));
     conn->chirp = chirp;
+    conn->flags |= flags;
+    ch_rd_init(&conn->reader);
+    if(conn->flags & CH_CN_ENCRYPTED)
+        return ch_cn_init_enc(chirp, conn);
+    return CH_SUCCESS;
+}
+
+// .. c:function::
+ch_error_t
+ch_cn_init_enc(ch_chirp_t* chirp, ch_connection_t* conn)
+//    :noindex:
+//
+//    see: :c:func:`ch_cn_init_enc`
+//
+// .. code-block:: cpp
+//
+{
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    ch_chirp_int_t* ichirp = chirp->_;
     conn->ssl = SSL_new(ichirp->encryption.ssl_ctx);
     if(conn->ssl == NULL) {
 #       ifndef NDEBUG
