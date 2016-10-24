@@ -92,6 +92,7 @@ ch_pr_init(ch_chirp_t* chirp, ch_protocol_t* protocol)
     memset(protocol, 0, sizeof(ch_protocol_t));
     protocol->chirp = chirp;
 }
+
 // .. c:function::
 ch_error_t
 ch_pr_start(ch_protocol_t* protocol);
@@ -100,6 +101,7 @@ ch_pr_start(ch_protocol_t* protocol);
 //
 //    TODO params
 //
+
 // .. c:function::
 ch_error_t
 ch_pr_stop(ch_protocol_t* protocol);
