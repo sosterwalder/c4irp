@@ -154,7 +154,7 @@ _ch_cn_send_pending_cb(uv_write_t* req, int status)
         chirp,
         conn
     );
-    ch_cn_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
+    ch_cn_send_if_pending(conn);
 }
 
 // .. c:function::
@@ -287,7 +287,7 @@ _ch_cn_shutdown_gen(
                     chirp
                 );
             } else
-                ch_cn_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
+                ch_cn_send_if_pending(conn);
         }
     }
     tmp_err = uv_shutdown(
@@ -468,6 +468,7 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn, uint8_t flags)
     memset(conn, 0, sizeof(ch_connection_t));
     conn->chirp = chirp;
     conn->flags |= flags;
+    conn->uv_buf.base = conn->buffer_uv;
     ch_rd_init(&conn->reader);
     if(conn->flags & CH_CN_ENCRYPTED)
         return ch_cn_init_enc(chirp, conn);
@@ -570,7 +571,7 @@ ch_cn_read_alloc_cb(
 
 // .. c:function::
 void
-ch_cn_send_if_pending(ch_connection_t* conn, void* buf, size_t size)
+ch_cn_send_if_pending(ch_connection_t* conn)
 //    :noindex:
 //
 //    see: :c:func:`ch_cn_send_if_pending`
@@ -587,8 +588,7 @@ ch_cn_send_if_pending(ch_connection_t* conn, void* buf, size_t size)
         conn->flags |= CH_CN_BUF_USED;
         conn->flags |= CH_CN_WRITE_PENDING;
 #   endif
-    int read = BIO_read(conn->bio_app, buf, size);
-    conn->uv_buf.base = buf;
+    int read = BIO_read(conn->bio_app, conn->buffer_uv, conn->buffer_size);
     conn->uv_buf.len = read;
     conn->write_req.data = conn;
     uv_write(
@@ -614,5 +614,45 @@ ch_cn_shutdown(ch_connection_t* conn)
         conn,
         _ch_cn_shutdown_cb,
         _ch_cn_shutdown_timeout_cb
+    );
+}
+
+// .. c:function::
+void
+ch_cn_write(
+        ch_connection_t* conn,
+        void* buf,
+        size_t size,
+        uv_write_cb callback
+)
+//    :noindex:
+//
+//    see: :c:func:`ch_cn_write`
+//
+// .. code-block:: cpp
+{
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    A(!(conn->flags & CH_CN_BUF_USED), "The uv buffer is still used");
+#   ifdef NDEBUG
+        conn->flags |= CH_CN_BUF_USED;
+        conn->flags |= CH_CN_WRITE_PENDING;
+#   endif
+    if(conn->flags & CH_CN_ENCRYPTED) {
+        BIO_write(conn->bio_app, buf, size);
+        int read = BIO_read(conn->bio_app, conn->buffer_uv, conn->buffer_size);
+        conn->uv_buf.len = read;
+        conn->write_req.data = conn;
+    } else {
+        memcpy(conn->buffer_uv, buf, size);
+        conn->uv_buf.len = size;
+        conn->write_req.data = conn;
+    }
+    uv_write(
+        &conn->write_req,
+        (uv_stream_t*) &conn->client,
+        &conn->uv_buf,
+        1,
+        callback
     );
 }

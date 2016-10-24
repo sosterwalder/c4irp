@@ -32,6 +32,7 @@ static ch_config_t _ch_config_defaults = {
     .TIMEOUT         = 5,
     .PORT            = 2998,
     .BACKLOG         = 100,
+    .RETRIES         = 1,
     .CLOSE_ON_SIGINT = 1,
     .BUFFER_SIZE     = 0,
     .BIND_V6         = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -357,6 +358,7 @@ ch_chirp_init(
     ch_chirp_int_t* ichirp  = ch_alloc(sizeof(ch_chirp_int_t));
     memset(ichirp, 0, sizeof(ch_chirp_int_t));
     ichirp->config          = *config;
+    ichirp->public_port     = config->PORT;
     ichirp->loop            = loop;
     ch_config_t* tmp_conf   = &ichirp->config;
     ch_protocol_t* protocol = &ichirp->protocol;

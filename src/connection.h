@@ -196,11 +196,29 @@ ch_cn_init_enc(ch_chirp_t* chirp, ch_connection_t* conn);
 
 // .. c:function::
 void
-ch_cn_send_if_pending(ch_connection_t* conn, void* buf, size_t size);
+ch_cn_send_if_pending(ch_connection_t* conn);
 //
 //    Send all pending data from SSL
 //
 //    TODO params
+//
+//
+// .. c:function::
+void
+ch_cn_write(
+        ch_connection_t* conn,
+        void* buf,
+        size_t size,
+        uv_write_cb callback
+);
+//
+//    Send data to remote
+//
+//    :param ch_connection_t* conn: Connection
+//    :param void* buf: Buffer to send, will be copied and there can be freed
+//                      after this call.
+//    :param size_t size: Size of data to send
+//    :param uv_write_cb: Callback when data is written, can be NULL
 //
 //
 // .. code-block:: cpp

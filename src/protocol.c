@@ -137,7 +137,7 @@ _ch_pr_do_handshake(ch_connection_t* conn)
         }
     } else {
         conn->handshake_state = SSL_do_handshake(conn->ssl);
-        ch_cn_send_if_pending(conn, conn->buffer_uv, conn->buffer_size);
+        ch_cn_send_if_pending(conn);
     }
 }
 

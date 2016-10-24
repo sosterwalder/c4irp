@@ -22,7 +22,7 @@ struct ch_connection_s;
 // .. code-block:: cpp
 
 typedef struct ch_reader_s {
-  unsigned char state;
+    unsigned char state;
 } ch_reader_t;
 
 // .. c:type:: ch_rd_state
@@ -49,6 +49,30 @@ typedef enum {
     CH_RD_SIZE  = 2
 } ch_rd_state_t;
 
+// .. c:type:: ch_rd_handshake_t
+//
+//    Connection handshake data
+//
+//    .. c:member:: port
+//
+//    Public port
+//
+//    .. c:member:: port
+//
+//    Maximum timeout
+//
+//    .. c:member:: identity
+//
+//    identity
+//
+// .. code-block:: cpp
+
+typedef struct ch_rd_handshake_s {
+    uint16_t port;
+    uint16_t max_timeout;
+    unsigned char identity[16];
+} ch_rd_handshake_t;
+
 // .. c:function::
 static
 ch_inline
@@ -66,12 +90,12 @@ ch_rd_init(ch_reader_t* reader)
 
 // .. c:function::
 void
-ch_rd_read(struct ch_connection_s* conn, char* buf, size_t read);
+ch_rd_read(struct ch_connection_s* conn, void* buf, size_t read);
 //
 //    Implements the wire protocol reader part.
 //
 //    :param ch_connection_t* conn: Connection the data was read from
-//    :param char* buf: The that read
+//    :param void* buf: The that read
 //    :param size_t read: Count of bytes read
 //
 // .. code-block:: cpp

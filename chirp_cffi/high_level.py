@@ -118,6 +118,7 @@ typedef struct {
     float           TIMEOUT;
     uint16_t        PORT;
     uint8_t         BACKLOG;
+    uint8_t         RETRIES;
     char            CLOSE_ON_SIGINT;
     uint32_t        BUFFER_SIZE;
     char            BIND_V6[16];

@@ -116,6 +116,7 @@ class ChirpPool(object):
                 'TIMEOUT',
                 'PORT',
                 'BACKLOG',
+                'RETRIES',
         ]:
             setattr(
                 c_conf,
