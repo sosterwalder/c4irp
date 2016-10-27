@@ -17,6 +17,10 @@ RULES
 
 * We use defined length integers ie. uint8_t for file-formates, wire-protocols
   and when plain int is really really wasteful
+* Buffers and chars:
+  * char* for C-strings
+  * void* for buffers
+  * uint8_t for bytes (for example the identity)
 * Use one flags member instead of many bools (int)
 * Structs end in _s
 * All the structs have a typedef ending in _t
