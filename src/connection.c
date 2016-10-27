@@ -480,7 +480,6 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn, uint8_t flags)
     memset(conn, 0, sizeof(ch_connection_t));
     conn->chirp = chirp;
     conn->flags |= flags;
-    conn->uv_buf.base = conn->buffer_uv;
     ch_rd_init(&conn->reader);
     if(conn->flags & CH_CN_ENCRYPTED)
         return ch_cn_init_enc(chirp, conn);
@@ -579,6 +578,7 @@ ch_cn_read_alloc_cb(
     }
     buf->base = conn->buffer_uv;
     buf->len = conn->buffer_size;
+    conn->uv_buf.base = conn->buffer_uv;
 }
 
 // .. c:function::
