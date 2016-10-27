@@ -296,22 +296,10 @@ _ch_pr_read_data_cb(
     ch_connection_t* conn = stream->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    ch_protocol_t* protocol = &chirp->_->protocol;
 #   ifndef NDEBUG
         conn->flags &= ~CH_CN_BUF_USED;
 #   endif
     if(nread == UV_EOF) {
-        if(sglib_ch_connection_t_is_member(protocol->connections, conn))
-            sglib_ch_connection_t_delete(&protocol->connections, conn);
-        else {
-            E(
-                chirp,
-                "Closing unknown connection. ch_connection_t:%p "
-                "ch_chirp_t:%p",
-                conn,
-                chirp
-            );
-        }
         ch_cn_shutdown(conn);
         return;
     }

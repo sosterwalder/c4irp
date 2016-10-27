@@ -254,6 +254,7 @@ _ch_cn_shutdown_gen(
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_chirp_int_t* ichirp = chirp->_;
+    ch_protocol_t* protocol = &ichirp->protocol;
     if(conn->flags & CH_CN_SHUTTING_DOWN) {
         E(
             chirp,
@@ -262,6 +263,17 @@ _ch_cn_shutdown_gen(
             chirp
         );
         return CH_IN_PRORESS;
+    }
+    if(sglib_ch_connection_t_is_member(protocol->connections, conn))
+        sglib_ch_connection_t_delete(&protocol->connections, conn);
+    else {
+        E(
+            chirp,
+            "Closing unknown connection. ch_connection_t:%p "
+            "ch_chirp_t:%p",
+            conn,
+            chirp
+        );
     }
     conn->flags |= CH_CN_SHUTTING_DOWN;
     if(conn->flags & CH_CN_ENCRYPTED) {
