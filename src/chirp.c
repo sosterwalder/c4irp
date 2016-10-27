@@ -376,7 +376,7 @@ ch_chirp_init(
     srand((unsigned int) time(NULL));
     int i = 0;
     while(
-            i < sizeof(tmp_conf->IDENTITY) &&
+            i < (sizeof(tmp_conf->IDENTITY) - 1) &&
             tmp_conf->IDENTITY[i] == 0
     ) i += 1;
     if(tmp_conf->IDENTITY[i] == 0)
