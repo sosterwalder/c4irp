@@ -119,8 +119,10 @@ _ch_pr_do_handshake(ch_connection_t* conn)
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     if(SSL_is_init_finished(conn->ssl)) {
-        conn->flags &= ~CH_CN_HANDSHAKE;
-        if(conn->handshake_state == 1)
+        conn->flags &= ~CH_CN_TLS_HANDSHAKE;
+        // Last handshake state, since we got that on the last read and have to
+        // use it on this read.
+        if(conn->tls_handshake_state == 1)
             _ch_pr_read(conn);
         else {
 #           ifndef NDEBUG
@@ -136,7 +138,8 @@ _ch_pr_do_handshake(ch_connection_t* conn)
             return;
         }
     } else {
-        conn->handshake_state = SSL_do_handshake(conn->ssl);
+        // Save the state for the next callback-iteration.
+        conn->tls_handshake_state = SSL_do_handshake(conn->ssl);
         ch_cn_send_if_pending(conn);
     }
 }
@@ -210,7 +213,7 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
         sglib_ch_connection_t_add(&protocol->connections, conn);
         if(conn->flags & CH_CN_ENCRYPTED) {
             SSL_set_accept_state(conn->ssl);
-            conn->flags |= CH_CN_HANDSHAKE;
+            conn->flags |= CH_CN_TLS_HANDSHAKE;
         };
         uv_read_start(
             (uv_stream_t*) client,
@@ -242,7 +245,7 @@ _ch_pr_read(ch_connection_t* conn)
     // Handshake done, normal operation
     tmp_err = SSL_read(
         conn->ssl,
-        conn->buffer_tls,
+        conn->buffer_rtls,
         conn->buffer_size
     );
     if(tmp_err > 0) {
@@ -253,7 +256,7 @@ _ch_pr_read(ch_connection_t* conn)
             chirp,
             conn
         );
-        ch_rd_read(conn, conn->buffer_tls, tmp_err);
+        ch_rd_read(conn, conn->buffer_rtls, tmp_err);
     } else {
         if(tmp_err < 0) {
 #           ifndef NDEBUG
@@ -293,11 +296,13 @@ _ch_pr_read_data_cb(
 // .. code-block:: cpp
 //
 {
+    int tmp_err;
+    size_t bytes_decrypted = 0;
     ch_connection_t* conn = stream->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
 #   ifndef NDEBUG
-        conn->flags &= ~CH_CN_BUF_USED;
+        conn->flags &= ~CH_CN_BUF_UV_USED;
 #   endif
     if(nread == UV_EOF) {
         ch_cn_shutdown(conn);
@@ -311,21 +316,25 @@ _ch_pr_read_data_cb(
         conn
     );
     if(conn->flags & CH_CN_ENCRYPTED) {
-        if(BIO_write(conn->bio_app, buf->base, nread) < 1) {
-            E(
-                chirp,
-                "SSL error writing to BIO, shutting down connection. "
-                "ch_connection_t:%p ch_chirp_t:%p",
-                conn,
-                chirp
-            );
-            ch_cn_shutdown(conn);
-            return;
-        }
-        if(conn->flags & CH_CN_HANDSHAKE)
-            _ch_pr_do_handshake(conn);
-        else
-            _ch_pr_read(conn);
+        do {
+            tmp_err = BIO_write(conn->bio_app, buf->base, nread);
+            if(tmp_err < 0) {
+                E(
+                    chirp,
+                    "SSL error writing to BIO, shutting down connection. "
+                    "ch_connection_t:%p ch_chirp_t:%p",
+                    conn,
+                    chirp
+                );
+                ch_cn_shutdown(conn);
+                return;
+            }
+            bytes_decrypted += tmp_err;
+            if(conn->flags & CH_CN_TLS_HANDSHAKE)
+                _ch_pr_do_handshake(conn);
+            else
+                _ch_pr_read(conn);
+        } while(bytes_decrypted < nread);
     } else
         ch_rd_read(conn, buf->base, nread);
 }

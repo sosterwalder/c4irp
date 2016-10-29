@@ -136,7 +136,7 @@ _ch_cn_send_pending_cb(uv_write_t* req, int status)
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
 #   ifdef NDEBUG
         conn->flags &= ~CH_CN_WRITE_PENDING;
-        conn->flags &= ~CH_CN_BUF_USED;
+        conn->flags &= ~CH_CN_BUF_WTLS_USED;
 #   endif
     if(status < 0) {
         L(
@@ -447,7 +447,10 @@ ch_cn_close_cb(uv_handle_t* handle)
     if(conn->shutdown_tasks < 1) {
         if(conn->buffer_uv != NULL) {
             ch_free(conn->buffer_uv);
-            ch_free(conn->buffer_tls);
+            if(conn->flags & CH_CN_ENCRYPTED) {
+                ch_free(conn->buffer_wtls);
+                ch_free(conn->buffer_rtls);
+            }
         }
         if(conn->ssl != NULL)
             SSL_free(conn->ssl); // The doc says this frees conn->bio_ssl
@@ -558,27 +561,40 @@ ch_cn_read_alloc_cb(
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_chirp_int_t* ichirp = chirp->_;
+    //ichirp->config.BUFFER_SIZE = 40; // TODO remove
+    A(!(conn->flags & CH_CN_BUF_UV_USED), "UV buffer still used");
+#   ifndef NDEBUG
+        conn->flags |= CH_CN_BUF_UV_USED;
+#   endif
     if(!conn->buffer_uv) {
         // We also allocate the TLS buffer, because they have to be of the same
         // size
         if(ichirp->config.BUFFER_SIZE == 0) {
             conn->buffer_uv   = ch_alloc(suggested_size);
-            conn->buffer_tls  = ch_alloc(suggested_size);
+            if(conn->flags & CH_CN_ENCRYPTED) {
+                conn->buffer_wtls  = ch_alloc(suggested_size);
+                conn->buffer_rtls  = ch_alloc(suggested_size);
+            }
             conn->buffer_size = suggested_size;
         } else {
             conn->buffer_uv   = ch_alloc(ichirp->config.BUFFER_SIZE);
-            conn->buffer_tls  = ch_alloc(ichirp->config.BUFFER_SIZE);
+            if(conn->flags & CH_CN_ENCRYPTED) {
+                conn->buffer_wtls  = ch_alloc(ichirp->config.BUFFER_SIZE);
+                conn->buffer_rtls  = ch_alloc(ichirp->config.BUFFER_SIZE);
+            }
             conn->buffer_size = ichirp->config.BUFFER_SIZE;
         }
-#       ifndef NDEBUG
-            conn->flags |= CH_CN_BUF_USED;
-#       endif
-    } else {
-        A(!(conn->flags & CH_CN_BUF_USED), "Buffer still used");
+        conn->buffer_uv_uv = uv_buf_init(
+            conn->buffer_uv,
+            conn->buffer_size
+        );
+        conn->buffer_wtls_uv = uv_buf_init(
+            conn->buffer_wtls,
+            conn->buffer_size
+        );
     }
     buf->base = conn->buffer_uv;
     buf->len = conn->buffer_size;
-    conn->uv_buf.base = conn->buffer_uv;
 }
 
 // .. c:function::
@@ -592,23 +608,32 @@ ch_cn_send_if_pending(ch_connection_t* conn)
 //
 {
     A(!(conn->flags & CH_CN_WRITE_PENDING), "Another write is still pending");
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     int pending = BIO_pending(conn->bio_app);
     if(pending < 1)
         return;
-    A(!(conn->flags & CH_CN_BUF_USED), "The uv buffer is still used");
+    A(!(conn->flags & CH_CN_BUF_WTLS_USED), "The wtls buffer is still used");
 #   ifdef NDEBUG
-        conn->flags |= CH_CN_BUF_USED;
+        conn->flags |= CH_CN_BUF_WTLS_USED;
         conn->flags |= CH_CN_WRITE_PENDING;
 #   endif
-    int read = BIO_read(conn->bio_app, conn->buffer_uv, conn->buffer_size);
-    conn->uv_buf.len = read;
+    int read = BIO_read(conn->bio_app, conn->buffer_wtls, conn->buffer_size);
+    conn->buffer_wtls_uv.len = read;
     conn->write_req.data = conn;
     uv_write(
         &conn->write_req,
         (uv_stream_t*) &conn->client,
-        &conn->uv_buf,
+        &conn->buffer_wtls_uv,
         1,
         _ch_cn_send_pending_cb
+    );
+    L(
+        chirp,
+        "Sending %d pending bytes. ch_chirp_t:%p, ch_connection_t:%p",
+        read,
+        chirp,
+        conn
     );
 }
 
@@ -646,26 +671,32 @@ ch_cn_write(
 {
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    A(!(conn->flags & CH_CN_BUF_USED), "The uv buffer is still used");
+    A(!(conn->flags & CH_CN_BUF_WTLS_USED), "The wtls buffer is still used");
 #   ifdef NDEBUG
-        conn->flags |= CH_CN_BUF_USED;
+        conn->flags |= CH_CN_BUF_WTLS_USED;
         conn->flags |= CH_CN_WRITE_PENDING;
 #   endif
     if(conn->flags & CH_CN_ENCRYPTED) {
+        // TODO rewrite this
         BIO_write(conn->bio_app, buf, size);
-        int read = BIO_read(conn->bio_app, conn->buffer_uv, conn->buffer_size);
-        conn->uv_buf.len = read;
+        int read = BIO_read(conn->bio_app, conn->buffer_wtls, conn->buffer_size);
+        conn->buffer_wtls_uv.len = read;
         conn->write_req.data = conn;
     } else {
-        memcpy(conn->buffer_uv, buf, size);
-        conn->uv_buf.len = size;
-        conn->write_req.data = conn;
+        // Write directly
     }
     uv_write(
         &conn->write_req,
         (uv_stream_t*) &conn->client,
-        &conn->uv_buf,
+        &conn->buffer_wtls_uv,
         1,
         callback
+    );
+    L(
+        chirp,
+        "Called uv_write with %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+        (int) size,
+        chirp,
+        conn
     );
 }

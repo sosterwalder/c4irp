@@ -26,15 +26,15 @@ typedef enum {
 } uv_run_mode;
 
 struct uv_loop_s {
-  /* User data - use this for whatever. */
-  void* data;
-  /* Loop reference counting. */
-  unsigned int active_handles;
-  void* handle_queue[2];
-  void* active_reqs[2];
-  /* Internal flag to signal loop stop. */
-  unsigned int stop_flag;
-  ...;
+    /* User data - use this for whatever. */
+    void* data;
+    /* Loop reference counting. */
+    unsigned int active_handles;
+    void* handle_queue[2];
+    void* active_reqs[2];
+    /* Internal flag to signal loop stop. */
+    unsigned int stop_flag;
+    ...;
 };
 typedef struct uv_loop_s uv_loop_t;
 

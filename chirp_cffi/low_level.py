@@ -64,7 +64,8 @@ typedef struct ch_connection_s {
     int32_t                 port;
     uv_tcp_t                client;
     void*                   buffer_uv;
-    void*                   buffer_tls;
+    void*                   buffer_wtls;
+    void*                   buffer_rtls;
     size_t                  buffer_size;
     ch_chirp_t*             chirp;
     uv_shutdown_t           shutdown_req;
@@ -76,7 +77,8 @@ typedef struct ch_connection_s {
     SSL*                    ssl;
     BIO*                    bio_ssl;
     BIO*                    bio_app;
-    int                     handshake_state;
+    int                     tls_handshake_state;
+    ch_reader_t             reader;
     char                    color_field;
     struct ch_connection_s* left;
     struct ch_connection_s* right;

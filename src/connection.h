@@ -35,18 +35,20 @@
 //
 //       There is a write pending.
 //
-//    .. c:member:: CH_CN_HANDSHAKE
+//    .. c:member:: CH_CN_TLS_HANDSHAKE
 //
 //       Handshake is running.
 //
 // .. code-block:: cpp
 //
 typedef enum {
-    CH_CN_BUF_USED       = 1 << 0,
-    CH_CN_SHUTTING_DOWN  = 1 << 1,
-    CH_CN_WRITE_PENDING  = 1 << 2,
-    CH_CN_HANDSHAKE      = 1 << 3,
-    CH_CN_ENCRYPTED      = 1 << 4,
+    CH_CN_SHUTTING_DOWN  = 1 << 0,
+    CH_CN_WRITE_PENDING  = 1 << 1,
+    CH_CN_TLS_HANDSHAKE  = 1 << 2,
+    CH_CN_ENCRYPTED      = 1 << 3,
+    CH_CN_BUF_WTLS_USED  = 1 << 4,
+    CH_CN_BUF_RTLS_USED  = 1 << 5,
+    CH_CN_BUF_UV_USED    = 1 << 6,
 } ch_cn_flags_t;
 
 
@@ -69,11 +71,13 @@ typedef struct ch_connection_s {
     int32_t                 port;
     uv_tcp_t                client;
     void*                   buffer_uv;
-    void*                   buffer_tls;
+    void*                   buffer_wtls;
+    void*                   buffer_rtls;
+    uv_buf_t                buffer_uv_uv;
+    uv_buf_t                buffer_wtls_uv;
     size_t                  buffer_size;
     ch_chirp_t*             chirp;
     uv_shutdown_t           shutdown_req;
-    uv_buf_t                uv_buf;
     uv_write_t              write_req;
     uv_timer_t              shutdown_timeout;
     int8_t                  shutdown_tasks;
@@ -81,7 +85,7 @@ typedef struct ch_connection_s {
     SSL*                    ssl;
     BIO*                    bio_ssl;
     BIO*                    bio_app;
-    int                     handshake_state;
+    int                     tls_handshake_state;
     ch_reader_t             reader;
     char                    color_field;
     struct ch_connection_s* left;
@@ -215,8 +219,8 @@ ch_cn_write(
 //    Send data to remote
 //
 //    :param ch_connection_t* conn: Connection
-//    :param void* buf: Buffer to send, will be copied and there can be freed
-//                      after this call.
+//    :param void* buf: Buffer to send. It must stay valid till the callback is
+//                      called.
 //    :param size_t size: Size of data to send
 //    :param uv_write_cb: Callback when data is written, can be NULL
 //

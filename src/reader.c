@@ -20,6 +20,7 @@ ch_rd_read(ch_connection_t* conn, void* buf, size_t read)
 // .. code-block:: cpp
 //
 {
+    // TODO excpect partial reads
     ch_rd_handshake_t hs;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
