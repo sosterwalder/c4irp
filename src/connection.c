@@ -161,11 +161,7 @@ _ch_cn_partial_write(ch_connection_t* conn)
     A(!(conn->flags & CH_CN_WRITE_PENDING), "Another uv write is pending");
 #   ifndef NDEBUG
         conn->flags |= CH_CN_WRITE_PENDING;
-#   endif
-#   ifndef NDEBUG
         conn->flags |= CH_CN_BUF_WTLS_USED;
-        int pending = BIO_pending(conn->bio_app);
-        A(pending == 0, "There is still pending data in SSL BIO");
 #   endif
     do {
         tmp_err = SSL_write(
@@ -189,7 +185,6 @@ _ch_cn_partial_write(ch_connection_t* conn)
             conn->buffer_wtls + bytes_read,
             conn->buffer_size - bytes_read
         );
-        assert(read >= tmp_err); // SSL adds some bytes
         bytes_encrypted += tmp_err;
         bytes_read += read;
     } while(
@@ -537,24 +532,61 @@ _ch_cn_write_cb(uv_write_t* req, int status)
         _ch_cn_partial_write(conn);
         L(
             chirp,
-            "Partially sent %d of %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+            "Partially encrypted %d of %d bytes. "
+            "ch_chirp_t:%p, ch_connection_t:%p",
             (int) conn->write_written,
             (int) conn->write_size,
             chirp,
             conn
         );
-    }
-    else {
-        L(
-            chirp,
-            "Completely sent %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
-            (int) conn->write_written,
-            chirp,
-            conn
-        );
-        conn->write_size = 0;
-        if(conn->write_callback != NULL)
-            conn->write_callback(req, status);
+    } else {
+        int pending = BIO_pending(conn->bio_app);
+        if(pending < 1) {
+            L(
+                chirp,
+                "Completely sent %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+                (int) conn->write_written,
+                chirp,
+                conn
+            );
+            conn->write_size = 0;
+            if(conn->write_callback != NULL)
+                conn->write_callback(req, status);
+        } else {
+#           ifndef NDEBUG
+                conn->flags |= CH_CN_WRITE_PENDING;
+                conn->flags |= CH_CN_BUF_WTLS_USED;
+#           endif
+            L(
+                chirp,
+                "Partially sent %d bytes. "
+                "ch_chirp_t:%p, ch_connection_t:%p",
+                (int) conn->buffer_size,
+                chirp,
+                conn
+            );
+            int read = BIO_read(
+                conn->bio_app,
+                conn->buffer_wtls,
+                conn->buffer_size
+            );
+            conn->buffer_wtls_uv.len = read;
+            uv_write(
+                &conn->write_req,
+                (uv_stream_t*) &conn->client,
+                &conn->buffer_wtls_uv,
+                1,
+                _ch_cn_write_cb
+            );
+            L(
+                chirp,
+                "Called uv_write with %d bytes. ch_chirp_t:%p, "
+                "ch_connection_t:%p",
+                (int) read,
+                chirp,
+                conn
+            );
+        }
     }
 }
 
@@ -710,7 +742,7 @@ ch_cn_read_alloc_cb(
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_chirp_int_t* ichirp = chirp->_;
-    //ichirp->config.BUFFER_SIZE = 40; // TODO remove
+    // ichirp->config.BUFFER_SIZE = 40; // TODO remove
     A(!(conn->flags & CH_CN_BUF_UV_USED), "UV buffer still used");
 #   ifndef NDEBUG
         conn->flags |= CH_CN_BUF_UV_USED;
@@ -825,6 +857,10 @@ ch_cn_write(
         conn->write_buffer    = buf;
         conn->write_size      = size;
         conn->write_written   = 0;
+#       ifndef NDEBUG
+            int pending = BIO_pending(conn->bio_app);
+            A(pending == 0, "There is still pending data in SSL BIO");
+#       endif
         _ch_cn_partial_write(conn);
     } else {
         conn->buffer_any_uv = uv_buf_init(buf, size);
