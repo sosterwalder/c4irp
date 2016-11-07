@@ -631,9 +631,23 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
     );
     V(
         chirp,
-        conf->BUFFER_SIZE > CH_LIB_UV_MIN_BUFFER || conf->BUFFER_SIZE == 0,
+        conf->BUFFER_SIZE >= CH_LIB_UV_MIN_BUFFER || conf->BUFFER_SIZE == 0,
         "Config: buffer size must be > %d (%d)",
         CH_LIB_UV_MIN_BUFFER,
+        conf->BUFFER_SIZE
+    );
+    V(
+        chirp,
+        conf->BUFFER_SIZE >= sizeof(ch_message_t) || conf->BUFFER_SIZE == 0,
+        "Config: buffer size must be > %d (%d)",
+        (int) sizeof(ch_message_t),
+        conf->BUFFER_SIZE
+    );
+    V(
+        chirp,
+        conf->BUFFER_SIZE >= sizeof(ch_rd_handshake_t) || conf->BUFFER_SIZE == 0,
+        "Config: buffer size must be > %d (%d)",
+        (int) sizeof(ch_rd_handshake_t),
         conf->BUFFER_SIZE
     );
     return CH_SUCCESS;

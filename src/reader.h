@@ -11,20 +11,6 @@
 
 struct ch_connection_s;
 
-// .. c:type:: ch_reader_t
-//
-//    Contains the state of the reader
-//
-//    .. c:member:: state
-//
-//    Statemachine-state of the reader
-//
-// .. code-block:: cpp
-
-typedef struct ch_reader_s {
-    unsigned char state;
-} ch_reader_t;
-
 // .. c:type:: ch_rd_state
 //
 //    Represents connection flags.
@@ -72,6 +58,26 @@ typedef struct ch_rd_handshake_s {
     uint16_t max_timeout;
     unsigned char identity[16];
 } ch_rd_handshake_t;
+
+// .. c:type:: ch_reader_t
+//
+//    Contains the state of the reader
+//
+//    .. c:member:: unsinged char state
+//
+//    Statemachine-state of the reader
+//
+//    .. c:member:: ch_rd_handshake_t hs
+//
+//    Handshake structure to send over the network
+//
+// .. code-block:: cpp
+
+typedef struct ch_reader_s {
+    unsigned char state;
+    ch_rd_handshake_t hs;
+} ch_reader_t;
+
 
 // .. c:function::
 static

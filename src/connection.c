@@ -28,6 +28,17 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
 
 // .. c:function::
 static
+ch_inline
+void
+_ch_cn_partial_write(ch_connection_t* conn);
+//
+//    Called by libuv when pending data has been sent
+//
+//    :param ch_connection_t* conn: Connection
+//
+
+// .. c:function::
+static
 void
 _ch_cn_send_pending_cb(uv_write_t* req, int status);
 //
@@ -117,8 +128,91 @@ _ch_cn_shutdown_timeout_gen_cb(
 //                                       after the shutdown is
 //                                       complete
 
+// .. c:function::
+static
+void
+_ch_cn_write_cb(uv_write_t* req, int status);
+//
+//    Callback used for ch_cn_write.
+//
+//    :param uv_write_t* req: Write request
+//    :param int status: Write status
+//
+
 // Definitions
 // ===========
+// .. c:function::
+static
+ch_inline
+void
+_ch_cn_partial_write(ch_connection_t* conn)
+//    :noindex:
+//
+//    see: :c:func:`_ch_cn_partial_write`
+//
+// .. code-block:: cpp
+{
+    int tmp_err;
+    size_t bytes_encrypted = 0;
+    size_t bytes_read      = 0;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    A(!(conn->flags & CH_CN_BUF_WTLS_USED), "The wtls buffer is still used");
+    A(!(conn->flags & CH_CN_WRITE_PENDING), "Another uv write is pending");
+#   ifndef NDEBUG
+        conn->flags |= CH_CN_WRITE_PENDING;
+#   endif
+#   ifndef NDEBUG
+        conn->flags |= CH_CN_BUF_WTLS_USED;
+        int pending = BIO_pending(conn->bio_app);
+        A(pending == 0, "There is still pending data in SSL BIO");
+#   endif
+    do {
+        tmp_err = SSL_write(
+            conn->ssl,
+            conn->write_buffer + bytes_encrypted + conn->write_written,
+            conn->write_size - bytes_encrypted - conn->write_written
+        );
+        if(tmp_err < 1) {
+            E(
+                chirp,
+                "SSL error writing to BIO, shutting down connection. "
+                "ch_connection_t:%p ch_chirp_t:%p",
+                conn,
+                chirp
+            );
+            ch_cn_shutdown(conn);
+            return;
+        }
+        int read = BIO_read(
+            conn->bio_app,
+            conn->buffer_wtls + bytes_read,
+            conn->buffer_size - bytes_read
+        );
+        assert(read >= tmp_err); // SSL adds some bytes
+        bytes_encrypted += tmp_err;
+        bytes_read += read;
+    } while(
+        ((bytes_encrypted + conn->write_written) < conn->write_size) &&
+        (bytes_read < conn->buffer_size)
+    );
+    conn->buffer_wtls_uv.len = bytes_read;
+    uv_write(
+        &conn->write_req,
+        (uv_stream_t*) &conn->client,
+        &conn->buffer_wtls_uv,
+        1,
+        _ch_cn_write_cb
+    );
+    L(
+        chirp,
+        "Called uv_write with %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+        (int) bytes_read,
+        chirp,
+        conn
+    );
+    conn->write_written += bytes_encrypted;
+}
 
 // .. c:function::
 static
@@ -134,7 +228,7 @@ _ch_cn_send_pending_cb(uv_write_t* req, int status)
     ch_connection_t* conn = req->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-#   ifdef NDEBUG
+#   ifndef NDEBUG
         conn->flags &= ~CH_CN_WRITE_PENDING;
         conn->flags &= ~CH_CN_BUF_WTLS_USED;
 #   endif
@@ -411,6 +505,60 @@ _ch_cn_shutdown_timeout_gen_cb(
 }
 
 // .. c:function::
+static
+void
+_ch_cn_write_cb(uv_write_t* req, int status)
+//    :noindex:
+//
+//    see: :c:func:`_ch_cn_write_cb`
+//
+// .. code-block:: cpp
+//
+{
+    ch_connection_t* conn = req->data;
+    ch_chirp_t* chirp = conn->chirp;
+    A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+#   ifndef NDEBUG
+        conn->flags &= ~CH_CN_WRITE_PENDING;
+        conn->flags &= ~CH_CN_BUF_WTLS_USED;
+#   endif
+    if(status < 0) {
+        L(
+            chirp,
+            "Sending pending data failed. ch_chirp_t:%p, ch_connection_t:%p",
+            chirp,
+            conn
+        );
+        conn->write_callback(req, status);
+        ch_cn_shutdown(conn);
+        return;
+    }
+    if(conn->write_size < conn->write_written) {
+        _ch_cn_partial_write(conn);
+        L(
+            chirp,
+            "Partially sent %d of %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+            (int) conn->write_written,
+            (int) conn->write_size,
+            chirp,
+            conn
+        );
+    }
+    else {
+        L(
+            chirp,
+            "Completely sent %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+            (int) conn->write_written,
+            chirp,
+            conn
+        );
+        conn->write_size = 0;
+        if(conn->write_callback != NULL)
+            conn->write_callback(req, status);
+    }
+}
+
+// .. c:function::
 void
 ch_cn_close_cb(uv_handle_t* handle)
 //    :noindex:
@@ -481,8 +629,9 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn, uint8_t flags)
 {
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     memset(conn, 0, sizeof(ch_connection_t));
-    conn->chirp = chirp;
-    conn->flags |= flags;
+    conn->chirp           = chirp;
+    conn->flags          |= flags;
+    conn->write_req.data  = conn;
     ch_rd_init(&conn->reader);
     if(conn->flags & CH_CN_ENCRYPTED)
         return ch_cn_init_enc(chirp, conn);
@@ -614,13 +763,12 @@ ch_cn_send_if_pending(ch_connection_t* conn)
     if(pending < 1)
         return;
     A(!(conn->flags & CH_CN_BUF_WTLS_USED), "The wtls buffer is still used");
-#   ifdef NDEBUG
+#   ifndef NDEBUG
         conn->flags |= CH_CN_BUF_WTLS_USED;
         conn->flags |= CH_CN_WRITE_PENDING;
 #   endif
     int read = BIO_read(conn->bio_app, conn->buffer_wtls, conn->buffer_size);
     conn->buffer_wtls_uv.len = read;
-    conn->write_req.data = conn;
     uv_write(
         &conn->write_req,
         (uv_stream_t*) &conn->client,
@@ -671,32 +819,28 @@ ch_cn_write(
 {
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    A(!(conn->flags & CH_CN_BUF_WTLS_USED), "The wtls buffer is still used");
-#   ifdef NDEBUG
-        conn->flags |= CH_CN_BUF_WTLS_USED;
-        conn->flags |= CH_CN_WRITE_PENDING;
-#   endif
+    A(conn->write_size == 0, "Another connection write is pending");
     if(conn->flags & CH_CN_ENCRYPTED) {
-        // TODO rewrite this
-        BIO_write(conn->bio_app, buf, size);
-        int read = BIO_read(conn->bio_app, conn->buffer_wtls, conn->buffer_size);
-        conn->buffer_wtls_uv.len = read;
-        conn->write_req.data = conn;
+        conn->write_callback  = callback;
+        conn->write_buffer    = buf;
+        conn->write_size      = size;
+        conn->write_written   = 0;
+        _ch_cn_partial_write(conn);
     } else {
-        // Write directly
+        conn->buffer_any_uv = uv_buf_init(buf, size);
+        uv_write(
+            &conn->write_req,
+            (uv_stream_t*) &conn->client,
+            &conn->buffer_any_uv,
+            1,
+            _ch_cn_write_cb
+        );
+        L(
+            chirp,
+            "Called uv_write with %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+            (int) size,
+            chirp,
+            conn
+        );
     }
-    uv_write(
-        &conn->write_req,
-        (uv_stream_t*) &conn->client,
-        &conn->buffer_wtls_uv,
-        1,
-        callback
-    );
-    L(
-        chirp,
-        "Called uv_write with %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
-        (int) size,
-        chirp,
-        conn
-    );
 }

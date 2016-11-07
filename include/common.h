@@ -234,4 +234,22 @@ A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*")
 #   define ch_inline inline
 #endif // _WIN32
 
+// Generic functions
+// =================
+//
+#define MINMAX_FUNCS(type) \
+static \
+ch_inline \
+type \
+max_##type(type a, type b) { \
+    return (a > b) ? a : b; \
+} \
+static \
+ch_inline \
+type \
+min_##type(type a, type b) { \
+    return (a < b) ? a : b; \
+}
+
+
 #endif //ch_common_h

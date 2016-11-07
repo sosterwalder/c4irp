@@ -132,6 +132,7 @@ ch_en_start(ch_encryption_t* enc)
         SSL_MODE_AUTO_RETRY |
         SSL_MODE_ENABLE_PARTIAL_WRITE
     );
+    SSL_CTX_set_options(enc->ssl_ctx, SSL_OP_NO_COMPRESSION);
     SSL_CTX_set_verify(
             enc->ssl_ctx,
             SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,

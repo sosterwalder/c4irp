@@ -317,8 +317,12 @@ _ch_pr_read_data_cb(
     );
     if(conn->flags & CH_CN_ENCRYPTED) {
         do {
-            tmp_err = BIO_write(conn->bio_app, buf->base, nread);
-            if(tmp_err < 0) {
+            tmp_err = BIO_write(
+                conn->bio_app,
+                buf->base + bytes_decrypted,
+                nread - bytes_decrypted
+            );
+            if(tmp_err < 1) {
                 E(
                     chirp,
                     "SSL error writing to BIO, shutting down connection. "
@@ -493,3 +497,4 @@ ch_pr_stop(ch_protocol_t* protocol)
     return CH_SUCCESS;
 }
 //
+
