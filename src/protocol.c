@@ -118,30 +118,33 @@ _ch_pr_do_handshake(ch_connection_t* conn)
 {
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    conn->tls_handshake_state = SSL_do_handshake(conn->ssl);
     if(SSL_is_init_finished(conn->ssl)) {
         conn->flags &= ~CH_CN_TLS_HANDSHAKE;
         // Last handshake state, since we got that on the last read and have to
         // use it on this read.
-        if(conn->tls_handshake_state == 1)
-            _ch_pr_read(conn);
-        else {
+        if(conn->tls_handshake_state == 1) {
+            L(
+                chirp,
+                "SSL handshake successful. ch_chirp_t:%p, ch_connection_t:%p",
+                chirp,
+                conn
+            );
+        } else {
 #           ifndef NDEBUG
                 ERR_print_errors_fp(stderr);
 #           endif
             E(
                 chirp,
-                "SSL Handshake failed. ch_chirp_t:%p, ch_connection_t:%p",
+                "SSL handshake failed. ch_chirp_t:%p, ch_connection_t:%p",
                 chirp,
                 conn
             );
             ch_cn_shutdown(conn);
             return;
         }
-    } else {
-        // Save the state for the next callback-iteration.
-        conn->tls_handshake_state = SSL_do_handshake(conn->ssl);
-        ch_cn_send_if_pending(conn);
     }
+    ch_cn_send_if_pending(conn);
 }
 
 // .. c:function::
@@ -214,7 +217,8 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
         if(conn->flags & CH_CN_ENCRYPTED) {
             SSL_set_accept_state(conn->ssl);
             conn->flags |= CH_CN_TLS_HANDSHAKE;
-        };
+        } else
+            ch_rd_read(conn, NULL, 0); // Start reader
         uv_read_start(
             (uv_stream_t*) client,
             ch_cn_read_alloc_cb,

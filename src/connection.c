@@ -42,9 +42,12 @@ static
 void
 _ch_cn_send_pending_cb(uv_write_t* req, int status);
 //
-//    Called by libuv when pending data has been sent
+//    Called during handshake by libuv when pending data has been sent
 //
-//    TODO params
+//    :param uv_write_t* req: Write request type, holding the
+//                            connection handle
+//    :param int status: The status after the shutdown. 0 in case of
+//                       success, < 0 otherwise
 //
 
 // .. c:function::
@@ -169,7 +172,7 @@ _ch_cn_partial_write(ch_connection_t* conn)
             conn->write_buffer + bytes_encrypted + conn->write_written,
             conn->write_size - bytes_encrypted - conn->write_written
         );
-        if(tmp_err < 1) {
+        if(tmp_err < 0) {
             E(
                 chirp,
                 "SSL error writing to BIO, shutting down connection. "
@@ -201,7 +204,8 @@ _ch_cn_partial_write(ch_connection_t* conn)
     );
     L(
         chirp,
-        "Called uv_write with %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
+        "Called uv_write with %d handshake bytes. "
+        "ch_chirp_t:%p, ch_connection_t:%p",
         (int) bytes_read,
         chirp,
         conn
@@ -239,7 +243,8 @@ _ch_cn_send_pending_cb(uv_write_t* req, int status)
     }
     L(
         chirp,
-        "Write to connection successful. ch_chirp_t:%p, ch_connection_t:%p",
+        "Write handshake bytes to connection successful. "
+        "ch_chirp_t:%p, ch_connection_t:%p",
         chirp,
         conn
     );
@@ -792,8 +797,11 @@ ch_cn_send_if_pending(ch_connection_t* conn)
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     int pending = BIO_pending(conn->bio_app);
-    if(pending < 1)
+    if(pending < 1) {
+        if(!(conn->flags & CH_CN_TLS_HANDSHAKE))
+             ch_rd_read(conn, NULL, 0); // Start reader
         return;
+    }
     A(!(conn->flags & CH_CN_BUF_WTLS_USED), "The wtls buffer is still used");
 #   ifndef NDEBUG
         conn->flags |= CH_CN_BUF_WTLS_USED;
@@ -810,7 +818,7 @@ ch_cn_send_if_pending(ch_connection_t* conn)
     );
     L(
         chirp,
-        "Sending %d pending bytes. ch_chirp_t:%p, ch_connection_t:%p",
+        "Sending %d pending handshake bytes. ch_chirp_t:%p, ch_connection_t:%p",
         read,
         chirp,
         conn

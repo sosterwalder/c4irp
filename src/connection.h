@@ -207,9 +207,9 @@ ch_cn_init_enc(ch_chirp_t* chirp, ch_connection_t* conn);
 void
 ch_cn_send_if_pending(ch_connection_t* conn);
 //
-//    Send all pending data from SSL
+//    Send all pending handshake data from SSL
 //
-//    TODO params
+//    :param ch_connection_t* conn: Connection
 //
 //
 // .. c:function::
