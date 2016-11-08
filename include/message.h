@@ -37,9 +37,9 @@ typedef struct {
     int16_t  actor_len;
     int32_t  data_len;
     // These fields follow the message in this order (see _len above)
-    char*    header;
+    void*    header;
     char*    actor;
-    char*    data;
+    void*    data;
     // Local only data
     uint8_t  ip_protocol;
     uint8_t  address[16];

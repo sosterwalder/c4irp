@@ -23,6 +23,14 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     CH_CONNECTION_CMP
 );
 
+SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
+    ch_connection_set_t,
+    left,
+    right,
+    color_field,
+    SGLIB_NUMERIC_COMPARATOR
+);
+
 // Declarations
 // ============
 
@@ -144,6 +152,7 @@ _ch_cn_write_cb(uv_write_t* req, int status);
 
 // Definitions
 // ===========
+
 // .. c:function::
 static
 ch_inline
@@ -358,17 +367,9 @@ _ch_cn_shutdown_gen(
         );
         return CH_IN_PRORESS;
     }
-    if(sglib_ch_connection_t_is_member(protocol->connections, conn))
-        sglib_ch_connection_t_delete(&protocol->connections, conn);
-    else {
-        E(
-            chirp,
-            "Closing unknown connection. ch_connection_t:%p "
-            "ch_chirp_t:%p",
-            conn,
-            chirp
-        );
-    }
+    // There are many reasons the connection is not in this data-structure,
+    // therefore we do a blind delete.
+    sglib_ch_connection_t_delete(&protocol->connections, conn);
     conn->flags |= CH_CN_SHUTTING_DOWN;
     if(conn->flags & CH_CN_ENCRYPTED) {
         tmp_err = SSL_get_verify_result(conn->ssl);
@@ -409,7 +410,7 @@ _ch_cn_shutdown_gen(
             conn,
             chirp
         );
-        return _ch_uv_error_map(tmp_err);
+        return ch_uv_error_map(tmp_err);
     }
     tmp_err = uv_timer_init(ichirp->loop, &conn->shutdown_timeout);
     if(tmp_err != CH_SUCCESS) {

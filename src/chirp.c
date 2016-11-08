@@ -380,7 +380,7 @@ ch_chirp_init(
             tmp_conf->IDENTITY[i] == 0
     ) i += 1;
     if(tmp_conf->IDENTITY[i] == 0)
-        _ch_random_ints_to_bytes(ichirp->identity, sizeof(ichirp->identity));
+        ch_random_ints_as_bytes(ichirp->identity, sizeof(ichirp->identity));
     else
         *ichirp->identity = *tmp_conf->IDENTITY;
 
@@ -425,13 +425,22 @@ ch_chirp_init(
         chirp->_init = 0;
         return tmp_err;
     }
-
+#   ifndef NDEBUG
+    char id_str[33];
+    ch_bytes_to_hex(
+        ichirp->identity,
+        sizeof(ichirp->identity),
+        id_str,
+        sizeof(id_str)
+    );
     L(
         chirp,
-        "Chirp initialized. ch_chirp_t:%p, uv_loop_t:%p",
+        "Chirp initialized id: %s. ch_chirp_t:%p, uv_loop_t:%p",
+        id_str,
         chirp,
         loop
     );
+#   endif
     if(!_ch_chirp_sig_init) {
        if(signal(SIGINT, _ch_chirp_sig_handler) == SIG_ERR) {
             E(
@@ -466,7 +475,7 @@ ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp_out)
     }
     *chirp_out = NULL;
 
-    tmp_err = _ch_uv_error_map(ch_loop_init(&loop));
+    tmp_err = ch_uv_error_map(ch_loop_init(&loop));
     if(tmp_err != CH_SUCCESS) {
         E(
             (&chirp),

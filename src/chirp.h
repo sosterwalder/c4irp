@@ -66,7 +66,7 @@ struct ch_chirp_int_s {
     ch_protocol_t   protocol;
     ch_encryption_t encryption;
     uv_loop_t*      loop;
-    unsigned char   identity[16];
+    uint8_t         identity[16];
     uint16_t        public_port;
 };
 

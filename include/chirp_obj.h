@@ -71,9 +71,9 @@ typedef struct {
     uint8_t         RETRIES;
     char            CLOSE_ON_SIGINT;
     uint32_t        BUFFER_SIZE;
-    char            BIND_V6[16];
-    char            BIND_V4[4];
-    unsigned char   IDENTITY[16];
+    uint8_t         BIND_V6[16];
+    uint8_t         BIND_V4[4];
+    uint8_t         IDENTITY[16];
     char*           CERT_CHAIN_PEM;
     char*           DH_PARAMS_PEM;
 } ch_config_t;

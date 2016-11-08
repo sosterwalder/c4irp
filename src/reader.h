@@ -30,9 +30,10 @@ struct ch_connection_s;
 // .. code-block:: cpp
 //
 typedef enum {
-    CH_RD_START = 0,
-    CH_RD_WAIT  = 1,
-    CH_RD_SIZE  = 2
+    CH_RD_START     = 0,
+    CH_RD_HANDSHAKE = 1,
+    CH_RD_WAIT      = 2,
+    CH_RD_SIZE      = 3
 } ch_rd_state_t;
 
 // .. c:type:: ch_rd_handshake_t
@@ -102,7 +103,7 @@ ch_rd_read(struct ch_connection_s* conn, void* buf, size_t read);
 //    Implements the wire protocol reader part.
 //
 //    :param ch_connection_t* conn: Connection the data was read from
-//    :param void* buf: The that read
+//    :param void* buf: Buffer containing bytes read
 //    :param size_t read: Count of bytes read
 //
 // .. code-block:: cpp

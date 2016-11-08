@@ -23,11 +23,11 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
 static
 ch_inline
 void
-_ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections);
+_ch_pr_close_free_connections(ch_chirp_t* chirp);
 //
 //    Close and free all remaining connections
 //
-//    TODO params
+//    :param ch_chirpt_t* chirp: Chrip object
 //
 // .. c:function::
 static
@@ -82,7 +82,7 @@ _ch_pr_read_data_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
 static
 ch_inline
 void
-_ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
+_ch_pr_close_free_connections(ch_chirp_t* chirp)
 //    :noindex:
 //
 //    see: :c:func:`_ch_pr_close_free_connections`
@@ -90,18 +90,33 @@ _ch_pr_close_free_connections(ch_chirp_t* chirp, ch_connection_t* connections)
 // .. code-block:: cpp
 //
 {
+    ch_chirp_int_t* ichirp = chirp->_;
+    ch_protocol_t* protocol = &ichirp->protocol;
     ch_connection_t* t;
-    struct sglib_ch_connection_t_iterator it;
+    struct sglib_ch_connection_t_iterator itt;
+    struct sglib_ch_connection_set_t_iterator its;
     for(
             t = sglib_ch_connection_t_it_init(
-                &it,
-                connections
+                &itt,
+                protocol->connections
             );
             t != NULL;
-            t = sglib_ch_connection_t_it_next(&it) // NOCOV TODO remove
+            t = sglib_ch_connection_t_it_next(&itt) // NOCOV TODO remove
     ) {
         ch_cn_shutdown(t);
     } // NOCOV TODO remove
+    for(
+            t = sglib_ch_connection_set_t_it_init(
+                &its,
+                protocol->old_connections
+            );
+            t != NULL;
+            t = sglib_ch_connection_set_t_it_next(&its) // NOCOV TODO remove
+    ) {
+        ch_cn_shutdown(t);
+    } // NOCOV TODO remove
+    // Effectively we have cleared the list
+    protocol->old_connections = NULL;
 }
 
 // .. c:function::
@@ -185,7 +200,6 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
 //
 {
     CH_GET_CHIRP(server); // NOCOV TODO
-    ch_protocol_t* protocol = &chirp->_->protocol;
     if (status < 0) { // NOCOV TODO
         L(
             chirp,
@@ -212,8 +226,47 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
     uv_tcp_init(server->loop, client);
     client->data = conn;
     if (uv_accept(server, (uv_stream_t*) client) == 0) {
-        L(chirp, "Accepted connection. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
-        sglib_ch_connection_t_add(&protocol->connections, conn);
+        struct sockaddr_storage addr;
+        int addr_len;
+        L(
+            chirp,
+            "Accepted connection. ch_chirp_t:%p, ch_connection_t:%p",
+            chirp,
+            conn
+        );
+        if(uv_tcp_getpeername(
+                    client,
+                    (struct sockaddr*) &addr,
+                    &addr_len
+        ) != CH_SUCCESS) {
+            E(
+                chirp,
+                "Could not get remote address. ch_chirp_t:%p, "
+                "ch_connection_t:%p",
+                chirp,
+                conn
+            );
+            conn->shutdown_tasks = 1;
+            uv_close((uv_handle_t*) client, ch_cn_close_cb);
+            return;
+        };
+        if(addr.ss_family == AF_INET6) {
+            struct sockaddr_in6* saddr = (struct sockaddr_in6*) &addr;
+            conn->ip_protocol = CH_IPV6;
+            memcpy(
+                &conn->address,
+                &saddr->sin6_addr,
+                sizeof(saddr->sin6_addr)
+            );
+        } else {
+            struct sockaddr_in* saddr = (struct sockaddr_in*) &addr;
+            conn->ip_protocol = CH_IPV4;
+            memcpy(
+                &conn->address,
+                &saddr->sin_addr,
+                sizeof(saddr->sin_addr)
+            );
+        }
         if(conn->flags & CH_CN_ENCRYPTED) {
             SSL_set_accept_state(conn->ssl);
             conn->flags |= CH_CN_TLS_HANDSHAKE;
@@ -376,7 +429,7 @@ ch_pr_start(ch_protocol_t* protocol)
     if(uv_ip4_addr(tmp_addr.data, config->PORT, &protocol->addrv4) < 0) {
         return CH_VALUE_ERROR; // NOCOV uv will just wrap bad port
     }
-    tmp_err = _ch_uv_error_map(uv_tcp_bind(
+    tmp_err = ch_uv_error_map(uv_tcp_bind(
             &protocol->serverv4,
             (const struct sockaddr*)&protocol->addrv4,
             0
@@ -423,7 +476,7 @@ ch_pr_start(ch_protocol_t* protocol)
     if(uv_ip6_addr(tmp_addr.data, config->PORT, &protocol->addrv6) < 0) {
         return CH_VALUE_ERROR; // NOCOV errors happend for IPV4
     }
-    tmp_err = _ch_uv_error_map(uv_tcp_bind(
+    tmp_err = ch_uv_error_map(uv_tcp_bind(
             &protocol->serverv6,
             (const struct sockaddr*) &protocol->addrv6,
             UV_TCP_IPV6ONLY
@@ -492,7 +545,7 @@ ch_pr_stop(ch_protocol_t* protocol)
 {
     ch_chirp_t* chirp = protocol->chirp;
     L(chirp, "Closing protocol. ch_chirp_t:%p", chirp);
-    _ch_pr_close_free_connections(chirp, protocol->connections);
+    _ch_pr_close_free_connections(chirp);
     uv_close((uv_handle_t*) &protocol->serverv4, ch_chirp_close_cb);
     uv_close((uv_handle_t*) &protocol->serverv6, ch_chirp_close_cb);
     chirp->_->closing_tasks += 2;

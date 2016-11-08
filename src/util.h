@@ -31,6 +31,29 @@ ch_alloc(size_t size)
 {
     return _ch_alloc_cb(size);
 }
+// .. c:function::
+static
+ch_inline
+void
+ch_bytes_to_hex(uint8_t* bytes, size_t bytes_size, char* str, size_t str_size)
+//
+//    Convert a bytes array to a hex string
+//
+//    :param uint8_t* bytes: Bytes to convert
+//    :param size_t bytes_size: Length of the bytes to convert
+//    :param char* str: Destination string
+//    :param size_t str_size: Length of the buffer to write the string to
+//
+// .. code-block:: cpp
+//
+{
+    A(bytes_size * 2 + 1 <= str_size, "Not enough space for string");
+    for(int i = 0; i < bytes_size; i++)
+    {
+            str += sprintf(str, "%02X", bytes[i]);
+    }
+    str = 0;
+}
 
 // .. c:function::
 static
@@ -54,13 +77,13 @@ ch_free(
 static
 ch_inline
 void
-_ch_random_ints_to_bytes(unsigned char* bytes, size_t len)
+ch_random_ints_as_bytes(uint8_t* bytes, size_t len)
 //
 //    Fill in random ints efficiently len MUST be multiple of four.
 //
 //    Thank you windows for making this really complicated.
 //
-//    :param char* bytes: The buffer to fill the bytes into
+//    :param uint8_t* bytes: The buffer to fill the bytes into
 //    :param size_t  len: The length of the buffer
 //
 // .. code-block:: cpp
@@ -123,7 +146,7 @@ ch_realloc(
 static
 ch_inline
 ch_error_t
-_ch_uv_error_map(int error)
+ch_uv_error_map(int error)
 //
 //    Map common libuv errors to chirp errors.
 //

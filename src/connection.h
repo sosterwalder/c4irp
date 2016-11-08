@@ -69,6 +69,8 @@ typedef struct ch_connection_s {
     uint8_t                 ip_protocol;
     uint8_t                 address[16];
     int32_t                 port;
+    uint8_t                 remote_identity[16];
+    float                   max_timeout;
     uv_tcp_t                client;
     void*                   buffer_uv;
     void*                   buffer_wtls;
@@ -97,6 +99,8 @@ typedef struct ch_connection_s {
     struct ch_connection_s* right;
 } ch_connection_t;
 
+typedef ch_connection_t ch_connection_set_t;
+
 // Sglib Prototypes
 // ================
 //
@@ -110,6 +114,14 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
     right,
     color_field,
     CH_CONNECTION_CMP
+);
+
+SGLIB_DEFINE_RBTREE_PROTOTYPES(
+    ch_connection_set_t,
+    left,
+    right,
+    color_field,
+    SGLIB_NUMERIC_COMPARATOR
 );
 
 // .. c:function::
@@ -132,10 +144,8 @@ ch_cn_read_alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
 //
 //    :param uv_handle_t* handle: The libuv handle holding the
 //                                connection
-//    :param size_ti suggested_size: The size of the connection buffer
-//                                   in bit (unsigned integer, at
-//                                   least 16 bit). This is used if
-//                                   the buffer needs to be allocated
+//    :param size_t suggested_size: The size of the connection buffer
+//                                  in bytes.
 //    :param uv_buf_t* buf: Libuv buffer which will hold the
 //                          connection
 
@@ -172,7 +182,11 @@ ch_connection_cmp(ch_connection_t* x, ch_connection_t* y)
     if(x->ip_protocol != y->ip_protocol) {
         return x->ip_protocol - y->ip_protocol;
     } else {
-        int tmp_cmp = memcmp(x->address, y->address, 16);
+        int tmp_cmp = memcmp(
+            x->address,
+            y->address,
+            x->ip_protocol == CH_IPV6 ? 16 : 4
+        );
         if(tmp_cmp != 0) {
             return tmp_cmp;
         } else {
