@@ -63,7 +63,7 @@
 //
 // .. code-block:: cpp
 
-typedef struct {
+typedef struct ch_config_s {
     float           REUSE_TIME;
     float           TIMEOUT;
     uint16_t        PORT;

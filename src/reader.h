@@ -8,6 +8,7 @@
 #define ch_reader_h
 
 #include "../include/common.h"
+#include "message.h"
 
 struct ch_connection_s;
 
@@ -60,6 +61,15 @@ typedef struct ch_rd_handshake_s {
     unsigned char identity[16];
 } ch_rd_handshake_t;
 
+// .. c:type:: ch_rd_message_t
+//
+//    Wire message (network endianness)
+//
+// .. code-block:: cpp
+typedef struct ch_rd_message_s {
+    CH_WIRE_MESSAGE;
+} ch_rd_message_t;
+
 // .. c:type:: ch_reader_t
 //
 //    Contains the state of the reader
@@ -72,11 +82,16 @@ typedef struct ch_rd_handshake_s {
 //
 //    Handshake structure to send over the network
 //
+//    .. c:member:: ch_rd_message_t msg
+//
+//    Wire protocol message in network order
+//
 // .. code-block:: cpp
 
 typedef struct ch_reader_s {
     unsigned char state;
     ch_rd_handshake_t hs;
+    ch_rd_message_t msg;
 } ch_reader_t;
 
 
