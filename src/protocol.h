@@ -58,6 +58,7 @@ typedef struct ch_protocol_s {
     uv_tcp_t            serverv4;
     uv_tcp_t            serverv6;
     ch_connection_t*    connections;
+    ch_connection_t*    old_connections;
     ch_receipt_t*       receipts;
     ch_receipt_t*       late_receipts;
     ch_chirp_t*         chirp;
@@ -92,6 +93,7 @@ ch_pr_init(ch_chirp_t* chirp, ch_protocol_t* protocol)
     memset(protocol, 0, sizeof(ch_protocol_t));
     protocol->chirp = chirp;
 }
+
 // .. c:function::
 ch_error_t
 ch_pr_start(ch_protocol_t* protocol);
@@ -100,6 +102,7 @@ ch_pr_start(ch_protocol_t* protocol);
 //
 //    TODO params
 //
+
 // .. c:function::
 ch_error_t
 ch_pr_stop(ch_protocol_t* protocol);

@@ -13,6 +13,8 @@
 
 // .. c:type:: ch_config_t
 //
+//   TODO fix types
+//
 //    Chirp configuration.
 //
 //    .. c:member:: int REUSE_TIME
@@ -31,6 +33,10 @@
 //    .. c:member:: int BACKLOG
 //
 //       TCP-Listen socket backlog.
+//
+//    .. c:member:: uint8_t RETRIES
+//
+//       Count of retries till error is reported, by default 1.
 //
 //    .. c:member:: char CLOSE_ON_SIGINT
 //
@@ -57,17 +63,19 @@
 //
 // .. code-block:: cpp
 
-typedef struct {
+typedef struct ch_config_s {
     float           REUSE_TIME;
     float           TIMEOUT;
     uint16_t        PORT;
     uint8_t         BACKLOG;
+    uint8_t         RETRIES;
     char            CLOSE_ON_SIGINT;
     uint32_t        BUFFER_SIZE;
-    char            BIND_V6[16];
-    char            BIND_V4[4];
-    unsigned char   IDENTITY[16];
+    uint8_t         BIND_V6[16];
+    uint8_t         BIND_V4[4];
+    uint8_t         IDENTITY[16];
     char*           CERT_CHAIN_PEM;
+    char*           DH_PARAMS_PEM;
 } ch_config_t;
 
 

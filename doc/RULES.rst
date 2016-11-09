@@ -17,6 +17,10 @@ RULES
 
 * We use defined length integers ie. uint8_t for file-formates, wire-protocols
   and when plain int is really really wasteful
+* Buffers and chars:
+  * char* for C-strings
+  * void* for buffers
+  * uint8_t for bytes (for example the identity)
 * Use one flags member instead of many bools (int)
 * Structs end in _s
 * All the structs have a typedef ending in _t
@@ -26,7 +30,7 @@ RULES
   - Use natural names and _cb will indicated that it probably happened AFTER
 
 * Callback types end in _cb_t
-* Sort symbols alphabetically ignoring underscores "_"
+* Sort symbols alphabetically including underscores "_"
   - When independent
   - Forward declarations go directly before being used
 
@@ -102,6 +106,10 @@ Performance
      be sent after the current message has been acknowledged. The first
      statement is important for simpleness and robustness and the second
      statement makes flow-control possible.
+
+   - Since we the error condition sent to the user is a timeout on the ack. We
+     can react on all other errors accordingly, but do not have to report back
+     to the user. Which saves extremely complex callback structures. Yey!
 
 * Since chirp is meant for multiprocessing, our performance goals refer to this
   configuration

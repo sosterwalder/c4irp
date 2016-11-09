@@ -51,6 +51,7 @@ class ChirpPool(object):
         self._chirp     = ffi.new("ch_chirp_t*")
         self._loop      = ffi.new("uv_loop_t*")
         self._cert_str  = None
+        self._dh_str    = None
         self._thread    = None
         self._pool      = None
         self._uv_ret    = 0
@@ -98,16 +99,24 @@ class ChirpPool(object):
         conf   = self._config
         lib.ch_chirp_config_init(c_conf)
         folder = __file__.split(os.path.sep)[:-1]
-        folder.append("cert.pem")
+        cert   = list(folder)
+        dh     = list(folder)
+        cert.append("cert.pem")
+        dh.append("dh.pem")
         conf.CERT_CHAIN_PEM = "%s%s" % (
             os.path.sep,
-            os.path.join(*folder)
+            os.path.join(*cert)
+        )
+        conf.DH_PARAMS_PEM = "%s%s" % (
+            os.path.sep,
+            os.path.join(*dh)
         )
         for std_attr in [
                 'REUSE_TIME',
                 'TIMEOUT',
                 'PORT',
                 'BACKLOG',
+                'RETRIES',
         ]:
             setattr(
                 c_conf,
@@ -120,7 +129,11 @@ class ChirpPool(object):
         self._cert_str = ffi.new(
             "char[]", conf.CERT_CHAIN_PEM.encode("UTF-8")
         )
+        self._dh_str = ffi.new(
+            "char[]", conf.DH_PARAMS_PEM.encode("UTF-8")
+        )
         c_conf.CERT_CHAIN_PEM = self._cert_str
+        c_conf.DH_PARAMS_PEM = self._dh_str
 
 if sys.version_info > (3, 4):
 

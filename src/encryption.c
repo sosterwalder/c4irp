@@ -39,6 +39,7 @@ ch_en_openssl_init(const ch_config_t* config)
 //
 {
     SSL_library_init();
+    OpenSSL_add_all_algorithms();
     SSL_load_error_strings();
     OPENSSL_config("chirp");
 
@@ -74,7 +75,7 @@ ch_en_set_manual_openssl_init(void)
 // .. code-block:: cpp
 //
 {
-    _ch_en_manual_openssl = 0;
+    _ch_en_manual_openssl = 1;
 }
 
 // .. c:function::
@@ -87,6 +88,7 @@ ch_en_start(ch_encryption_t* enc)
 // .. code-block:: cpp
 //
 { 
+    int tmp_err;
     ch_chirp_t* chirp = enc->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_chirp_int_t* ichirp = chirp->_;
@@ -97,26 +99,40 @@ ch_en_start(ch_encryption_t* enc)
             "Initializing the OpenSSL library. ch_chirp_t:%p",
             chirp
         );
-        return ch_en_openssl_init(&ichirp->config);
+        tmp_err = ch_en_openssl_init(&ichirp->config);
+        if(tmp_err != CH_SUCCESS) {
+            L(
+                chirp,
+                "Could not initialize the OpenSSL library. ch_chirp_t:%p",
+                chirp
+            );
+            return tmp_err;
+        }
     }
     const SSL_METHOD* method = TLSv1_2_method();
     if(method == NULL) {
-        L(
+        E(
             chirp,
-            "Error: Could not get the TLSv1_2_method. ch_chirp_t:%p",
+            "Could not get the TLSv1_2_method. ch_chirp_t:%p",
             chirp
         );
         return CH_TLS_ERROR;
     }
     enc->ssl_ctx = SSL_CTX_new(method);
     if(enc->ssl_ctx == NULL) {
-        L(
+        E(
             chirp,
-            "Error: Could create the SSL_CTX. ch_chirp_t:%p",
+            "Could create the SSL_CTX. ch_chirp_t:%p",
             chirp
         );
         return CH_TLS_ERROR;
     }
+    SSL_CTX_set_mode(
+        enc->ssl_ctx,
+        SSL_MODE_AUTO_RETRY |
+        SSL_MODE_ENABLE_PARTIAL_WRITE
+    );
+    SSL_CTX_set_options(enc->ssl_ctx, SSL_OP_NO_COMPRESSION);
     SSL_CTX_set_verify(
             enc->ssl_ctx,
             SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
@@ -128,9 +144,9 @@ ch_en_start(ch_encryption_t* enc)
                 ichirp->config.CERT_CHAIN_PEM,
                 NULL
     ) != 1) {
-        L(
+        E(
             chirp,
-            "Error: Could not set the verification certificate "
+            "Could not set the verification certificate "
             "%s. ch_chirp_t:%p",
             ichirp->config.CERT_CHAIN_PEM,
             chirp
@@ -141,10 +157,65 @@ ch_en_start(ch_encryption_t* enc)
                 enc->ssl_ctx,
                 ichirp->config.CERT_CHAIN_PEM
     ) != 1) {
-        L(
+        E(
             chirp,
-            "Error: Could not set the certificate %s. ch_chirp_t:%p",
+            "Could not set the certificate %s. ch_chirp_t:%p",
             ichirp->config.CERT_CHAIN_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
+    if(SSL_CTX_use_PrivateKey_file(
+                enc->ssl_ctx,
+                ichirp->config.CERT_CHAIN_PEM,
+                SSL_FILETYPE_PEM
+    ) != 1) {
+        E(
+            chirp,
+            "Could not set the private key %s. ch_chirp_t:%p",
+            ichirp->config.CERT_CHAIN_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
+    if(SSL_CTX_check_private_key(enc->ssl_ctx) != 1) {
+        E(
+            chirp,
+            "Private key is not valid %s. ch_chirp_t:%p",
+            ichirp->config.CERT_CHAIN_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
+    DH *dh = NULL;
+    FILE *paramfile;
+    paramfile = fopen(ichirp->config.DH_PARAMS_PEM, "r");
+    if(paramfile == NULL) {
+        E(
+            chirp,
+            "Could not open the dh-params %s. ch_chirp_t:%p",
+            ichirp->config.DH_PARAMS_PEM,
+            chirp
+        );
+        fclose(paramfile);
+        return CH_TLS_ERROR;
+    }
+    dh = PEM_read_DHparams(paramfile, NULL, NULL, NULL);
+    fclose(paramfile);
+    if(dh == NULL) {
+        E(
+            chirp,
+            "Could not load the dh-params %s. ch_chirp_t:%p",
+            ichirp->config.DH_PARAMS_PEM,
+            chirp
+        );
+        return CH_TLS_ERROR;
+    }
+    if(SSL_CTX_set_tmp_dh(enc->ssl_ctx, dh) != 1) {
+        E(
+            chirp,
+            "Could not set the dh-params %s. ch_chirp_t:%p",
+            ichirp->config.DH_PARAMS_PEM,
             chirp
         );
         return CH_TLS_ERROR;
@@ -152,20 +223,23 @@ ch_en_start(ch_encryption_t* enc)
     if(SSL_CTX_set_cipher_list(
             enc->ssl_ctx,
             "-ALL:"
-            "TLS_RSA_WITH_AES_256_CBC_SHA256:"
-            "TLS_DH_RSA_WITH_AES_256_CBC_SHA256:"
-            "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384:"
-            "TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384:"
-            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384:"
-            "TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384:"
+            "DHE-DSS-AES256-GCM-SHA384:"
+            "DHE-RSA-AES256-GCM-SHA384:"
+            "DHE-RSA-AES256-SHA256:"
+            "DHE-DSS-AES256-SHA256:"
     ) != 1) {
-        L(
+        E(
             chirp,
-            "Error: Could not set the cipher list. ch_chirp_t:%p",
+            "Could not set the cipher list. ch_chirp_t:%p",
             chirp
         );
         return CH_TLS_ERROR;
     }
+    L(
+        chirp,
+        "Created SSL context for chirp. ch_chirp_t:%p",
+        chirp
+    );
     return CH_SUCCESS;
 }
 

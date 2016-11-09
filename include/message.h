@@ -28,23 +28,25 @@
 //
 // .. code-block:: cpp
 
-typedef struct {
+#define CH_WIRE_MESSAGE \
+    uint8_t  identity[16]; \
+    uint8_t  serial[16]; \
+    int8_t   message_type; \
+    int16_t  header_len; \
+    int16_t  actor_len; \
+    int32_t  data_len \
+
+typedef struct ch_message_s {
     // Network data, has to be sent in network order
-    char     identity[16];
-    char     serial[16];
-    int8_t   message_type;
-    int16_t  header_len;
-    int16_t  actor_len;
-    int32_t  data_len;
+    CH_WIRE_MESSAGE;
     // These fields follow the message in this order (see _len above)
-    char*    header;
+    void*    header;
     char*    actor;
-    char*    data;
+    void*    data;
     // Local only data
     uint8_t  ip_protocol;
     uint8_t  address[16];
     int32_t  port;
-    int8_t   host_order;
     int8_t   free_header;
     int8_t   free_actor;
     int8_t   free_data;
@@ -56,7 +58,7 @@ typedef struct {
 //
 // .. code-block:: cpp
 //
-typedef struct {
+typedef struct ch_text_address_s {
     char data[INET6_ADDRSTRLEN];
 } ch_text_address_t;
 

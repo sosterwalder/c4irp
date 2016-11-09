@@ -43,9 +43,17 @@ typedef void (*ch_free_cb_t)(void* buf);
 //
 //    Logging callback
 //
+//    .. c:member:: char msg[]
+//
+//       The message to log
+//
+//    .. c:member:: char error
+//
+//       The message is a error
+//
 // .. code-block:: cpp
 
-typedef void (*ch_log_cb_t)(char msg[]);
+typedef void (*ch_log_cb_t)(char msg[], char error);
 
 // .. c:type:: ch_realloc_cb_t
 //

@@ -40,8 +40,12 @@ Internal C API
    src/message.c.rst
    src/protocol.h.rst
    src/protocol.c.rst
+   src/reader.h.rst
+   src/reader.c.rst
    src/util.h.rst
    src/util.c.rst
+   src/writer.h.rst
+   src/writer.c.rst
 
 Public Python API
 =================

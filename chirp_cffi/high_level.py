@@ -26,15 +26,15 @@ typedef enum {
 } uv_run_mode;
 
 struct uv_loop_s {
-  /* User data - use this for whatever. */
-  void* data;
-  /* Loop reference counting. */
-  unsigned int active_handles;
-  void* handle_queue[2];
-  void* active_reqs[2];
-  /* Internal flag to signal loop stop. */
-  unsigned int stop_flag;
-  ...;
+    /* User data - use this for whatever. */
+    void* data;
+    /* Loop reference counting. */
+    unsigned int active_handles;
+    void* handle_queue[2];
+    void* active_reqs[2];
+    /* Internal flag to signal loop stop. */
+    unsigned int stop_flag;
+    ...;
 };
 typedef struct uv_loop_s uv_loop_t;
 
@@ -60,7 +60,7 @@ typedef enum {
 //callbacks.h
 typedef void* (*ch_alloc_cb_t)(size_t size);
 typedef void (*ch_free_cb_t)(void* buf);
-typedef void (*ch_log_cb_t)(char msg[]);
+typedef void (*ch_log_cb_t)(char msg[], char error);
 typedef void* (*ch_realloc_cb_t)(void* buf, size_t new_size);
 
 //message.h
@@ -118,15 +118,17 @@ typedef struct {
     float           TIMEOUT;
     uint16_t        PORT;
     uint8_t         BACKLOG;
+    uint8_t         RETRIES;
     char            CLOSE_ON_SIGINT;
     uint32_t        BUFFER_SIZE;
     char            BIND_V6[16];
     char            BIND_V4[4];
     unsigned char   IDENTITY[16];
     char*           CERT_CHAIN_PEM;
+    char*           DH_PARAMS_PEM;
 } ch_config_t;
 
-extern "Python" void python_log_cb(char msg[]);
+extern "Python" void python_log_cb(char msg[], char msg);
 
 typedef struct ch_chirp_s {
     ...;
@@ -184,6 +186,11 @@ ch_chirp_close_ts(ch_chirp_t* chirp);
 extern
 void
 ch_chirp_set_auto_stop(ch_chirp_t* chirp);
+
+// encryption.h
+extern
+void
+ch_en_set_manual_openssl_init(void);
 """)
 
 

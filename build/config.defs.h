@@ -7,10 +7,6 @@
 
 #define CH_LIB_UV_MIN_BUFFER 1024
 
-// Log to STDERR instead of the callback
-//
-// .. code-block:: cpp
-//
-////#define CH_LOG_TO_STDERR
+////#define CH_CN_PRINT_CIPHERS
 
 #endif //ch_global_config_h
