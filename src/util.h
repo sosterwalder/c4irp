@@ -138,7 +138,6 @@ ch_random_ints_as_bytes(uint8_t* bytes, size_t len)
 #       endif // ACCEPT_STRANGE_PLATFORM
 #   else // RAND_MAX < 1073741824 || INT_MAX < 1073741824
         /* Tested: this is 4 times faster*/
-        int tmp_rand;
         for(i = 0; i < len; i += 4) {
             tmp_rand = rand();
             memcpy(bytes + i, &tmp_rand, 4);
