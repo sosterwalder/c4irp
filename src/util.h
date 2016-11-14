@@ -48,11 +48,11 @@ ch_bytes_to_hex(uint8_t* bytes, size_t bytes_size, char* str, size_t str_size)
 //
 {
     A(bytes_size * 2 + 1 <= str_size, "Not enough space for string");
-    for(int i = 0; i < bytes_size; i++)
+    for(size_t i = 0; i < bytes_size; i++)
     {
             str += sprintf(str, "%02X", bytes[i]);
     }
-    str = 0;
+    *str = 0;
 }
 
 // .. c:function::
@@ -130,7 +130,8 @@ ch_random_ints_as_bytes(uint8_t* bytes, size_t len)
             }
 #       else // ACCEPT_STRANGE_PLATFORM
             // cppcheck-suppress preprocessorErrorDirective
-#           error Unexpected RAND_MAX / INT_MAX, define CH_ACCEPT_STRANGE_PLATFORM
+#           error Unexpected RAND_MAX / INT_MAX, define \
+                CH_ACCEPT_STRANGE_PLATFORM
 #       endif // ACCEPT_STRANGE_PLATFORM
 #   else // RAND_MAX < 1073741824 || INT_MAX < 1073741824
         /* Tested: this is 4 times faster*/

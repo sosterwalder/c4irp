@@ -186,9 +186,11 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
     assert(uv_prepare_init(ichirp->loop, &ichirp->close_check) == CH_SUCCESS);
     ichirp->close_check.data = chirp;
     // We use a semaphore to wait until all callbacks are done:
-    // 1. Every time a new callback is scheduled we do ichirp->closing_tasks += 1
+    // 1. Every time a new callback is scheduled we do
+    //    ichirp->closing_tasks += 1
     // 2. Every time a callback is called we do ichirp->closing_tasks -= 1
-    // 3. Every uv_loop iteration before it blocks we check ichirp->closing_tasks == 0
+    // 3. Every uv_loop iteration before it blocks we check
+    //    ichirp->closing_tasks == 0
     // -> if we reach 0 all callbacks are done and we continue freeing memory
     // etc.
     assert(uv_prepare_start(
@@ -590,7 +592,7 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
         chirp,
         conf->CERT_CHAIN_PEM != NULL,
         "Config: CERT_CHAIN_PEM must be set."
-    );    
+    );
     V(
         chirp,
         access(conf->CERT_CHAIN_PEM, F_OK ) != -1,
@@ -674,7 +676,9 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
     );
     V(
         chirp,
-        conf->BUFFER_SIZE >= sizeof(ch_rd_handshake_t) || conf->BUFFER_SIZE == 0,
+        conf->BUFFER_SIZE >= sizeof(
+            ch_rd_handshake_t
+        ) || conf->BUFFER_SIZE == 0,
         "Config: buffer size must be > %d (%d)",
         (int) sizeof(ch_rd_handshake_t),
         conf->BUFFER_SIZE

@@ -1,9 +1,9 @@
 """Message-passing and actor-based programming for everyone."""
 import logging
-import sys
 import ssl  # noqa
+import sys
 
-from _chirp_cffi import lib, ffi
+from _chirp_cffi import ffi, lib
 
 from .chirp import ChirpPool  # noqa
 from .const import Config  # noqa

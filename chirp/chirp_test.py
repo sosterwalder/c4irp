@@ -1,16 +1,18 @@
 """Testing the chirp object."""
 import os
-import pytest
 import threading
 import time
 from contextlib import contextmanager
 
+import pytest
 from hypothesis import strategies as st
-from hypothesis import given
 
 from _chirp_cffi import ffi, lib
 
 from . import ChirpPool
+
+# from hypothesis import given
+
 
 config_st = st.fixed_dictionaries({
     "REUSE_TIME"   : st.integers(2, 3600),
@@ -166,17 +168,16 @@ def test_chirp_run():
     assert res[0] == lib.CH_SUCCESS
 
 
-@given(config_st)
-def test_chirp_object_config(config):
-    """Test if initializing, using and closing the ChirpPool object works...
-
-    with hypothesis generated config.
-    """
-    return  # TODO Fix this
-    # TODO as validate is implemented this is going to need assume()s
-    chirp = init_chirp(config)
-    # TODO send a message to second (standard c chirp)
-    chirp.close()
+# @given(config_st) TODO fix this
+# def test_chirp_object_config(config):
+#     """Test if initializing, using and closing the ChirpPool object works...
+#
+#     with hypothesis generated config.
+#     """
+#     # TODO as validate is implemented this is going to need assume()s
+#     chirp = init_chirp(config)
+#     # TODO send a message to second (standard c chirp)
+#     chirp.close()
 
 
 def test_chirp_object_basic():

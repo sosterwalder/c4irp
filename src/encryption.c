@@ -87,12 +87,12 @@ ch_en_start(ch_encryption_t* enc)
 //
 // .. code-block:: cpp
 //
-{ 
-    int tmp_err;
+{
     ch_chirp_t* chirp = enc->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_chirp_int_t* ichirp = chirp->_;
     if(!_ch_en_manual_openssl) {
+        int tmp_err;
         _ch_en_openssl_ref_count += 1;
         L(
             chirp,
@@ -197,7 +197,6 @@ ch_en_start(ch_encryption_t* enc)
             ichirp->config.DH_PARAMS_PEM,
             chirp
         );
-        fclose(paramfile);
         return CH_TLS_ERROR;
     }
     dh = PEM_read_DHparams(paramfile, NULL, NULL, NULL);

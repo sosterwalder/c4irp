@@ -38,6 +38,7 @@ else:
         "ssl",
         "crypto",
     ])
+    cflags.append("-std=gnu99")
     if sys.platform != "darwin":
         libs.append("rt")
     else:

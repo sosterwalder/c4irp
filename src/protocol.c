@@ -298,7 +298,7 @@ _ch_pr_read(ch_connection_t* conn)
 {
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    int tmp_err = 1;
+    int tmp_err;
     // Handshake done, normal operation
     tmp_err = SSL_read(
         conn->ssl,
@@ -353,8 +353,6 @@ _ch_pr_read_data_cb(
 // .. code-block:: cpp
 //
 {
-    int tmp_err;
-    size_t bytes_decrypted = 0;
     ch_connection_t* conn = stream->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
@@ -373,7 +371,9 @@ _ch_pr_read_data_cb(
         conn
     );
     if(conn->flags & CH_CN_ENCRYPTED) {
+        size_t bytes_decrypted = 0;
         do {
+            int tmp_err;
             tmp_err = BIO_write(
                 conn->bio_app,
                 buf->base + bytes_decrypted,

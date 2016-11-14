@@ -19,7 +19,7 @@
 //
 //    .. c:member:: char* actor
 //
-//    Preallocated buffer for the actor 
+//    Preallocated buffer for the actor
 //
 //    .. c:member:: void* data
 //
@@ -28,9 +28,9 @@
 // .. code-block:: cpp
 
 typedef struct ch_bf_handler_s {
-    void* header[CH_BF_PREALLOC_HEADER];
-    char* actor[CH_BF_PREALLOC_ACTOR];
-    void* data[CH_BF_PREALLOC_DATA];
+    ch_buf* header[CH_BF_PREALLOC_HEADER];
+    char*   actor[CH_BF_PREALLOC_ACTOR];
+    ch_buf* data[CH_BF_PREALLOC_DATA];
 } ch_bf_handler_t;
 
 

@@ -72,9 +72,9 @@ typedef struct ch_connection_s {
     uint8_t                 remote_identity[16];
     float                   max_timeout;
     uv_tcp_t                client;
-    void*                   buffer_uv;
-    void*                   buffer_wtls;
-    void*                   buffer_rtls;
+    ch_buf*                 buffer_uv;
+    ch_buf*                 buffer_wtls;
+    ch_buf*                 buffer_rtls;
     uv_buf_t                buffer_uv_uv;
     uv_buf_t                buffer_wtls_uv;
     uv_buf_t                buffer_any_uv;
@@ -82,7 +82,7 @@ typedef struct ch_connection_s {
     uv_write_cb             write_callback;
     size_t                  write_written;
     size_t                  write_size;
-    void*                   write_buffer;
+    ch_buf*                 write_buffer;
     ch_chirp_t*             chirp;
     uv_shutdown_t           shutdown_req;
     uv_write_t              write_req;

@@ -112,7 +112,7 @@ _ch_rd_handshake(
     );
 #   ifndef NDEBUG
     {
-        ch_text_address_t addr; 
+        ch_text_address_t addr;
         char identity[33];
         uv_inet_ntop(
             conn->ip_protocol == CH_IPV6 ? AF_INET6 : AF_INET,

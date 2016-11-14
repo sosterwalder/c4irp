@@ -67,6 +67,7 @@ typedef struct ch_rd_handshake_s {
 //    Wire message (network endianness)
 //
 // .. code-block:: cpp
+
 typedef struct ch_rd_message_s {
     CH_WIRE_MESSAGE;
 } ch_rd_message_t;

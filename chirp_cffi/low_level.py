@@ -19,6 +19,7 @@ ffi.set_source(
 
 ffi.cdef("""
 //connection.h
+
 struct uv_tcp_s {
     ...;
 };
@@ -48,6 +49,8 @@ struct uv_write_s {
 };
 typedef struct uv_write_s uv_write_t;
 
+typedef void (*uv_write_cb)(uv_write_t* req, int status);
+
 struct SSL_s {
     ...;
 };
@@ -58,18 +61,33 @@ struct BIO_s {
 };
 typedef struct BIO_s BIO;
 
+struct ch_reader_s {
+    ...;
+};
+typedef struct ch_reader_s ch_reader_t;
+
+typedef char ch_buf;
+
 typedef struct ch_connection_s {
     uint8_t                 ip_protocol;
     uint8_t                 address[16];
     int32_t                 port;
+    uint8_t                 remote_identity[16];
+    float                   max_timeout;
     uv_tcp_t                client;
-    void*                   buffer_uv;
-    void*                   buffer_wtls;
-    void*                   buffer_rtls;
+    ch_buf*                 buffer_uv;
+    ch_buf*                 buffer_wtls;
+    ch_buf*                 buffer_rtls;
+    uv_buf_t                buffer_uv_uv;
+    uv_buf_t                buffer_wtls_uv;
+    uv_buf_t                buffer_any_uv;
     size_t                  buffer_size;
+    uv_write_cb             write_callback;
+    size_t                  write_written;
+    size_t                  write_size;
+    ch_buf*                 write_buffer;
     ch_chirp_t*             chirp;
     uv_shutdown_t           shutdown_req;
-    uv_buf_t                uv_buf;
     uv_write_t              write_req;
     uv_timer_t              shutdown_timeout;
     int8_t                  shutdown_tasks;

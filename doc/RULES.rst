@@ -19,7 +19,8 @@ RULES
   and when plain int is really really wasteful
 * Buffers and chars:
   * char* for C-strings
-  * void* for buffers
+  * void* for buffers (in interfaces)
+  * ch_buf* for buffer-instances (an alias for char*)
   * uint8_t for bytes (for example the identity)
 * Use one flags member instead of many bools (int)
 * Structs end in _s

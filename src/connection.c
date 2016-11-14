@@ -163,8 +163,8 @@ _ch_cn_partial_write(ch_connection_t* conn)
 //    see: :c:func:`_ch_cn_partial_write`
 //
 // .. code-block:: cpp
+//
 {
-    int tmp_err;
     size_t bytes_encrypted = 0;
     size_t bytes_read      = 0;
     ch_chirp_t* chirp = conn->chirp;
@@ -176,6 +176,7 @@ _ch_cn_partial_write(ch_connection_t* conn)
         conn->flags |= CH_CN_BUF_WTLS_USED;
 #   endif
     do {
+        int tmp_err;
         tmp_err = SSL_write(
             conn->ssl,
             conn->write_buffer + bytes_encrypted + conn->write_written,
@@ -298,7 +299,12 @@ _ch_cn_shutdown_gen_cb(
     ch_connection_t* conn = req->handle->data;
     ch_chirp_t* chirp = conn->chirp;
     ch_chirp_int_t* ichirp = chirp->_;
-    L(chirp, "Shutdown callback called. ch_connection_t:%p, ch_chirp_t:%p", conn,  chirp);
+    L(
+        chirp,
+        "Shutdown callback called. ch_connection_t:%p, ch_chirp_t:%p",
+        conn,
+        chirp
+    );
     tmp_err = uv_timer_stop(&conn->shutdown_timeout);
     if(tmp_err != CH_SUCCESS) {
         E(
@@ -442,7 +448,12 @@ _ch_cn_shutdown_gen(
             chirp
         );
     }
-    L(chirp, "Shutdown connection. ch_connection_t:%p, ch_chirp_t:%p", conn, chirp);
+    L(
+        chirp,
+        "Shutdown connection. ch_connection_t:%p, ch_chirp_t:%p",
+        conn,
+        chirp
+    );
     return CH_SUCCESS;
 }
 
@@ -648,7 +659,8 @@ ch_cn_close_cb(uv_handle_t* handle)
         ch_free(conn);
         L(
             chirp,
-            "Closed connection, closing semaphore (%d). ch_connection_t:%p, ch_chirp_t:%p",
+            "Closed connection, closing semaphore (%d). ch_connection_t:%p, "
+            "ch_chirp_t:%p",
             chirp->_->closing_tasks,
             conn,
             chirp

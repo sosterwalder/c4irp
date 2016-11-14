@@ -71,7 +71,7 @@ class ChirpPool(object):
         )
         if err == lib.CH_EADDRINUSE:
             raise RuntimeError("Port %d already in use." % self._config.PORT)
-        assert(err == lib.CH_SUCCESS)
+        assert err == lib.CH_SUCCESS
         lib.ch_chirp_set_auto_stop(self._chirp)
 
         def run():
@@ -89,8 +89,8 @@ class ChirpPool(object):
         """Closing everything."""
         lib.ch_chirp_close_ts(self._chirp)
         self._thread.join()
-        assert(self._uv_ret == lib.CH_SUCCESS)
-        assert(self._chirp_ret == lib.CH_SUCCESS)
+        assert self._uv_ret == lib.CH_SUCCESS
+        assert self._chirp_ret == lib.CH_SUCCESS
         self._pool.shutdown()
 
     def _fill_c_config(self):

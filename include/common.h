@@ -234,9 +234,18 @@ A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*")
 #   define ch_inline inline
 #endif // _WIN32
 
+// Typedefs
+// ========
+//
+// .. code-block:: cpp
+
+typedef char ch_buf; // Used to show it is not a c-string but a buffer
+
 // Generic functions
 // =================
 //
+// .. code-block:: cpp
+
 #define MINMAX_FUNCS(type) \
 static \
 ch_inline \

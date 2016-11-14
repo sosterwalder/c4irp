@@ -16,18 +16,22 @@ from _chirp_low_level import ffi, lib
 )
 def test_ch_cn_conn_dict(choice, address1, port1, address2, port2, force_eq):
     """Test if sglib and the connection comperator behaves as expected."""
-    af_inet1          = choice((2, 10))
-    af_inet2          = choice((2, 10))
+    inet1          = choice((0, 1))
+    inet2          = choice((0, 1))
+    if not inet1:
+        address1 = address1[:4]
+    if not inet2:
+        address2 = address2[:4]
     if force_eq:
-        af_inet2      = af_inet1
+        inet2      = inet1
         address2      = address1
         port2         = port1
     conn1             = ffi.new("ch_connection_t*")
-    conn1.ip_protocol = af_inet1
+    conn1.ip_protocol = inet1
     conn1.address     = address1
     conn1.port        = port1
     conn2             = ffi.new("ch_connection_t*")
-    conn2.ip_protocol = af_inet2
+    conn2.ip_protocol = inet2
     conn2.address     = address2
     conn2.port        = port2
     cmp_              = ffi.new("int*")
@@ -35,8 +39,8 @@ def test_ch_cn_conn_dict(choice, address1, port1, address2, port2, force_eq):
     len_              = ffi.new("int*")
     x_mem             = ffi.new("int*")
     y_mem             = ffi.new("int*")
-    conn1_tup         = (af_inet1, address1, port1)
-    conn2_tup         = (af_inet2, address2, port2)
+    conn1_tup         = (inet1, address1, port1)
+    conn2_tup         = (inet2, address2, port2)
     equal             = conn1_tup == conn2_tup
     lib.test_ch_cn_conn_dict(
         conn1,
