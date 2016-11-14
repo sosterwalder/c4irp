@@ -644,6 +644,7 @@ ch_cn_close_cb(uv_handle_t* handle)
                                  // that.
         if(conn->bio_app != NULL)
             BIO_free(conn->bio_app);
+        ch_rd_free(&conn->reader);
         ch_free(conn);
         L(
             chirp,
@@ -670,7 +671,7 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn, uint8_t flags)
     conn->chirp           = chirp;
     conn->flags          |= flags;
     conn->write_req.data  = conn;
-    ch_rd_init(&conn->reader);
+    ch_rd_init(&conn->reader, chirp->_->config.MAX_HANDLERS);
     if(conn->flags & CH_CN_ENCRYPTED)
         return ch_cn_init_enc(chirp, conn);
     return CH_SUCCESS;

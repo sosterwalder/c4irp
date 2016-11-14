@@ -33,6 +33,8 @@ static ch_config_t _ch_config_defaults = {
     .PORT            = 2998,
     .BACKLOG         = 100,
     .RETRIES         = 1,
+    .MAX_HANDLERS    = 16,
+    .FLOW_CONTROL    = 1,
     .CLOSE_ON_SIGINT = 1,
     .BUFFER_SIZE     = 0,
     .BIND_V6         = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -637,6 +639,24 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
         "Config: timeout must be <= reuse time. (%f, %f)",
         conf->TIMEOUT,
         conf->REUSE_TIME
+    );
+    if(conf->FLOW_CONTROL) {
+        V(
+            chirp,
+            conf->MAX_HANDLERS >= 16,
+            "Config: if flow control is on max_handlers must be >= 16."
+        );
+    } else {
+        V(
+            chirp,
+            conf->MAX_HANDLERS >= 1,
+            "Config: max_handlers must be >= 1."
+        );
+    }
+    V(
+        chirp,
+        conf->MAX_HANDLERS <= 32,
+        "Config: max_handlers must be <= 1."
     );
     V(
         chirp,

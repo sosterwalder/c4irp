@@ -181,6 +181,8 @@ ch_rd_read(ch_connection_t* conn, void* buf, size_t read)
                 );
                 bytes_handled += sizeof(reader->hs);
                 break;
+            case CH_RD_WAIT:
+                break;
             default:
                 A(0, "Unknown reader state");
                 break;

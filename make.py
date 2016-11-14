@@ -118,4 +118,4 @@ else:
         os.symlink("build/pyproject", "pyproject")
     except Exception:  # Well, lazy python 2/3 compat, really I don't care
         pass
-    os.execvp("make", ["make", "-f", "build/project.make"] + sys.argv[1:])
+    os.execvp("make", ["make", "-f", "build/project.mk"] + sys.argv[1:])

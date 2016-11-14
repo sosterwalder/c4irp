@@ -38,6 +38,16 @@
 //
 //       Count of retries till error is reported, by default 1.
 //
+//    .. c:member:: uint8_t MAX_HANDLERS
+//
+//       Count of handlers used. Allowed values between 1 and 32. Default: 16.
+//       If FLOW_CONTROL is on it must be >= 16.
+//
+//    .. c:member:: uint8_t FLOW_CONTROL
+//
+//       Flow control prevents overload of one node in chain for workers.
+//       Default: 1.
+//
 //    .. c:member:: char CLOSE_ON_SIGINT
 //
 //       By default chirp closes on SIGINT (Ctrl-C)
@@ -69,6 +79,8 @@ typedef struct ch_config_s {
     uint16_t        PORT;
     uint8_t         BACKLOG;
     uint8_t         RETRIES;
+    uint8_t         MAX_HANDLERS;
+    uint8_t         FLOW_CONTROL;
     char            CLOSE_ON_SIGINT;
     uint32_t        BUFFER_SIZE;
     uint8_t         BIND_V6[16];

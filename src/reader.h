@@ -9,6 +9,7 @@
 
 #include "../include/common.h"
 #include "message.h"
+#include "buffer.h"
 
 struct ch_connection_s;
 
@@ -92,14 +93,14 @@ typedef struct ch_reader_s {
     unsigned char state;
     ch_rd_handshake_t hs;
     ch_rd_message_t msg;
+    ch_buffer_t buffers;
 } ch_reader_t;
-
 
 // .. c:function::
 static
 ch_inline
 void
-ch_rd_init(ch_reader_t* reader)
+ch_rd_free(ch_reader_t* reader)
 //
 //    Initialize the reader structure
 //
@@ -108,7 +109,25 @@ ch_rd_init(ch_reader_t* reader)
 // .. code-block:: cpp
 //
 {
+    ch_bf_free(&reader->buffers);
+}
+
+// .. c:function::
+static
+ch_inline
+void
+ch_rd_init(ch_reader_t* reader, uint8_t max_buffers)
+//
+//    Initialize the reader structure
+//
+//    :param ch_reader_t* reader: The reader
+//    :param max_buffers: Buffers to allocate
+//
+// .. code-block:: cpp
+//
+{
     reader->state = CH_RD_START;
+    ch_bf_init(&reader->buffers, max_buffers);
 }
 
 // .. c:function::

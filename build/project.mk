@@ -14,7 +14,10 @@ DOCH=$(wildcard src/*.h) $(wildcard include/*.h)
 DOCRST=$(DOCC:.c=.c.rst) $(DOCH:.h=.h.rst)
 
 debug:  ## Build the project in debug mode
-	MODE=debug make -f build/build.make
+	MODE=debug make -f build/build.mk
+
+release:  ## Build the project in debug mode
+	MODE=release make -f build/build.mk
 
 dmod: debug  ## Build the python module in debug mode
 	MODE=debug rm *.so; pip install -v -e .
@@ -40,7 +43,7 @@ ifeq ($(NOLIB),true)
 test-lib:
 else
 test-lib:
-	make -f build/build.make test-lib
+	make -f build/build.mk test-lib
 endif
 
 genhtml:.python-version  ## Generate html coverage report

@@ -58,6 +58,27 @@ ch_bytes_to_hex(uint8_t* bytes, size_t bytes_size, char* str, size_t str_size)
 // .. c:function::
 static
 ch_inline
+int
+ch_msb32(uint32_t x)
+//
+//    Get the most significant bit set
+//
+//    :param uint32_t x: The bit set
+//
+// .. code-block:: cpp
+//
+{
+    x |= (x >> 1);
+    x |= (x >> 2);
+    x |= (x >> 4);
+    x |= (x >> 8);
+    x |= (x >> 16);
+    return(x & ~(x >> 1));
+}
+
+// .. c:function::
+static
+ch_inline
 void
 ch_free(
         void* buf

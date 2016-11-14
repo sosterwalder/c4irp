@@ -84,7 +84,7 @@ typedef struct ch_text_address_s {
 //
 // * Please use MAX_HANDLERS preallocated buffers of size 32 for header
 // * Please use MAX_HANDLERS preallocated buffers of size 256 for actor
-// * Please use MAX_HANDLERS preallocated buffers of size 1024 for data
+// * Please use MAX_HANDLERS preallocated buffers of size 512 for data
 //
 // Either fields may exceed the limit, in which case you have to alloc and set
 // the free_* field.

@@ -26,13 +26,12 @@ NOTEST=$(filter-out $(wildcard src/*_test.c),$(wildcard src/*.c))
 ifeq ($(MODE),debug)
 	SRCS      = $(wildcard src/*.c)
 	MYCFLAGS := $(COMMONCFLAGS) $(DEBUGCFLAGS)
-	BUILDS   := libchirp $(TESTEXECS)
 else
-	SRCS      =$(filter-out $(wildcard src/*_etest.c),$(NOTEST))
+	SRCS      = $(NOTEST)
 	MYCFLAGS := $(COMMONCFLAGS) $(RELEASECFLAGS)
 	MODE     := release
-	BUILDS   := libchirp
 endif
+BUILDS   := libchirp $(TESTEXECS)
 ifneq ($(UNAME_S),Darwin)
 	MYCFLAGS += -pthread
 else
