@@ -76,3 +76,9 @@ endif
 
 %.h.rst: %.h
 	pyproject/c2rst $<
+
+
+ifeq ($(TRAVIS),true)
+coala:
+	@echo TODO coala not working in travis, try next release
+endif

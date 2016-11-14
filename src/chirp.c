@@ -11,7 +11,13 @@
 
 #include <time.h>
 #include <signal.h>
-#include <unistd.h>
+#ifdef _WIN32
+#   define ch_access _access
+#   include <io.h>
+#else
+#   define ch_access access
+#   include <unistd.h>
+#endif
 
 SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     ch_chirp_t,
@@ -607,7 +613,7 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
     );
     V(
         chirp,
-        access(conf->CERT_CHAIN_PEM, F_OK ) != -1,
+        ch_access(conf->CERT_CHAIN_PEM, F_OK ) != -1,
         "Config: cert %s does not exist.",
         conf->CERT_CHAIN_PEM
     );

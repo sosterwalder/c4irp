@@ -26,6 +26,7 @@ if sys.platform == "win32":
         "libeay32",
         "ssleay32",
         "gdi32",
+        "crypt32",
     ])
     ldflags.extend(["/LIBPATH:openssl\\lib"])
     if os.environ['MODE'].lower() == "debug":

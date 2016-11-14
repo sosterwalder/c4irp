@@ -50,7 +50,7 @@ ch_bytes_to_hex(uint8_t* bytes, size_t bytes_size, char* str, size_t str_size)
     A(bytes_size * 2 + 1 <= str_size, "Not enough space for string");
     for(size_t i = 0; i < bytes_size; i++)
     {
-            str += sprintf(str, "%02X", bytes[i]);
+            str += snprintf(str, 2, "%02X", bytes[i]);
     }
     *str = 0;
 }
