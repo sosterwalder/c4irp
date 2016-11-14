@@ -51,7 +51,10 @@ def test_ssl():
             stdout, stderr = p.communicate()
             print(stdout.decode("UTF-8"), stderr.decode("UTF-8"))
         finally:
-            p.kill()
+            try:  # Races always possible
+                p.kill()
+            except OSError:
+                pass
 
 if __name__ == "__main__":
     connect_ssl()

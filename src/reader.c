@@ -62,8 +62,8 @@ _ch_rd_handshake(
             chirp,
             "Illegal handshake size -> shutdown. ch_chirp_t:%p, "
             "ch_connection_t:%p",
-            chirp,
-            conn
+            (void*) chirp,
+            (void*) conn
         );
         ch_cn_shutdown(conn);
         return;
@@ -93,9 +93,9 @@ _ch_rd_handshake(
             chirp,
             "ch_connection_t:%p replaced ch_connection_t:%p. "
             "ch_chirp_t:%p",
-            conn,
-            old_conn,
-            chirp
+            (void*) conn,
+            (void*) old_conn,
+            (void*) chirp
         );
         sglib_ch_connection_t_delete(
             &protocol->connections,
@@ -133,8 +133,8 @@ _ch_rd_handshake(
             addr.data,
             conn->port,
             identity,
-            chirp,
-            conn
+            (void*) chirp,
+            (void*) conn
         );
     }
 #   endif

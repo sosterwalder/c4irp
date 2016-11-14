@@ -114,7 +114,7 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
     right,
     color_field,
     CH_CONNECTION_CMP
-);
+)
 
 SGLIB_DEFINE_RBTREE_PROTOTYPES(
     ch_connection_set_t,
@@ -122,7 +122,7 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
     right,
     color_field,
     SGLIB_NUMERIC_COMPARATOR
-);
+)
 
 // .. c:function::
 void

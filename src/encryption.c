@@ -30,7 +30,7 @@ static int _ch_en_openssl_ref_count = 0;
 
 // .. c:function::
 ch_error_t
-ch_en_openssl_init(const ch_config_t* config)
+ch_en_openssl_init(void)
 //    :noindex:
 //
 //    see: :c:func:`ch_en_openssl_init`
@@ -97,14 +97,14 @@ ch_en_start(ch_encryption_t* enc)
         L(
             chirp,
             "Initializing the OpenSSL library. ch_chirp_t:%p",
-            chirp
+            (void*) chirp
         );
-        tmp_err = ch_en_openssl_init(&ichirp->config);
+        tmp_err = ch_en_openssl_init();
         if(tmp_err != CH_SUCCESS) {
             L(
                 chirp,
                 "Could not initialize the OpenSSL library. ch_chirp_t:%p",
-                chirp
+                (void*) chirp
             );
             return tmp_err;
         }
@@ -114,7 +114,7 @@ ch_en_start(ch_encryption_t* enc)
         E(
             chirp,
             "Could not get the TLSv1_2_method. ch_chirp_t:%p",
-            chirp
+            (void*) chirp
         );
         return CH_TLS_ERROR;
     }
@@ -123,7 +123,7 @@ ch_en_start(ch_encryption_t* enc)
         E(
             chirp,
             "Could create the SSL_CTX. ch_chirp_t:%p",
-            chirp
+            (void*) chirp
         );
         return CH_TLS_ERROR;
     }
@@ -149,7 +149,7 @@ ch_en_start(ch_encryption_t* enc)
             "Could not set the verification certificate "
             "%s. ch_chirp_t:%p",
             ichirp->config.CERT_CHAIN_PEM,
-            chirp
+            (void*) chirp
         );
         return CH_TLS_ERROR;
     }
@@ -161,7 +161,7 @@ ch_en_start(ch_encryption_t* enc)
             chirp,
             "Could not set the certificate %s. ch_chirp_t:%p",
             ichirp->config.CERT_CHAIN_PEM,
-            chirp
+            (void*) chirp
         );
         return CH_TLS_ERROR;
     }
@@ -174,7 +174,7 @@ ch_en_start(ch_encryption_t* enc)
             chirp,
             "Could not set the private key %s. ch_chirp_t:%p",
             ichirp->config.CERT_CHAIN_PEM,
-            chirp
+            (void*) chirp
         );
         return CH_TLS_ERROR;
     }
@@ -183,7 +183,7 @@ ch_en_start(ch_encryption_t* enc)
             chirp,
             "Private key is not valid %s. ch_chirp_t:%p",
             ichirp->config.CERT_CHAIN_PEM,
-            chirp
+            (void*) chirp
         );
         return CH_TLS_ERROR;
     }
@@ -195,7 +195,7 @@ ch_en_start(ch_encryption_t* enc)
             chirp,
             "Could not open the dh-params %s. ch_chirp_t:%p",
             ichirp->config.DH_PARAMS_PEM,
-            chirp
+            (void*) chirp
         );
         return CH_TLS_ERROR;
     }
@@ -206,7 +206,7 @@ ch_en_start(ch_encryption_t* enc)
             chirp,
             "Could not load the dh-params %s. ch_chirp_t:%p",
             ichirp->config.DH_PARAMS_PEM,
-            chirp
+            (void*) chirp
         );
         return CH_TLS_ERROR;
     }
@@ -215,7 +215,7 @@ ch_en_start(ch_encryption_t* enc)
             chirp,
             "Could not set the dh-params %s. ch_chirp_t:%p",
             ichirp->config.DH_PARAMS_PEM,
-            chirp
+            (void*) chirp
         );
         return CH_TLS_ERROR;
     }
@@ -230,14 +230,14 @@ ch_en_start(ch_encryption_t* enc)
         E(
             chirp,
             "Could not set the cipher list. ch_chirp_t:%p",
-            chirp
+            (void*) chirp
         );
         return CH_TLS_ERROR;
     }
     L(
         chirp,
         "Created SSL context for chirp. ch_chirp_t:%p",
-        chirp
+        (void*) chirp
     );
     return CH_SUCCESS;
 }
@@ -260,7 +260,7 @@ ch_en_stop(ch_encryption_t* enc)
             L(
                 chirp,
                 "Uninitializing the OpenSSL library. ch_chirp_t:%p",
-                chirp
+                (void*) chirp
             );
             return ch_en_openssl_uninit();
         }

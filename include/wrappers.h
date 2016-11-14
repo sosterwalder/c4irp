@@ -31,7 +31,7 @@ ch_loop_close(uv_loop_t* loop)
         __FILE__,
         __LINE__,
         tmp_err,
-        loop
+        (void*) loop
     );
 #endif
     return tmp_err;

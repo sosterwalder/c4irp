@@ -43,6 +43,8 @@
 // .. code-block:: cpp
 //
 
+#define CH_EMPTY
+
 #define E(chirp, message, ...) do { \
     if(chirp->_log != NULL) { \
         char buf[1024]; \
@@ -52,7 +54,7 @@
             "%s:%d " message, \
             __FILE__, \
             __LINE__, \
-            ##__VA_ARGS__ \
+           __VA_ARGS__ \
         ); \
         chirp->_log(buf, 1); \
     } else { \
@@ -61,7 +63,7 @@
             "%s:%d Error: " message "\n", \
             __FILE__, \
             __LINE__, \
-            ##__VA_ARGS__ \
+            __VA_ARGS__ \
         ); \
     } \
 } while(0)
@@ -77,7 +79,7 @@
                     "%s:%d " message, \
                     __FILE__, \
                     __LINE__, \
-                    ##__VA_ARGS__ \
+                    __VA_ARGS__ \
                 ); \
                 chirp->_log(buf, 1); \
             } else { \
@@ -86,7 +88,34 @@
                     "%s:%d " message "\n", \
                     __FILE__, \
                     __LINE__, \
-                    ##__VA_ARGS__ \
+                    __VA_ARGS__ \
+                ); \
+                assert(condition); \
+                /* Since we check the condition twice, check for bad asserts*/ \
+                fprintf(stderr, "Bad assert: condition not stable\n"); \
+                assert(0); \
+            } \
+            return CH_VALUE_ERROR; \
+        } \
+    } while(0)
+#   define VE(chirp, condition, message) do { \
+        if(!(condition)) { \
+            if(chirp->_log != NULL) { \
+                char buf[1024]; \
+                snprintf( \
+                    buf, \
+                    1024, \
+                    "%s:%d " message, \
+                    __FILE__, \
+                    __LINE__ \
+                ); \
+                chirp->_log(buf, 1); \
+            } else { \
+                fprintf( \
+                    stderr, \
+                    "%s:%d " message "\n", \
+                    __FILE__, \
+                    __LINE__ \
                 ); \
                 assert(condition); \
                 /* Since we check the condition twice, check for bad asserts*/ \
@@ -105,7 +134,7 @@
                 "%s:%d " message, \
                 __FILE__, \
                 __LINE__, \
-                ##__VA_ARGS__ \
+                __VA_ARGS__ \
             ); \
             chirp->_log(buf, 0); \
         } else { \
@@ -114,13 +143,13 @@
                 "%s:%d " message "\n", \
                 __FILE__, \
                 __LINE__, \
-                ##__VA_ARGS__ \
+                __VA_ARGS__ \
             ); \
         } \
     } while(0)
 #   define A(condition, ...) do { \
         if(!(condition)) { \
-            fprintf(stderr, ##__VA_ARGS__); \
+            fprintf(stderr, __VA_ARGS__); \
             fprintf(stderr, "\n"); \
             assert(condition); \
             /* Since we check the condition twice, check for bad asserts*/ \
@@ -139,7 +168,7 @@
                     "%s:%d " message, \
                     __FILE__, \
                     __LINE__, \
-                    ##__VA_ARGS__ \
+                    __VA_ARGS__ \
                 ); \
                 chirp->_log(buf, 1); \
             } else { \
@@ -148,7 +177,30 @@
                     "%s:%d " message "\n", \
                     __FILE__, \
                     __LINE__, \
-                    ##__VA_ARGS__ \
+                    __VA_ARGS__ \
+                ); \
+            } \
+            return CH_VALUE_ERROR; \
+        } \
+    } while(0)
+#   define VE(chirp, condition, message) do { \
+        if(!(condition)) { \
+            if(chirp->_log != NULL) { \
+                char buf[1024]; \
+                snprintf( \
+                    buf, \
+                    1024, \
+                    "%s:%d " message, \
+                    __FILE__, \
+                    __LINE__ \
+                ); \
+                chirp->_log(buf, 1); \
+            } else { \
+                fprintf( \
+                    stderr, \
+                    "%s:%d " message "\n", \
+                    __FILE__, \
+                    __LINE__ \
                 ); \
             } \
             return CH_VALUE_ERROR; \

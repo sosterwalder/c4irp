@@ -13,7 +13,7 @@ endif
 COMMON        := config.h $(wildcard include/*.h)
 
 LIBUVD        := build/libuv
-COMMONCFLAGS  := -std=gnu99 -fPIC -Wall -Wno-unused-function -I$(LIBUVD)/include $(CFLAGS)
+COMMONCFLAGS  := -std=gnu99 -fPIC -Wall -Wextra -pedantic -Wno-unused-function -I$(LIBUVD)/include $(CFLAGS)
 DEBUGCFLAGS   := -g -O0
 RELEASECFLAGS := -O3 -DNDEBUG 
 TESTLIBS      := libchirp.a libuv.a -lssl -lcrypto
