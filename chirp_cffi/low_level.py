@@ -11,7 +11,7 @@ ffi.set_source(
     """,
     libraries=libs,
     library_dirs=["."],
-    include_dirs=["include", "build/libuv/include"],
+    include_dirs=["include", "build/libuv/include", "openssl/include"],
     extra_compile_args=cflags,
     extra_link_args=ldflags,
 )

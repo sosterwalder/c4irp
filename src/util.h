@@ -111,13 +111,13 @@ ch_random_ints_as_bytes(uint8_t* bytes, size_t len)
 // .. code-block:: cpp
 //
 {
-    A(len % 4 == 0, "len must be multiple of four");
     size_t i;
+    int tmp_rand;
+    A(len % 4 == 0, "len must be multiple of four");
 #ifdef _WIN32
 #   if RAND_MAX < 16384 || INT_MAX < 16384 // 2**14
 #       error Seriously broken compiler or platform
 #   else // RAND_MAX < 16384 || INT_MAX < 16384
-        int tmp_rand;
         for(i = 0; i < len; i += 2) {
             tmp_rand = rand();
             memcpy(bytes + i, &tmp_rand, 2);
@@ -127,6 +127,7 @@ ch_random_ints_as_bytes(uint8_t* bytes, size_t len)
 #   if RAND_MAX < 1073741824 || INT_MAX < 1073741824 // 2**30
 #       ifdef CH_ACCEPT_STRANGE_PLATFORM
             /* WTF, fallback platform */
+            (void)(tmp_rand);
             for(i = 0; i < len; i++) {
                 bytes[i] = ((unsigned int) rand()) % 256;
             }
