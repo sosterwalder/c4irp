@@ -2,6 +2,7 @@
 
 set -e
 BUILDTYPE="$1"
+CHIRP_DOCKER="True"
 
 source /etc/profile
 pyenv local 3.5.2

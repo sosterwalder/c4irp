@@ -78,7 +78,7 @@ endif
 	pyproject/c2rst $<
 
 
-ifeq ($(TRAVIS),true)
+ifeq ($(CHIRP_DOCKER),True)
 coala:
 	@echo TODO coala not working in travis, try next release
 endif
