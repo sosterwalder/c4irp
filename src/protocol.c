@@ -226,47 +226,12 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
     uv_tcp_init(server->loop, client);
     client->data = conn;
     if (uv_accept(server, (uv_stream_t*) client) == 0) {
-        struct sockaddr_storage addr;
-        int addr_len;
         L(
             chirp,
             "Accepted connection. ch_chirp_t:%p, ch_connection_t:%p",
             (void*) chirp,
             (void*) conn
         );
-        if(uv_tcp_getpeername(
-                    client,
-                    (struct sockaddr*) &addr,
-                    &addr_len
-        ) != CH_SUCCESS) {
-            E(
-                chirp,
-                "Could not get remote address. ch_chirp_t:%p, "
-                "ch_connection_t:%p",
-                (void*) chirp,
-                (void*) conn
-            );
-            conn->shutdown_tasks = 1;
-            uv_close((uv_handle_t*) client, ch_cn_close_cb);
-            return;
-        };
-        if(addr.ss_family == AF_INET6) {
-            struct sockaddr_in6* saddr = (struct sockaddr_in6*) &addr;
-            conn->ip_protocol = CH_IPV6;
-            memcpy(
-                &conn->address,
-                &saddr->sin6_addr,
-                sizeof(saddr->sin6_addr)
-            );
-        } else {
-            struct sockaddr_in* saddr = (struct sockaddr_in*) &addr;
-            conn->ip_protocol = CH_IPV4;
-            memcpy(
-                &conn->address,
-                &saddr->sin_addr,
-                sizeof(saddr->sin_addr)
-            );
-        }
         if(conn->flags & CH_CN_ENCRYPTED) {
             SSL_set_accept_state(conn->ssl);
             conn->flags |= CH_CN_TLS_HANDSHAKE;
@@ -514,23 +479,6 @@ ch_pr_start(ch_protocol_t* protocol)
     protocol->receipts = NULL;
     protocol->late_receipts = NULL;
     protocol->connections = NULL;
-    /*ch_receipt_t* t;
-    struct sglib_ch_receipt_t_iterator it;
-    for(int i = 0; i < 10; ++i) {
-        t = ch_chirp_alloc(chirp, sizeof(ch_receipt_t));
-        // TODO fill t->receipt
-        sglib_ch_receipt_t_add(&protocol->receipts, t);
-    }
-    for(
-            t = sglib_ch_receipt_t_it_init_inorder(
-                &it,
-                protocol->receipts
-            );
-            t != NULL;
-            t = sglib_ch_receipt_t_it_next(&it)
-    ) {
-        printf("%d ", t->receipt[0]);
-    } */
     return CH_SUCCESS;
 }
 

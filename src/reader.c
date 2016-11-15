@@ -52,6 +52,8 @@ _ch_rd_handshake(
 // .. code-block:: cpp
 //
 {
+    struct sockaddr_storage addr;
+    int addr_len;
     ch_connection_t* old_conn;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
@@ -80,6 +82,38 @@ _ch_rd_handshake(
         reader->hs.identity,
         sizeof(conn->remote_identity)
     );
+    if(uv_tcp_getpeername(
+                &conn->client,
+                (struct sockaddr*) &addr,
+                &addr_len
+    ) != CH_SUCCESS) {
+        E(
+            chirp,
+            "Could not get remote address. ch_chirp_t:%p, "
+            "ch_connection_t:%p",
+            (void*) chirp,
+            (void*) conn
+        );
+        ch_cn_shutdown(conn);
+        return;
+    };
+    if(addr.ss_family == AF_INET6) {
+        struct sockaddr_in6* saddr = (struct sockaddr_in6*) &addr;
+        conn->ip_protocol = CH_IPV6;
+        memcpy(
+            &conn->address,
+            &saddr->sin6_addr,
+            sizeof(saddr->sin6_addr)
+        );
+    } else {
+        struct sockaddr_in* saddr = (struct sockaddr_in*) &addr;
+        conn->ip_protocol = CH_IPV4;
+        memcpy(
+            &conn->address,
+            &saddr->sin_addr,
+            sizeof(saddr->sin_addr)
+        );
+    }
     old_conn = sglib_ch_connection_t_find_member(
         protocol->connections,
         conn
