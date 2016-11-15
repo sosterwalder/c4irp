@@ -10,7 +10,7 @@ help:  ## Display this help
 	@echo
 	@cat $(MAKEFILE_LIST) | grep -E '^[0-9a-zA-Z_-]+:.*?## .*$$' | sort -k1,1 | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-chain: | $(NAME).pem  ## Create a cert-chain (default cert.pem) 'make NAME=bla' for bla.pem
+chain: | $(NAME).pem  ## Create a cert-chain (cert.pem) or 'make chain NAME=bla' for bla.pem
 
 dh: | dh.pem  ## Create the dh-parameters
 

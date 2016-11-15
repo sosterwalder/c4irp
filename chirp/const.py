@@ -126,4 +126,12 @@ class Config(object):
         cat cert-pub.pem >> cert.pem
         cat ca-root.pem >> cert.pem
 
+    Or use c4irp/build/makepki
+
+    .. code-block:: bash
+
+        cd c4irp/build/makepki
+        make
+        make chain NAME=customerA
+
     """
