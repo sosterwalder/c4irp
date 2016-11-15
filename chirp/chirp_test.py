@@ -119,19 +119,7 @@ def test_chirp_run():
     chirp = ffi.new("ch_chirp_t**")
     config = ffi.new("ch_config_t*")
     lib.ch_chirp_config_init(config)
-    folder = __file__.split(os.path.sep)[:-1]
-    cert   = list(folder)
-    dh     = list(folder)
-    cert.append("cert.pem")
-    dh.append("dh.pem")
-    cert = "%s%s" % (
-        os.path.sep,
-        os.path.join(*cert)
-    )
-    dh = "%s%s" % (
-        os.path.sep,
-        os.path.join(*dh)
-    )
+    cert, dh = common.get_crypto_files()
     cert_str = ffi.new(
         "char[]", cert.encode("UTF-8")
     )
