@@ -13,7 +13,9 @@ LG = logging.getLogger("chirp")
 if sys.version_info > (3, 4):  # noqa
     from .chirp import ChirpAsync  # noqa # pragma: no cover
 
-lib.ch_en_set_manual_openssl_init()
+
+if sys.platform != "win32":
+    lib.ch_en_set_manual_openssl_init()
 
 
 @ffi.def_extern()

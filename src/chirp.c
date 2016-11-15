@@ -243,7 +243,6 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 {
     char chirp_closed = 0;
     ch_chirp_int_t* ichirp;
-    L(chirp, "Closing chirp via callback. ch_chirp_t:%p", (void*) chirp);
     if(chirp == NULL || chirp->_init != CH_CHIRP_MAGIC) {
         fprintf(
             stderr,
@@ -281,6 +280,7 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
     }
     ichirp->flags |= CH_CHIRP_CLOSING;
     ichirp->close.data = chirp;
+    L(chirp, "Closing chirp via callback. ch_chirp_t:%p", (void*) chirp);
     if(uv_async_send(&ichirp->close) < 0) {
         E(
             chirp,
