@@ -328,6 +328,18 @@ _ch_pr_read_data_cb(
         ch_cn_shutdown(conn);
         return;
     }
+    if(nread < 0) {
+        L(
+            chirp,
+            "Reader got error %d -> shutdown. ch_chirp_t:%p, "
+            "ch_connection_t:%p",
+            (int) nread,
+            (void*) chirp,
+            (void*) conn
+        );
+        ch_cn_shutdown(conn);
+        return;
+    }
     L(
         chirp,
         "%d available bytes. ch_chirp_t:%p, ch_connection_t:%p",
