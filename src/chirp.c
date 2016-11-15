@@ -472,7 +472,14 @@ ch_chirp_init(
             );
        }
        else
-           _ch_chirp_sig_init = 1;
+           _ch_chirp_sig_init = 1; // We need at least sigint
+       if(signal(SIGTERM, _ch_chirp_sig_handler) == SIG_ERR) {
+            E(
+                chirp,
+                "Unable to set SIGTERM handler. ch_chirp_t:%p",
+                (void*) chirp
+            );
+       }
     }
     _ch_chirp_ref_count += 1;
     sglib_ch_chirp_t_add(&_ch_chirp_instances, chirp);
@@ -573,7 +580,7 @@ _ch_chirp_sig_handler(int signo)
 //
 {
     ch_chirp_t* t;
-    if(signo != SIGINT)
+    if(signo != SIGINT && signo != SIGTERM)
         return;
     struct sglib_ch_chirp_t_iterator it;
     for(
