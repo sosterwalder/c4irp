@@ -6,7 +6,7 @@ import socket
 import ssl
 import time
 
-from . import sh, common
+from . import common, sh
 
 chirp = sh.background_command("src/chirp_etest")
 

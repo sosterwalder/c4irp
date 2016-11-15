@@ -1,6 +1,5 @@
 """Chirp bindings."""
 import concurrent.futures as fut
-import os
 import sys
 import threading
 
