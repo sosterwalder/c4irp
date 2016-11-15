@@ -62,6 +62,7 @@ ch_en_openssl_uninit(void)
     EVP_cleanup();
     CRYPTO_cleanup_all_ex_data();
     ERR_free_strings();
+    CONF_modules_free();
     return CH_SUCCESS;
 }
 
