@@ -84,7 +84,7 @@ setup(
     cffi_modules=cffi_modules,
     packages = find_packages(),
     package_data=find_data(
-        find_packages(), ["pem", "cnf"]
+        find_packages(), ["pem"]
     ),
     entry_points = {
         'console_scripts': [
