@@ -376,7 +376,12 @@ _ch_cn_shutdown_gen(
     }
     // There are many reasons the connection is not in this data-structure,
     // therefore we do a blind delete.
-    sglib_ch_connection_t_delete(&protocol->connections, conn);
+    ch_connection_t* out_conn;
+    sglib_ch_connection_t_delete_if_member(
+        &protocol->connections,
+        conn,
+        &out_conn
+    );
     conn->flags |= CH_CN_SHUTTING_DOWN;
     if(conn->flags & CH_CN_ENCRYPTED) {
         tmp_err = SSL_get_verify_result(conn->ssl);
