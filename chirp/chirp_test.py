@@ -9,7 +9,7 @@ from hypothesis import strategies as st
 
 from _chirp_cffi import ffi, lib
 
-from . import ChirpPool
+from . import ChirpPool, common
 
 # from hypothesis import given
 
@@ -54,19 +54,7 @@ def basic_uv():
     config = ffi.new("ch_config_t*")
     loop = ffi.new("uv_loop_t*")
     lib.ch_chirp_config_init(config)
-    folder = __file__.split(os.path.sep)[:-1]
-    cert   = list(folder)
-    dh     = list(folder)
-    cert.append("cert.pem")
-    dh.append("dh.pem")
-    cert = "%s%s" % (
-        os.path.sep,
-        os.path.join(*cert)
-    )
-    dh = "%s%s" % (
-        os.path.sep,
-        os.path.join(*dh)
-    )
+    cert, dh = common.get_crypto_files()
     cert_str = ffi.new(
         "char[]", cert.encode("UTF-8")
     )
@@ -108,16 +96,15 @@ def init_bad_port(port):
     loop = ffi.new("uv_loop_t*")
     config = ffi.new("ch_config_t*")
     lib.ch_chirp_config_init(config)
-    folder = __file__.split(os.path.sep)[:-1]
-    folder.append("cert.pem")
-    cert = "%s%s" % (
-        os.path.sep,
-        os.path.join(*folder)
-    )
+    (cert, dh) = common.get_crypto_files()
     cert_str = ffi.new(
         "char[]", cert.encode("UTF-8")
     )
+    dh_str = ffi.new(
+        "char[]", dh.encode("UTF-8")
+    )
     config.CERT_CHAIN_PEM = cert_str
+    config.DH_PARAMS_PEM = dh_str
     assert config.PORT == 2998
     config.PORT = port
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS

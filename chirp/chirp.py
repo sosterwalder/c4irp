@@ -98,19 +98,10 @@ class ChirpPool(object):
         c_conf = self._c_config
         conf   = self._config
         lib.ch_chirp_config_init(c_conf)
-        folder = __file__.split(os.path.sep)[:-1]
-        cert   = list(folder)
-        dh     = list(folder)
-        cert.append("cert.pem")
-        dh.append("dh.pem")
-        conf.CERT_CHAIN_PEM = "%s%s" % (
-            os.path.sep,
-            os.path.join(*cert)
-        )
-        conf.DH_PARAMS_PEM = "%s%s" % (
-            os.path.sep,
-            os.path.join(*dh)
-        )
+        (
+            conf.CERT_CHAIN_PEM,
+            conf.DH_PARAMS_PEM
+        ) = common.get_crypto_files()
         for std_attr in [
                 'REUSE_TIME',
                 'TIMEOUT',
