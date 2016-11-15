@@ -4,6 +4,7 @@
 import signal
 import socket
 import ssl
+import sys
 import time
 
 from . import common, sh
@@ -41,7 +42,10 @@ def test_ssl():
     finally:
         try:
             time.sleep(0.25)
-            p.send_signal(signal.SIGINT)
+            if sys.platform == "win32":
+                p.kill()
+            else:
+                p.send_signal(signal.SIGINT)
             stdout, stderr = p.communicate()
             print(stdout.decode("UTF-8"), stderr.decode("UTF-8"))
         finally:

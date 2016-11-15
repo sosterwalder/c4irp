@@ -1,5 +1,4 @@
 """Testing the chirp object."""
-import os
 import threading
 import time
 from contextlib import contextmanager
