@@ -96,7 +96,7 @@ class Config(object):
 
     .. code-block:: bash
 
-        openssl req -x509 -new -nodes -key ca-key.pem \
+        openssl req -x509 -new -nodes -extensions v3_ca -key ca-key.pem \
         -days 3650 -out ca-root.pem -sha512
 
     Create the private-key of your certificate.
