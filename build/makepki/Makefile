@@ -25,17 +25,20 @@ $(NAME)_key.pem:
 
 ca_cert.pem: | ca_key.pem
 	openssl req -x509 -new -nodes -key ca_key.pem \
-        -days 3650 -out ca_cert.pem -sha512
+        -days 36500 -out ca_cert.pem -sha512
 
 $(NAME).csr: | $(NAME)_key.pem
-	openssl req -new -key $(NAME)_key.pem -out $(NAME).csr -sha512
+	openssl req -new -key $(NAME)_key.pem -sha512 \
+		-out $(NAME).csr
 
 $(NAME)_pub.pem: | $(NAME).csr ca_cert.pem
-	openssl x509 -req -in $(NAME).csr -CA ca_cert.pem -CAkey ca_key.pem \
-        -CAcreateserial -out $(NAME)_pub.pem -days 3650 -sha512
+	openssl x509 -req -in $(NAME).csr -CA ca_cert.pem \
+		-CAkey ca_key.pem -extensions sslclient,sslserver \
+		-CAcreateserial -out $(NAME)_pub.pem -days 36500 \
+		-sha512
 
 $(NAME).pem: | $(NAME)_pub.pem
 	cat $(NAME)_key.pem > $(NAME).pem && \
 	cat $(NAME)_pub.pem >> $(NAME).pem && \
 	cat ca_cert.pem >> $(NAME).pem || \
-	rm $(NAME).pem
+	sh -c "rm $(NAME).pem; false"

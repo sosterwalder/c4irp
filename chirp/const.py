@@ -96,7 +96,7 @@ class Config(object):
 
     .. code-block:: bash
 
-        openssl req -x509 -new -nodes -extensions v3_ca -key ca-key.pem \
+        openssl req -x509 -new -nodes -key ca-key.pem \
         -days 3650 -out ca-root.pem -sha512
 
     Create the private-key of your certificate.
@@ -118,7 +118,7 @@ class Config(object):
         openssl x509 -req -in cert.csr -CA ca-root.pem -CAkey ca-key.pem \
         -CAcreateserial -out cert-pub.pem -days 3650 -sha512
 
-    Join the private- and public-keys (certs). ca-key.pem has to stay secert!
+    Join the private- and public-keys (certs). ca-key.pem has to stay secret!
 
     .. code-block:: bash
 
