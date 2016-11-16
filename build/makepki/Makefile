@@ -2,7 +2,7 @@
 NAME := cert
 
 help:  ## Display this help
-	@echo If you want to use an existing certifaction auhoritiy.
+	@echo If you want to use an existing certifaction auhoritiy,
 	@echo place ca_key.pem \(private key of the ca\) and ca_cert.pem
 	@echo \(the public cert of the ca\) in this directory.
 	@echo
