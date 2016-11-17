@@ -4,19 +4,16 @@ set -e
 
 ./make.py > /dev/null
 if [ "$BUILDTYPE" == "osx-test" ]; then
-    export PATH="$PATH:/usr/local/opt/llvm/bin"
     brew update
     brew uninstall libtool && brew install libtool
-    brew install libffi cppcheck openssl llvm
+    brew install libffi cppcheck openssl
     sudo NOLIB=true ./make.py test
 elif [ "$BUILDTYPE" == "osx-lib" ]; then
-    export PATH="$PATH:/usr/local/opt/llvm/bin"
     brew update
     brew uninstall libtool && brew install libtool
-    brew install libffi cppcheck openssl llvm
+    brew install libffi cppcheck openssl
     sudo NOLIB=false ./make.py test-lib
 elif [ "$BUILDTYPE" == "osx-bdist" ]; then
-    export PATH="$PATH:/usr/local/opt/llvm/bin"
     brew update
     brew uninstall libtool && brew install libtool
     brew install libffi cppcheck openssl

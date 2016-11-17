@@ -60,7 +60,7 @@ endif
 
 %.c.gcov: %.c
 ifeq ($(CC),clang)
-	llvm-cov $<
+	xcrun llvm-cov gcov $<
 else
 	gcov $<
 endif
