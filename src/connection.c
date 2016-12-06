@@ -424,20 +424,8 @@ _ch_cn_shutdown_gen(
         );
         return ch_uv_error_map(tmp_err);
     }
-    tmp_err = uv_timer_init(ichirp->loop, &conn->shutdown_timeout);
-    if(tmp_err != CH_SUCCESS) {
-        E(
-            chirp,
-            "Initializing shutdown timeout failed: %d. ch_connection_t:%p,"
-            " ch_chirp_t:%p",
-            tmp_err,
-            (void*) conn,
-            (void*) chirp
-        );
-    }
     if(ichirp->flags & CH_CHIRP_CLOSING)
         chirp->_->closing_tasks += 1;
-    conn->shutdown_timeout.data = conn;
     tmp_err = uv_timer_start(
         &conn->shutdown_timeout,
         timer_cb,
@@ -662,6 +650,7 @@ ch_cn_close_cb(uv_handle_t* handle)
         if(conn->bio_app != NULL)
             BIO_free(conn->bio_app);
         ch_rd_free(&conn->reader);
+        ch_wr_free(&conn->writer);
         ch_free(conn);
         L(
             chirp,
@@ -684,12 +673,29 @@ ch_cn_init(ch_chirp_t* chirp, ch_connection_t* conn, uint8_t flags)
 // .. code-block:: cpp
 //
 {
+    int tmp_err;
+
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
+    ch_chirp_int_t* ichirp  = chirp->_;
     memset(conn, 0, sizeof(ch_connection_t));
+    conn->load            = 0;
     conn->chirp           = chirp;
     conn->flags          |= flags;
     conn->write_req.data  = conn;
-    ch_rd_init(&conn->reader, chirp->_->config.MAX_HANDLERS);
+    ch_rd_init(&conn->reader, ichirp->config.MAX_HANDLERS);
+    ch_wr_init(&conn->writer, conn);
+    tmp_err = uv_timer_init(ichirp->loop, &conn->shutdown_timeout);
+    if(tmp_err != CH_SUCCESS) {
+        E(
+            chirp,
+            "Initializing shutdown timeout failed: %d. ch_connection_t:%p,"
+            " ch_chirp_t:%p",
+            tmp_err,
+            (void*) conn,
+            (void*) chirp
+        );
+    }
+    conn->shutdown_timeout.data = conn;
     if(conn->flags & CH_CN_ENCRYPTED)
         return ch_cn_init_enc(chirp, conn);
     return CH_SUCCESS;

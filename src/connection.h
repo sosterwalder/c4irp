@@ -12,6 +12,7 @@
 #include "../include/chirp_obj.h"
 #include "message.h"
 #include "reader.h"
+#include "writer.h"
 
 // System includes
 // ===============
@@ -93,7 +94,9 @@ typedef struct ch_connection_s {
     BIO*                    bio_ssl;
     BIO*                    bio_app;
     int                     tls_handshake_state;
+    float                   load;
     ch_reader_t             reader;
+    ch_writer_t             writer;
     char                    color_field;
     struct ch_connection_s* left;
     struct ch_connection_s* right;

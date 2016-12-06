@@ -214,6 +214,7 @@ ch_rd_read(ch_connection_t* conn, void* buf, size_t read)
                     read
                 );
                 bytes_handled += sizeof(reader->hs);
+                reader->state = CH_RD_WAIT;
                 break;
             case CH_RD_WAIT:
                 break;

@@ -66,6 +66,11 @@ struct ch_reader_s {
 };
 typedef struct ch_reader_s ch_reader_t;
 
+struct ch_writer_s {
+    ...;
+};
+typedef struct ch_writer_s ch_writer_t;
+
 typedef char ch_buf;
 
 typedef struct ch_connection_s {
@@ -96,7 +101,9 @@ typedef struct ch_connection_s {
     BIO*                    bio_ssl;
     BIO*                    bio_app;
     int                     tls_handshake_state;
+    float                   load;
     ch_reader_t             reader;
+    ch_writer_t             writer;
     char                    color_field;
     struct ch_connection_s* left;
     struct ch_connection_s* right;

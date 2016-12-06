@@ -41,6 +41,7 @@ static ch_config_t _ch_config_defaults = {
     .RETRIES         = 1,
     .MAX_HANDLERS    = 16,
     .FLOW_CONTROL    = 1,
+    .ACKNOWLEDGE     = 1,
     .CLOSE_ON_SIGINT = 1,
     .BUFFER_SIZE     = 0,
     .BIND_V6         = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -678,6 +679,18 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
             chirp,
             conf->MAX_HANDLERS >= 1,
             "Config: max_handlers must be >= 1."
+        );
+    }
+    if(conf->ACKNOWLEDGE == 0) {
+        VE(
+            chirp,
+            conf->RETRIES != 0,
+            "Config: if acknowledge is disabled retries has to be 0."
+        );
+        VE(
+            chirp,
+            conf->FLOW_CONTROL != 0,
+            "Config: if acknowledge is disabled flow-control has to be 0."
         );
     }
     VE(

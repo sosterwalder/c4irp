@@ -31,10 +31,10 @@
 #define CH_WIRE_MESSAGE \
     uint8_t  identity[16]; \
     uint8_t  serial[16]; \
-    int8_t   message_type; \
-    int16_t  header_len; \
-    int16_t  actor_len; \
-    int32_t  data_len \
+    uint8_t  message_type; \
+    uint16_t header_len; \
+    uint16_t actor_len; \
+    uint32_t data_len \
 
 typedef struct ch_message_s {
     // Network data, has to be sent in network order
@@ -51,6 +51,16 @@ typedef struct ch_message_s {
     int8_t   free_actor;
     int8_t   free_data;
 } ch_message_t;
+
+// .. c:type:: ch_ms_message_t
+//
+//    Wire message (network endianness)
+//
+// .. code-block:: cpp
+
+typedef struct ch_ms_message_s {
+    CH_WIRE_MESSAGE;
+} ch_ms_message_t;
 
 // .. c:type:: ch_text_address_t
 //

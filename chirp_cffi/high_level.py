@@ -62,6 +62,7 @@ typedef void* (*ch_alloc_cb_t)(size_t size);
 typedef void (*ch_free_cb_t)(void* buf);
 typedef void (*ch_log_cb_t)(char msg[], char error);
 typedef void* (*ch_realloc_cb_t)(void* buf, size_t new_size);
+typedef void (*ch_send_cb_t)(int status, float load);
 
 //message.h
 typedef struct {
@@ -122,7 +123,8 @@ typedef struct ch_config_s {
     uint8_t         BACKLOG;
     uint8_t         RETRIES;
     uint8_t         MAX_HANDLERS;
-    uint8_t         FLOW_CONTROL;
+    char            ACKNOWLEDGE;
+    char            FLOW_CONTROL;
     char            CLOSE_ON_SIGINT;
     uint32_t        BUFFER_SIZE;
     uint8_t         BIND_V6[16];

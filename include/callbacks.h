@@ -69,6 +69,25 @@ typedef void (*ch_log_cb_t)(char msg[], char error);
 //
 // .. code-block:: cpp
 //
+typedef void (*ch_send_cb_t)(int status, float load);
+
+// .. c:type:: ch_send_cb_t
+//
+//    Called by chirp when message is sent and can be freed.
+//
+//    .. c:member:: int status
+//
+//       Is CH_SUCCESS, CH_TIMEOUT, TODO list errors
+//
+//    .. c:member:: float load
+//
+//       The load of the remote peer. Range 0.0 - 1.0. 1.0 means all remote
+//       handlers are blocked. Use this for load balancing between multiple
+//       nodes. If flow control is not active or the remote node is completely
+//       blocked, you are likely to see timeouts on high load.
+//
+// .. code-block:: cpp
+//
 typedef void* (*ch_realloc_cb_t)(void* buf, size_t new_size);
 
 #endif //ch_inc_callbacks_h

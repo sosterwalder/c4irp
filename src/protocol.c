@@ -19,6 +19,9 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
 )
 
 
+// Declarations
+// ============
+
 // .. c:function::
 static
 ch_inline
@@ -77,6 +80,9 @@ _ch_pr_read_data_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
 //
 //    TODO params
 //
+
+// Definitions
+// ===========
 
 // .. c:function::
 static
