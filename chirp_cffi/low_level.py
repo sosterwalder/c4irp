@@ -8,6 +8,7 @@ ffi.set_source(
     "_chirp_low_level",
     """
     #include "../src/connection_test.h"
+    #include "../src/pool_test.h"
     """,
     libraries=libs,
     library_dirs=["."],
@@ -18,6 +19,11 @@ ffi.set_source(
 
 
 ffi.cdef("""
+//config.h
+#define CH_BF_PREALLOC_HEADER 32
+#define CH_BF_PREALLOC_ACTOR 256
+#define CH_BF_PREALLOC_DATA 512
+
 //connection.h
 
 struct uv_tcp_s {
@@ -121,6 +127,38 @@ test_ch_cn_conn_dict(
         int* x_mem,
         int* y_mem
 );
+//buffer.h
+typedef struct ch_bf_handler_s {
+    ch_buf* header[CH_BF_PREALLOC_HEADER];
+    char*   actor[CH_BF_PREALLOC_ACTOR];
+    ch_buf* data[CH_BF_PREALLOC_DATA];
+    uint8_t id;
+    uint8_t used;
+} ch_bf_handler_t;
+
+typedef struct ch_buffer_pool_s {
+    uint8_t  max_buffers;
+    uint8_t  used_buffers;
+    uint32_t free_buffers;
+    ch_bf_handler_t* handlers;
+} ch_buffer_pool_t;
+
+//pool_test.h
+extern
+void
+test_ch_bf_init(ch_buffer_pool_t* pool, uint8_t max_buffers);
+
+extern
+void
+test_ch_bf_free(ch_buffer_pool_t* pool);
+
+extern
+ch_bf_handler_t*
+test_ch_bf_reserve(ch_buffer_pool_t* pool);
+
+extern
+void
+test_ch_bf_return(ch_buffer_pool_t* pool, ch_bf_handler_t* handler_buf);
 """)
 
 

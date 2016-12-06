@@ -84,7 +84,7 @@ typedef struct ch_reader_s {
     unsigned char state;
     ch_rd_handshake_t hs;
     ch_ms_message_t msg;
-    ch_buffer_t buffers;
+    ch_buffer_pool_t pool;
 } ch_reader_t;
 
 // .. c:function::
@@ -100,7 +100,7 @@ ch_rd_free(ch_reader_t* reader)
 // .. code-block:: cpp
 //
 {
-    ch_bf_free(&reader->buffers);
+    ch_bf_free(&reader->pool);
 }
 
 // .. c:function::
@@ -118,7 +118,7 @@ ch_rd_init(ch_reader_t* reader, uint8_t max_buffers)
 //
 {
     reader->state = CH_RD_START;
-    ch_bf_init(&reader->buffers, max_buffers);
+    ch_bf_init(&reader->pool, max_buffers);
 }
 
 // .. c:function::

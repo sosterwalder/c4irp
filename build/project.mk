@@ -26,9 +26,17 @@ dmod: debug  ## Build the python module in debug mode
 vi:  ## Start a vim editing the imporant files
 	vim *.rst src/*.c src/*.h chirp/*.py chirp_cffi/*.py include/*.h doc/ref/* build/config.defs.h
 
-lldb: all  ## Build and run py.test in lldb
+lldb: dmod  ## Build and run py.test in lldb
 	echo lldb `pyenv which python` -- -m pytest -x
 	lldb `pyenv which python` -- -m pytest -x
+
+cgdb: dmod  ## Build and run py.test in cgdb
+	echo cgdb --args `pyenv which python` -m pytest -x
+	cgdb --args `pyenv which python` -m pytest -x
+
+gdb: dmod  ## Build and run py.test in gdb
+	echo gdb --args `pyenv which python` -m pytest -x
+	gdb --args `pyenv which python` -m pytest -x
 
 test_ext: coala cpp-check test-lib doc-all coverage
 
