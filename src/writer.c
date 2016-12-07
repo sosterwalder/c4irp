@@ -159,7 +159,6 @@ _ch_wr_send(ch_connection_t* conn, ch_message_t* msg, ch_send_cb_t send_cb)
 //
 {
     int tmp_err;
-    (void)(msg); // TODO remove
 
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
@@ -203,7 +202,7 @@ _ch_wr_send(ch_connection_t* conn, ch_message_t* msg, ch_send_cb_t send_cb)
     ch_cn_write(
         conn,
         net_msg,
-        sizeof(net_msg),
+        sizeof(ch_ms_message_t),
         _ch_wr_send_msg_header_cb
     );
 }

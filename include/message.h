@@ -40,9 +40,9 @@ typedef struct ch_message_s {
     // Network data, has to be sent in network order
     CH_WIRE_MESSAGE;
     // These fields follow the message in this order (see _len above)
-    void*    header;
+    ch_buf*  header;
     char*    actor;
-    void*    data;
+    ch_buf*  data;
     // Local only data
     uint8_t  ip_protocol;
     uint8_t  address[16];

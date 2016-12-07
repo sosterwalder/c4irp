@@ -13,7 +13,7 @@
 
 struct ch_connection_s;
 
-// .. c:type:: ch_rd_state
+// .. c:type:: ch_rd_state_t
 //
 //    Represents connection flags.
 //
@@ -25,9 +25,17 @@ struct ch_connection_s;
 //
 //       Wait for the next message
 //
-//    .. c:member:: CH_RD_SIZE
+//    .. c:member:: CH_RD_HEADER
 //
-//       Size of the next message was received
+//       Read header
+//
+//    .. c:member:: CH_RD_ACTOR
+//
+//       Read actor
+//
+//    .. c:member:: CH_RD_DATA
+//
+//       Read data
 //
 // .. code-block:: cpp
 //
@@ -35,7 +43,9 @@ typedef enum {
     CH_RD_START     = 0,
     CH_RD_HANDSHAKE = 1,
     CH_RD_WAIT      = 2,
-    CH_RD_SIZE      = 3
+    CH_RD_HEADER    = 3,
+    CH_RD_ACTOR     = 4,
+    CH_RD_DATA      = 5
 } ch_rd_state_t;
 
 // .. c:type:: ch_rd_handshake_t
@@ -57,8 +67,8 @@ typedef enum {
 // .. code-block:: cpp
 
 typedef struct ch_rd_handshake_s {
-    uint16_t port;
-    uint16_t max_timeout;
+    uint16_t      port;
+    uint16_t      max_timeout;
     unsigned char identity[16];
 } ch_rd_handshake_t;
 
@@ -81,10 +91,11 @@ typedef struct ch_rd_handshake_s {
 // .. code-block:: cpp
 
 typedef struct ch_reader_s {
-    unsigned char state;
+    ch_rd_state_t     state;
     ch_rd_handshake_t hs;
-    ch_ms_message_t msg;
-    ch_buffer_pool_t pool;
+    ch_ms_message_t   msg;
+    ch_buffer_pool_t  pool;
+    size_t            bytes_read;
 } ch_reader_t;
 
 // .. c:function::

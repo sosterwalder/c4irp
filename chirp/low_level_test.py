@@ -24,6 +24,10 @@ class PoolMachine(RuleBasedStateMachine):
         assert self.pool.max_buffers == self.max_buffers
         assert self.pool.used_buffers == 0
 
+    def __del__(self):
+        """Remove data buffers."""
+        lib.test_ch_bf_free(self.pool)
+
     @rule()
     @precondition(lambda self: self.count < self.max_buffers)
     def reserve_buf(self):
