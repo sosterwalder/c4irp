@@ -1,12 +1,6 @@
-// =====
-// Sglib
-// =====
-//
-// .. code-block:: cpp
-//
 /*
 
-  This is SGLIB version 1.0.3
+  This is SGLIB version 1.0.4
 
   (C) by Marian Vittek, Bratislava, http://www.xref-tech.com/sglib, 2003-5
 
@@ -27,7 +21,6 @@
 
 /* the assert is used exclusively to write unexpected error messages */
 #include <assert.h>
-
 
 /* ---------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------- */
@@ -65,12 +58,11 @@
 }
 
 #define SGLIB___ARRAY_HEAP_DOWN(type, a, ind, max, comparator, elem_exchanger) {\
-  type  _t_;\
   int   _m_, _l_, _r_, _i_;\
   _i_ = (ind);\
   _m_ = _i_;\
   do {\
-    _i_ = _m_;          \
+    _i_ = _m_;\
     _l_ = 2*_i_+1;\
     _r_ = _l_+1;\
     if (_l_ < (max)){\
@@ -95,9 +87,8 @@
 #define SGLIB_ARRAY_QUICK_SORT(type, a, max, comparator, elem_exchanger) {\
   int   _i_, _j_, _p_, _stacki_, _start_, _end_;\
   /* can sort up to 2^64 elements */\
-  int   _startStack_[64]; \
+  int   _startStack_[64];\
   int   _endStack_[64];\
-  type  _tmp_;\
   _startStack_[0] = 0;\
   _endStack_[0] = (max);\
   _stacki_ = 1;\
@@ -163,14 +154,14 @@
 
 #define SGLIB_ARRAY_BINARY_SEARCH(type, a, start_index, end_index, key, comparator, found, result_index) {\
   int _kk_, _cc_, _ii_, _jj_, _ff_;\
-  _ii_ = (start_index); \
+  _ii_ = (start_index);\
   _jj_ = (end_index);\
   _ff_ = 0;\
   while (_ii_ <= _jj_ && _ff_==0) {\
     _kk_ = (_jj_+_ii_)/2;\
     _cc_ = comparator(((a)[_kk_]), (key));\
     if (_cc_ == 0) {\
-      (result_index) = _kk_;    \
+      (result_index) = _kk_;\
       _ff_ = 1;\
     } else if (_cc_ < 0) {\
       _ii_ = _kk_+1;\
@@ -390,7 +381,7 @@
 #define SGLIB_LIST_MAP_ON_ELEMENTS(type, list, iteratedVariable, next, command) {\
   type *_ne_;\
   type *iteratedVariable;\
-  (iteratedVariable) = (list); \
+  (iteratedVariable) = (list);\
   while ((iteratedVariable)!=NULL) {\
     _ne_ = (iteratedVariable)->next;\
     {command;};\
@@ -400,6 +391,7 @@
 
 #define SGLIB_LIST_LEN(type, list, next, result) {\
   type *_ce_;\
+  (void)(_ce_);\
   (result) = 0;\
   SGLIB_LIST_MAP_ON_ELEMENTS(type, list, _ce_, next, (result)++);\
 }
@@ -516,8 +508,8 @@
 
 #define SGLIB_SORTED_LIST_FIND_MEMBER_OR_PLACE(type, list, elem, comparator, next, comparator_result, member_ptr) {\
   (comparator_result) = -1;\
-  for((member_ptr) = &(list); \
-      *(member_ptr)!=NULL && ((comparator_result)=comparator((*member_ptr), (elem))) < 0; \
+  for((member_ptr) = &(list);\
+      *(member_ptr)!=NULL && ((comparator_result)=comparator((*member_ptr), (elem))) < 0;\
       (member_ptr) = &(*(member_ptr))->next) ;\
 }
 
@@ -646,6 +638,7 @@
 #define SGLIB_DL_LIST_MAP_ON_ELEMENTS(type, list, iteratedVariable, previous, next, command) {\
   type *_dl_;\
   type *iteratedVariable;\
+  (void)(iteratedVariable);\
   if ((list)!=NULL) {\
     _dl_ = (list)->next;\
     SGLIB_LIST_MAP_ON_ELEMENTS(type, list, iteratedVariable, previous, command);\
@@ -654,7 +647,7 @@
 }
 
 #define SGLIB_DL_LIST_SORT(type, list, comparator, previous, next) {\
-  type *_dll_, *_dlp_, *_dlt_;\
+  type *_dll_;\
   _dll_ = (list);\
   if (_dll_ != NULL) {\
     for(; _dll_->previous!=NULL; _dll_=_dll_->previous) ;\
@@ -701,15 +694,15 @@
   if (_list_!=NULL) {\
     _nlist_ = _list_->next;\
     while (_list_!=NULL) {\
-      _dln_ = _list_->next; \
-      _dlp_ = _list_->previous; \
+      _dln_ = _list_->next;\
+      _dlp_ = _list_->previous;\
       _list_->next = _dlp_;\
       _list_->previous = _dln_;\
       _list_ = _dlp_;\
     }\
     while (_nlist_!=NULL) {\
-      _dln_ = _nlist_->next; \
-      _dlp_ = _nlist_->previous; \
+      _dln_ = _nlist_->next;\
+      _dlp_ = _nlist_->previous;\
       _nlist_->next = _dlp_;\
       _nlist_->previous = _dln_;\
       _nlist_ = _dln_;\
@@ -743,9 +736,9 @@
   type *_cn_;\
   int _pathi_;\
   type *iteratedVariable;\
+  (void)(iteratedVariable);\
   _cn_ = (tree);\
   _pathi_ = 0;\
-  (void)(iteratedVariable); \
   while (_cn_!=NULL) {\
     /* push down to leftmost innermost element */\
     while(_cn_!=NULL) {\
@@ -839,14 +832,14 @@
 
 
 #define SGLIB_DEFINE_QUEUE_PROTOTYPES(queue_type, elem_type, afield, ifield, jfield, dim) \
- extern void sglib_##queue_type##_init(queue_type *q); \
- extern int sglib_##queue_type##_is_empty(queue_type *q); \
- extern int sglib_##queue_type##_is_full(queue_type *q); \
- extern elem_type sglib_##queue_type##_first_element(queue_type *q); \
- extern elem_type *sglib_##queue_type##_first_element_ptr(queue_type *q); \
- extern void sglib_##queue_type##_add_next(queue_type *q); \
- extern void sglib_##queue_type##_add(queue_type *q, elem_type elem); \
- extern void sglib_##queue_type##_delete_first(queue_type *q); \
+ extern void sglib_##queue_type##_init(queue_type *q);\
+ extern int sglib_##queue_type##_is_empty(queue_type *q);\
+ extern int sglib_##queue_type##_is_full(queue_type *q);\
+ extern elem_type sglib_##queue_type##_first_element(queue_type *q);\
+ extern elem_type *sglib_##queue_type##_first_element_ptr(queue_type *q);\
+ extern void sglib_##queue_type##_add_next(queue_type *q);\
+ extern void sglib_##queue_type##_add(queue_type *q, elem_type elem);\
+ extern void sglib_##queue_type##_delete_first(queue_type *q);\
  extern void sglib_##queue_type##_delete(queue_type *q);
 
 
@@ -858,7 +851,7 @@
   return(SGLIB_QUEUE_IS_EMPTY(elem_type, q->afield, q->ifield, q->jfield));\
  }\
  int sglib_##queue_type##_is_full(queue_type *q) {\
-  return(SGLIB_QUEUE_IS_FULL(elem_type, q->afield, q->ifield, q->jfield));\
+  return(SGLIB_QUEUE_IS_FULL(elem_type, q->afield, q->ifield, q->jfield, dim));\
  }\
  elem_type sglib_##queue_type##_first_element(queue_type *q) {\
   return(SGLIB_QUEUE_FIRST_ELEMENT(elem_type, q->afield, q->ifield, q->jfield));\
@@ -889,14 +882,14 @@
 
 
 #define SGLIB_DEFINE_HEAP_PROTOTYPES(heap_type, elem_type, afield, ifield, dim, comparator, elem_exchanger) \
- extern void sglib_##heap_type##_init(heap_type *q); \
- extern int sglib_##heap_type##_is_empty(heap_type *q); \
- extern int sglib_##heap_type##_is_full(heap_type *q); \
- extern elem_type sglib_##heap_type##_first_element(heap_type *q); \
- extern elem_type *sglib_##heap_type##_first_element_ptr(heap_type *q); \
- extern void sglib_##heap_type##_add_next(heap_type *q); \
- extern void sglib_##heap_type##_add(heap_type *q, elem_type elem); \
- extern void sglib_##heap_type##_delete_first(heap_type *q); \
+ extern void sglib_##heap_type##_init(heap_type *q);\
+ extern int sglib_##heap_type##_is_empty(heap_type *q);\
+ extern int sglib_##heap_type##_is_full(heap_type *q);\
+ extern elem_type sglib_##heap_type##_first_element(heap_type *q);\
+ extern elem_type *sglib_##heap_type##_first_element_ptr(heap_type *q);\
+ extern void sglib_##heap_type##_add_next(heap_type *q);\
+ extern void sglib_##heap_type##_add(heap_type *q, elem_type elem);\
+ extern void sglib_##heap_type##_delete_first(heap_type *q);\
  extern void sglib_##heap_type##_delete(heap_type *q)
 
 #define SGLIB_DEFINE_HEAP_FUNCTIONS(heap_type, elem_type, afield, ifield, dim, comparator, elem_exchanger) \
@@ -957,9 +950,9 @@
   extern int sglib_hashed_##type##_add_if_not_member(type *table[dim], type *elem, type **member);\
   extern int sglib_hashed_##type##_is_member(type *table[dim], type *elem);\
   extern type * sglib_hashed_##type##_find_member(type *table[dim], type *elem);\
-  extern type *sglib_hashed_##type##_it_init(struct sglib_hashed_##type##_iterator *it, type *table[dim]); \
-  extern type *sglib_hashed_##type##_it_init_on_equal(struct sglib_hashed_##type##_iterator *it, type *table[dim], int (*subcomparator)(type *, type *), type *equalto); \
-  extern type *sglib_hashed_##type##_it_current(struct sglib_hashed_##type##_iterator *it); \
+  extern type *sglib_hashed_##type##_it_init(struct sglib_hashed_##type##_iterator *it, type *table[dim]);\
+  extern type *sglib_hashed_##type##_it_init_on_equal(struct sglib_hashed_##type##_iterator *it, type *table[dim], int (*subcomparator)(type *, type *), type *equalto);\
+  extern type *sglib_hashed_##type##_it_current(struct sglib_hashed_##type##_iterator *it);\
   extern type *sglib_hashed_##type##_it_next(struct sglib_hashed_##type##_iterator *it);
 
 #define SGLIB_DEFINE_HASHED_TABLE_FUNCTIONS(type, dim, hash_function, comparator) \
@@ -1045,9 +1038,9 @@
   extern int sglib_hashed_##type##_delete_if_member(type *table[dim], type *elem, type **memb);\
   extern int sglib_hashed_##type##_is_member(type *table[dim], type *elem);\
   extern type * sglib_hashed_##type##_find_member(type *table[dim], type *elem);\
-  extern type *sglib_hashed_##type##_it_init(struct sglib_hashed_##type##_iterator *it, type *table[dim]); \
-  extern type *sglib_hashed_##type##_it_init_on_equal(struct sglib_hashed_##type##_iterator *it, type *table[dim], int (*subcomparator)(type *, type *), type *equalto); \
-  extern type *sglib_hashed_##type##_it_current(struct sglib_hashed_##type##_iterator *it); \
+  extern type *sglib_hashed_##type##_it_init(struct sglib_hashed_##type##_iterator *it, type *table[dim]);\
+  extern type *sglib_hashed_##type##_it_init_on_equal(struct sglib_hashed_##type##_iterator *it, type *table[dim], int (*subcomparator)(type *, type *), type *equalto);\
+  extern type *sglib_hashed_##type##_it_current(struct sglib_hashed_##type##_iterator *it);\
   extern type *sglib_hashed_##type##_it_next(struct sglib_hashed_##type##_iterator *it);
 
 #define SGLIB_DEFINE_HASHED_CONTAINER_FUNCTIONS(type, dim, hash_function) \
@@ -1138,9 +1131,9 @@
  extern void sglib_##type##_sort(type **list);\
  extern int sglib_##type##_len(type *list);\
  extern void sglib_##type##_reverse(type **list);\
- extern type *sglib_##type##_it_init(struct sglib_##type##_iterator *it, type *list); \
- extern type *sglib_##type##_it_init_on_equal(struct sglib_##type##_iterator *it, type *list, int (*subcomparator)(type *, type *), type *equalto); \
- extern type *sglib_##type##_it_current(struct sglib_##type##_iterator *it); \
+ extern type *sglib_##type##_it_init(struct sglib_##type##_iterator *it, type *list);\
+ extern type *sglib_##type##_it_init_on_equal(struct sglib_##type##_iterator *it, type *list, int (*subcomparator)(type *, type *), type *equalto);\
+ extern type *sglib_##type##_it_current(struct sglib_##type##_iterator *it);\
  extern type *sglib_##type##_it_next(struct sglib_##type##_iterator *it);
 
 
@@ -1172,7 +1165,7 @@
    SGLIB_LIST_DELETE_IF_MEMBER(type, *list, elem, comparator, next, *member);\
    return(*member!=NULL);\
  }\
- void sglib_##type##_sort(type **list) { \
+ void sglib_##type##_sort(type **list) {\
    SGLIB_LIST_SORT(type, *list, comparator, next);\
  }\
  int sglib_##type##_len(type *list) {\
@@ -1202,7 +1195,7 @@
    ce = it->nextelem;\
    it->nextelem = NULL;\
    if (it->subcomparator != NULL) {\
-     eq = it->equalto; \
+     eq = it->equalto;\
      scp = it->subcomparator;\
      while (ce!=NULL && scp(ce, eq)!=0) ce = ce->next;\
    }\
@@ -1229,9 +1222,9 @@
  extern type *sglib_##type##_find_member(type *list, type *elem);\
  extern int sglib_##type##_len(type *list);\
  extern void sglib_##type##_sort(type **list);\
- extern type *sglib_##type##_it_init(struct sglib_##type##_iterator *it, type *list); \
- extern type *sglib_##type##_it_init_on_equal(struct sglib_##type##_iterator *it, type *list, int (*subcomparator)(type *, type *), type *equalto); \
- extern type *sglib_##type##_it_current(struct sglib_##type##_iterator *it); \
+ extern type *sglib_##type##_it_init(struct sglib_##type##_iterator *it, type *list);\
+ extern type *sglib_##type##_it_init_on_equal(struct sglib_##type##_iterator *it, type *list, int (*subcomparator)(type *, type *), type *equalto);\
+ extern type *sglib_##type##_it_current(struct sglib_##type##_iterator *it);\
  extern type *sglib_##type##_it_next(struct sglib_##type##_iterator *it);
 
 
@@ -1265,7 +1258,7 @@
    SGLIB_SORTED_LIST_LEN(type, list, next, res);\
    return(res);\
  }\
- void sglib_##type##_sort(type **list) { \
+ void sglib_##type##_sort(type **list) {\
    SGLIB_LIST_SORT(type, *list, comparator, next);\
  }\
  \
@@ -1288,7 +1281,7 @@
    ce = it->nextelem;\
    it->nextelem = NULL;\
    if (it->subcomparator != NULL) {\
-     eq = it->equalto; \
+     eq = it->equalto;\
      scp = it->subcomparator;\
      while (ce!=NULL && (c=scp(ce, eq)) < 0) ce = ce->next;\
      if (ce != NULL && c > 0) ce = NULL;\
@@ -1326,9 +1319,9 @@
  extern void sglib_##type##_sort(type **list);\
  extern int sglib_##type##_len(type *list);\
  extern void sglib_##type##_reverse(type **list);\
- extern type *sglib_##type##_it_init(struct sglib_##type##_iterator *it, type *list); \
- extern type *sglib_##type##_it_init_on_equal(struct sglib_##type##_iterator *it, type *list, int (*subcomparator)(type *, type *), type *equalto); \
- extern type *sglib_##type##_it_current(struct sglib_##type##_iterator *it); \
+ extern type *sglib_##type##_it_init(struct sglib_##type##_iterator *it, type *list);\
+ extern type *sglib_##type##_it_init_on_equal(struct sglib_##type##_iterator *it, type *list, int (*subcomparator)(type *, type *), type *equalto);\
+ extern type *sglib_##type##_it_current(struct sglib_##type##_iterator *it);\
  extern type *sglib_##type##_it_next(struct sglib_##type##_iterator *it);
 
 
@@ -1416,7 +1409,7 @@
    ce = it->prevelem;\
    it->prevelem = NULL;\
    if (it->subcomparator != NULL) {\
-     eq = it->equalto; \
+     eq = it->equalto;\
      scp = it->subcomparator;\
      while (ce!=NULL && scp(eq, ce)!=0) ce = ce->previous;\
    }\
@@ -1426,7 +1419,7 @@
      ce = it->nextelem;\
      it->nextelem = NULL;\
      if (it->subcomparator != NULL) {\
-       eq = it->equalto; \
+       eq = it->equalto;\
        scp = it->subcomparator;\
        while (ce!=NULL && scp(ce, eq)!=0) ce = ce->next;\
      }\
@@ -1451,13 +1444,13 @@ http://www.cis.ohio-state.edu/~gurari/course/cis680/cis680Ch11.html
 
 #define SGLIB___RBTREE_FIX_INSERTION_DISCREPANCY(type, tree, leftt, rightt, bits, RED, BLACK) {\
   type *t, *tl, *a, *b, *c, *ar, *bl, *br, *cl, *cr;\
-  (void)(bl); \
-  (void)(ar); \
+  (void)(bl);\
+  (void)(ar);\
   t = *tree;\
   tl = t->leftt;\
   if (t->rightt!=NULL && SGLIB___GET_VALUE(t->rightt->bits)==RED) {\
     if (SGLIB___GET_VALUE(tl->bits)==RED) {\
-      if ((tl->leftt!=NULL && SGLIB___GET_VALUE(tl->leftt->bits)==RED) \
+      if ((tl->leftt!=NULL && SGLIB___GET_VALUE(tl->leftt->bits)==RED)\
           || (tl->rightt!=NULL && SGLIB___GET_VALUE(tl->rightt->bits)==RED)) {\
         SGLIB___SET_VALUE(t->leftt->bits,BLACK);\
         SGLIB___SET_VALUE(t->rightt->bits,BLACK);\
@@ -1492,7 +1485,7 @@ http://www.cis.ohio-state.edu/~gurari/course/cis680/cis680Ch11.html
 
 #define SGLIB___RBTREE_FIX_DELETION_DISCREPANCY(type, tree, leftt, rightt, bits, RED, BLACK, res) {\
   type  *t, *a, *b, *c, *d, *ar, *bl, *br, *cl, *cr, *dl, *dr;\
-  (void)(ar); \
+  (void)(ar);\
   t = a = *tree;\
   assert(t!=NULL);\
   ar = a->rightt;\
@@ -1772,17 +1765,16 @@ int sglib_##type##_add_if_not_member(type **tree, type *elem, type **memb) {\
 int sglib_##type##_len(type *t) {\
     int   n;\
     type  *e;\
+    (void)(e);\
     n = 0;\
-    (void)(e); \
     SGLIB_BIN_TREE_MAP_ON_ELEMENTS(type, t, e, left, right, n++);\
     return(n);\
 }\
 \
 void sglib__##type##_it_compute_current_elem(struct sglib_##type##_iterator *it) {\
-    int   i,j,cmp;\
+    int   i,j;\
     type  *s, *eqt;\
     int   (*subcomparator)(type *, type *);\
-    (void)(cmp); \
     eqt = it->equalto;\
     subcomparator = it->subcomparator;\
     it->currentelem = NULL;\
@@ -1827,7 +1819,7 @@ type *sglib__##type##_it_init(struct sglib_##type##_iterator *it, type *tree, in
     it->order = order;\
     it->equalto = equalto;\
     it->subcomparator = subcomparator;\
-    if (equalto == NULL) {  \
+    if (equalto == NULL) {\
         t = tree;\
     } else {\
         if (subcomparator == NULL) {\
@@ -1911,21 +1903,21 @@ void sglib___##type##_consistency_check(type *t) {\
     type *equalto;\
     int (*subcomparator)(type *, type *);\
  };\
- extern void sglib___##type##_consistency_check(type *t); \
- extern void sglib_##type##_add(type **tree, type *elem); \
- extern int sglib_##type##_add_if_not_member(type **tree, type *elem, type **memb); \
- extern void sglib_##type##_delete(type **tree, type *elem); \
- extern int sglib_##type##_delete_if_member(type **tree, type *elem, type **memb); \
- extern int sglib_##type##_is_member(type *t, type *elem); \
- extern type *sglib_##type##_find_member(type *t, type *elem); \
- extern int sglib_##type##_len(type *t); \
- extern type *sglib_##type##_it_init(struct sglib_##type##_iterator *it, type *tree); \
- extern type *sglib_##type##_it_init_preorder(struct sglib_##type##_iterator *it, type *tree); \
- extern type *sglib_##type##_it_init_inorder(struct sglib_##type##_iterator *it, type *tree); \
- extern type *sglib_##type##_it_init_postorder(struct sglib_##type##_iterator *it, type *tree); \
- extern type *sglib_##type##_it_init_on_equal(struct sglib_##type##_iterator *it, type *tree, int (*subcomparator)(type *, type *), type *equalto); \
- extern type *sglib_##type##_it_current(struct sglib_##type##_iterator *it); \
- extern type *sglib_##type##_it_next(struct sglib_##type##_iterator *it); \
+ extern void sglib___##type##_consistency_check(type *t);\
+ extern void sglib_##type##_add(type **tree, type *elem);\
+ extern int sglib_##type##_add_if_not_member(type **tree, type *elem, type **memb);\
+ extern void sglib_##type##_delete(type **tree, type *elem);\
+ extern int sglib_##type##_delete_if_member(type **tree, type *elem, type **memb);\
+ extern int sglib_##type##_is_member(type *t, type *elem);\
+ extern type *sglib_##type##_find_member(type *t, type *elem);\
+ extern int sglib_##type##_len(type *t);\
+ extern type *sglib_##type##_it_init(struct sglib_##type##_iterator *it, type *tree);\
+ extern type *sglib_##type##_it_init_preorder(struct sglib_##type##_iterator *it, type *tree);\
+ extern type *sglib_##type##_it_init_inorder(struct sglib_##type##_iterator *it, type *tree);\
+ extern type *sglib_##type##_it_init_postorder(struct sglib_##type##_iterator *it, type *tree);\
+ extern type *sglib_##type##_it_init_on_equal(struct sglib_##type##_iterator *it, type *tree, int (*subcomparator)(type *, type *), type *equalto);\
+ extern type *sglib_##type##_it_current(struct sglib_##type##_iterator *it);\
+ extern type *sglib_##type##_it_next(struct sglib_##type##_iterator *it);\
 
 
 #define SGLIB_DEFINE_RBTREE_FUNCTIONS(type, left, right, colorbit, comparator) \
