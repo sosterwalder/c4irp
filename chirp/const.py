@@ -22,6 +22,7 @@ class IPProtocol(object):
     IPV4 = 2 ** 0
     IPV6 = 2 ** 1
 
+
 IP_PROTOCOL_DICT = _consts_to_dict(IPProtocol)
 
 

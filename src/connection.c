@@ -417,7 +417,8 @@ _ch_cn_shutdown_gen(
     if(tmp_err != CH_SUCCESS) {
         E(
             chirp,
-            "uv_shutdown returned error: %d. ch_connection_t:%p, ch_chirp_t:%p",
+            "uv_shutdown returned error: %d. ch_connection_t:%p, "
+            "ch_chirp_t:%p",
             tmp_err,
             (void*) conn,
             (void*) chirp
@@ -844,7 +845,8 @@ ch_cn_send_if_pending(ch_connection_t* conn)
     );
     L(
         chirp,
-        "Sending %d pending handshake bytes. ch_chirp_t:%p, ch_connection_t:%p",
+        "Sending %d pending handshake bytes. ch_chirp_t:%p, "
+        "ch_connection_t:%p",
         read,
         (void*) chirp,
         (void*) conn

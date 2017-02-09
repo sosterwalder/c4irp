@@ -125,6 +125,7 @@ class ChirpPool(object):
         c_conf.CERT_CHAIN_PEM = self._cert_str
         c_conf.DH_PARAMS_PEM = self._dh_str
 
+
 if sys.version_info > (3, 4):
 
     class ChirpAsync(object):  # pragma: no cover TODO

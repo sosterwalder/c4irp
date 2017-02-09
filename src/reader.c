@@ -51,8 +51,7 @@ _ch_rd_read_buffer(
 //    :param ch_readert* reader: Reader
 //    :param ch_buf* buf: Buffer containing bytes read
 //    :param size_t read: Count of bytes read
-//    :param ch_rd_state_t
-//    : 
+//    :param ch_rd_state_t state: Current state of the reader
 //
 //
 // Definitions
@@ -282,7 +281,7 @@ ch_rd_read(ch_connection_t* conn, void* buffer, size_t read)
                 msg = &reader->msg;
                 if(_ch_rd_read_buffer(
                     conn,
-                    reader, 
+                    reader,
                     buf + bytes_handled,
                     read - bytes_handled,
                     &bytes_handled,
@@ -303,7 +302,7 @@ ch_rd_read(ch_connection_t* conn, void* buffer, size_t read)
                 msg = &reader->msg;
                 if(_ch_rd_read_buffer(
                     conn,
-                    reader, 
+                    reader,
                     buf + bytes_handled,
                     read - bytes_handled,
                     &bytes_handled,
@@ -322,7 +321,7 @@ ch_rd_read(ch_connection_t* conn, void* buffer, size_t read)
                 msg = &reader->msg;
                 if(_ch_rd_read_buffer(
                     conn,
-                    reader, 
+                    reader,
                     buf + bytes_handled,
                     read - bytes_handled,
                     &bytes_handled,
@@ -358,5 +357,11 @@ _ch_rd_read_buffer(
 // .. code-block:: cpp
 //
 {
+    (void)(conn);
+    (void)(reader);
+    (void)(source_buf);
+    (void)(read);
+    (void)(bytes_handled);
+    (void)(state);
     return 1;
 }

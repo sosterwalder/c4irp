@@ -26,4 +26,5 @@ def python_log_cb(msg, error):
     else:
         LG.debug(ffi.string(msg).decode("UTF-8"))
 
+
 del python_log_cb

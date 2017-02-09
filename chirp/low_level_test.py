@@ -40,7 +40,7 @@ class PoolMachine(RuleBasedStateMachine):
 
     @rule(rnd=st.random_module())
     @precondition(lambda self: self.count > 0)
-    def return_buf(self, rnd):
+    def return_buf(self, rnd):  # Ignore PyLintBear (W0613)
         """Return a buffer."""
         random.shuffle(self.buffers)
         buf = self.buffers.pop()
@@ -48,6 +48,7 @@ class PoolMachine(RuleBasedStateMachine):
         lib.test_ch_bf_return(self.pool, buf)
         assert buf.used == 0
         self.count -= 1
+
 
 TestPool = PoolMachine.TestCase
 

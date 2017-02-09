@@ -182,6 +182,7 @@ def init_chirp(c=None):
     assert lib.ch_chirp_get_loop(chirp._chirp) is not ffi.NULL
     return chirp
 
+
 if __name__ == "__main__":  # pragma: no cover
     import sys
     import logging
