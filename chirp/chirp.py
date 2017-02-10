@@ -69,7 +69,8 @@ class ChirpPool(object):
             lib.python_log_cb
         )
         if err == lib.CH_EADDRINUSE:
-            raise RuntimeError("Port %d already in use." % self._config.PORT)
+            raise RuntimeError("Port {port_number:d} already in"
+                               "use.".format(port_number=self._config.PORT))
         assert err == lib.CH_SUCCESS
         lib.ch_chirp_set_auto_stop(self._chirp)
 
