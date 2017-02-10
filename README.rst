@@ -74,6 +74,17 @@ Requirements:
 
    ./make.py test
 
+Note: You may want to run clean before running tests. This makes sure, that the
+config.h file gets cleaned and then copied again (which is essential if there
+are new definitions).
+
+.. code-block:: bash
+
+   ./make.py clean
+
+   ./make.py test
+
+
 Windows
 -------
 
@@ -82,10 +93,7 @@ Use the testbuilds:
 * https://ci.appveyor.com/project/ganwell/c4irp
 
 * Navigate to the artifacts
-
-Or build ourself:
-
-* Install Python 2 (gyp needs this)
+Or build ourself: * Install Python 2 (gyp needs this)
 
 * Install Visual Studio 2015 if you want to build for python 3
 
