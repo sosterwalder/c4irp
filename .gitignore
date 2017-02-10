@@ -9,6 +9,7 @@ __pycache__
 *.gcno
 *.gcov
 *.obj
+*.DS_Store
 /*.lib
 /*.pdb
 /c4irp.info
