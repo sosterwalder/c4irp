@@ -1,6 +1,5 @@
 """Chirp bindings."""
 import concurrent.futures as fut
-import os
 import sys
 import threading
 
@@ -71,7 +70,7 @@ class ChirpPool(object):
         )
         if err == lib.CH_EADDRINUSE:
             raise RuntimeError("Port %d already in use." % self._config.PORT)
-        assert(err == lib.CH_SUCCESS)
+        assert err == lib.CH_SUCCESS
         lib.ch_chirp_set_auto_stop(self._chirp)
 
         def run():
@@ -89,8 +88,8 @@ class ChirpPool(object):
         """Closing everything."""
         lib.ch_chirp_close_ts(self._chirp)
         self._thread.join()
-        assert(self._uv_ret == lib.CH_SUCCESS)
-        assert(self._chirp_ret == lib.CH_SUCCESS)
+        assert self._uv_ret == lib.CH_SUCCESS
+        assert self._chirp_ret == lib.CH_SUCCESS
         self._pool.shutdown()
 
     def _fill_c_config(self):
@@ -98,19 +97,10 @@ class ChirpPool(object):
         c_conf = self._c_config
         conf   = self._config
         lib.ch_chirp_config_init(c_conf)
-        folder = __file__.split(os.path.sep)[:-1]
-        cert   = list(folder)
-        dh     = list(folder)
-        cert.append("cert.pem")
-        dh.append("dh.pem")
-        conf.CERT_CHAIN_PEM = "%s%s" % (
-            os.path.sep,
-            os.path.join(*cert)
-        )
-        conf.DH_PARAMS_PEM = "%s%s" % (
-            os.path.sep,
-            os.path.join(*dh)
-        )
+        (
+            conf.CERT_CHAIN_PEM,
+            conf.DH_PARAMS_PEM
+        ) = common.get_crypto_files()
         for std_attr in [
                 'REUSE_TIME',
                 'TIMEOUT',
@@ -134,6 +124,7 @@ class ChirpPool(object):
         )
         c_conf.CERT_CHAIN_PEM = self._cert_str
         c_conf.DH_PARAMS_PEM = self._dh_str
+
 
 if sys.version_info > (3, 4):
 

@@ -1,16 +1,17 @@
 """Testing the chirp object."""
-import os
-import pytest
 import threading
 import time
 from contextlib import contextmanager
 
+import pytest
 from hypothesis import strategies as st
-from hypothesis import given
 
 from _chirp_cffi import ffi, lib
 
-from . import ChirpPool
+from . import ChirpPool, common
+
+# from hypothesis import given
+
 
 config_st = st.fixed_dictionaries({
     "REUSE_TIME"   : st.integers(2, 3600),
@@ -52,19 +53,7 @@ def basic_uv():
     config = ffi.new("ch_config_t*")
     loop = ffi.new("uv_loop_t*")
     lib.ch_chirp_config_init(config)
-    folder = __file__.split(os.path.sep)[:-1]
-    cert   = list(folder)
-    dh     = list(folder)
-    cert.append("cert.pem")
-    dh.append("dh.pem")
-    cert = "%s%s" % (
-        os.path.sep,
-        os.path.join(*cert)
-    )
-    dh = "%s%s" % (
-        os.path.sep,
-        os.path.join(*dh)
-    )
+    cert, dh = common.get_crypto_files()
     cert_str = ffi.new(
         "char[]", cert.encode("UTF-8")
     )
@@ -106,16 +95,15 @@ def init_bad_port(port):
     loop = ffi.new("uv_loop_t*")
     config = ffi.new("ch_config_t*")
     lib.ch_chirp_config_init(config)
-    folder = __file__.split(os.path.sep)[:-1]
-    folder.append("cert.pem")
-    cert = "%s%s" % (
-        os.path.sep,
-        os.path.join(*folder)
-    )
+    (cert, dh) = common.get_crypto_files()
     cert_str = ffi.new(
         "char[]", cert.encode("UTF-8")
     )
+    dh_str = ffi.new(
+        "char[]", dh.encode("UTF-8")
+    )
     config.CERT_CHAIN_PEM = cert_str
+    config.DH_PARAMS_PEM = dh_str
     assert config.PORT == 2998
     config.PORT = port
     assert lib.ch_loop_init(loop) == lib.CH_SUCCESS
@@ -130,19 +118,7 @@ def test_chirp_run():
     chirp = ffi.new("ch_chirp_t**")
     config = ffi.new("ch_config_t*")
     lib.ch_chirp_config_init(config)
-    folder = __file__.split(os.path.sep)[:-1]
-    cert   = list(folder)
-    dh     = list(folder)
-    cert.append("cert.pem")
-    dh.append("dh.pem")
-    cert = "%s%s" % (
-        os.path.sep,
-        os.path.join(*cert)
-    )
-    dh = "%s%s" % (
-        os.path.sep,
-        os.path.join(*dh)
-    )
+    cert, dh = common.get_crypto_files()
     cert_str = ffi.new(
         "char[]", cert.encode("UTF-8")
     )
@@ -166,17 +142,16 @@ def test_chirp_run():
     assert res[0] == lib.CH_SUCCESS
 
 
-@given(config_st)
-def test_chirp_object_config(config):
-    """Test if initializing, using and closing the ChirpPool object works...
-
-    with hypothesis generated config.
-    """
-    return  # TODO Fix this
-    # TODO as validate is implemented this is going to need assume()s
-    chirp = init_chirp(config)
-    # TODO send a message to second (standard c chirp)
-    chirp.close()
+# @given(config_st) TODO fix this
+# def test_chirp_object_config(config):
+#     """Test if initializing, using and closing the ChirpPool object works...
+#
+#     with hypothesis generated config.
+#     """
+#     # TODO as validate is implemented this is going to need assume()s
+#     chirp = init_chirp(config)
+#     # TODO send a message to second (standard c chirp)
+#     chirp.close()
 
 
 def test_chirp_object_basic():
@@ -206,6 +181,7 @@ def init_chirp(c=None):
     ) != b''
     assert lib.ch_chirp_get_loop(chirp._chirp) is not ffi.NULL
     return chirp
+
 
 if __name__ == "__main__":  # pragma: no cover
     import sys

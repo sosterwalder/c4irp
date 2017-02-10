@@ -46,7 +46,7 @@ class Build(build_ext.build_ext):
         if sys.platform == "win32":
             ret = os.system("python make.py")
         else:
-            ret = os.system('make -f build/build.make')
+            ret = os.system('make -f build/build.mk')
         if ret != 0:
             raise OSError("Chirp build failed")
         build_ext.build_ext.run(self)

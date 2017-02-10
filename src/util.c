@@ -11,6 +11,48 @@ ch_alloc_cb_t _ch_alloc_cb = malloc;
 ch_realloc_cb_t _ch_realloc_cb = realloc;
 
 // .. c:function::
+void*
+ch_alloc(size_t size)
+//    :noindex:
+//
+//    see: :c:func:`ch_alloc`
+//
+// .. code-block:: cpp
+//
+{
+    return _ch_alloc_cb(size);
+}
+
+// .. c:function::
+void
+ch_free(void* buf)
+//    :noindex:
+//
+//    see: :c:func:`ch_free`
+//
+// .. code-block:: cpp
+//
+{
+    _ch_free_cb(buf);
+}
+
+// .. c:function::
+void*
+ch_realloc(
+        void*  buf,
+        size_t size
+)
+//    :noindex:
+//
+//    see: :c:func:`ch_realloc`
+//
+// .. code-block:: cpp
+//
+{
+    return _ch_realloc_cb(buf, size);
+}
+
+// .. c:function::
 void
 ch_set_alloc_funcs(
         ch_alloc_cb_t alloc,

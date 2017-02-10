@@ -19,7 +19,7 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
     _right,
     _color_field,
     SGLIB_NUMERIC_COMPARATOR
-);
+)
 
 // .. c:type:: ch_chirp_flags_t
 //

@@ -5,6 +5,7 @@
 // .. code-block:: cpp
 
 #include "message.h"
+#include "util.h"
 
 // .. c:function::
 ch_error_t
@@ -49,6 +50,10 @@ ch_msg_init(ch_message_t* message)
 //
 {
     memset(message, 0, sizeof(ch_message_t));
+    ch_random_ints_as_bytes(
+        message->identity,
+        sizeof(message->identity)
+    );
     return CH_SUCCESS;
 }
 

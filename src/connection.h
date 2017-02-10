@@ -12,6 +12,7 @@
 #include "../include/chirp_obj.h"
 #include "message.h"
 #include "reader.h"
+#include "writer.h"
 
 // System includes
 // ===============
@@ -72,9 +73,9 @@ typedef struct ch_connection_s {
     uint8_t                 remote_identity[16];
     float                   max_timeout;
     uv_tcp_t                client;
-    void*                   buffer_uv;
-    void*                   buffer_wtls;
-    void*                   buffer_rtls;
+    ch_buf*                 buffer_uv;
+    ch_buf*                 buffer_wtls;
+    ch_buf*                 buffer_rtls;
     uv_buf_t                buffer_uv_uv;
     uv_buf_t                buffer_wtls_uv;
     uv_buf_t                buffer_any_uv;
@@ -82,7 +83,7 @@ typedef struct ch_connection_s {
     uv_write_cb             write_callback;
     size_t                  write_written;
     size_t                  write_size;
-    void*                   write_buffer;
+    ch_buf*                 write_buffer;
     ch_chirp_t*             chirp;
     uv_shutdown_t           shutdown_req;
     uv_write_t              write_req;
@@ -93,7 +94,9 @@ typedef struct ch_connection_s {
     BIO*                    bio_ssl;
     BIO*                    bio_app;
     int                     tls_handshake_state;
+    float                   load;
     ch_reader_t             reader;
+    ch_writer_t             writer;
     char                    color_field;
     struct ch_connection_s* left;
     struct ch_connection_s* right;
@@ -114,7 +117,7 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
     right,
     color_field,
     CH_CONNECTION_CMP
-);
+)
 
 SGLIB_DEFINE_RBTREE_PROTOTYPES(
     ch_connection_set_t,
@@ -122,7 +125,7 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
     right,
     color_field,
     SGLIB_NUMERIC_COMPARATOR
-);
+)
 
 // .. c:function::
 void

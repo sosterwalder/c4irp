@@ -26,6 +26,7 @@ if sys.platform == "win32":
         "libeay32",
         "ssleay32",
         "gdi32",
+        "crypt32",
     ])
     ldflags.extend(["/LIBPATH:openssl\\lib"])
     if os.environ['MODE'].lower() == "debug":
@@ -38,6 +39,7 @@ else:
         "ssl",
         "crypto",
     ])
+    cflags.append("-std=gnu99")
     if sys.platform != "darwin":
         libs.append("rt")
     else:

@@ -30,6 +30,7 @@ Internal C API
    :maxdepth: 2
    :includehidden:
 
+   src/buffer.h.rst
    src/chirp.h.rst
    src/chirp.c.rst
    src/connection.h.rst

@@ -8,17 +8,24 @@ ffi.set_source(
     "_chirp_low_level",
     """
     #include "../src/connection_test.h"
+    #include "../src/pool_test.h"
     """,
     libraries=libs,
     library_dirs=["."],
-    include_dirs=["include", "build/libuv/include"],
+    include_dirs=["include", "build/libuv/include", "openssl/include"],
     extra_compile_args=cflags,
     extra_link_args=ldflags,
 )
 
 
 ffi.cdef("""
+//config.h
+#define CH_BF_PREALLOC_HEADER 32
+#define CH_BF_PREALLOC_ACTOR 256
+#define CH_BF_PREALLOC_DATA 512
+
 //connection.h
+
 struct uv_tcp_s {
     ...;
 };
@@ -48,6 +55,8 @@ struct uv_write_s {
 };
 typedef struct uv_write_s uv_write_t;
 
+typedef void (*uv_write_cb)(uv_write_t* req, int status);
+
 struct SSL_s {
     ...;
 };
@@ -58,18 +67,38 @@ struct BIO_s {
 };
 typedef struct BIO_s BIO;
 
+struct ch_reader_s {
+    ...;
+};
+typedef struct ch_reader_s ch_reader_t;
+
+struct ch_writer_s {
+    ...;
+};
+typedef struct ch_writer_s ch_writer_t;
+
+typedef char ch_buf;
+
 typedef struct ch_connection_s {
     uint8_t                 ip_protocol;
     uint8_t                 address[16];
     int32_t                 port;
+    uint8_t                 remote_identity[16];
+    float                   max_timeout;
     uv_tcp_t                client;
-    void*                   buffer_uv;
-    void*                   buffer_wtls;
-    void*                   buffer_rtls;
+    ch_buf*                 buffer_uv;
+    ch_buf*                 buffer_wtls;
+    ch_buf*                 buffer_rtls;
+    uv_buf_t                buffer_uv_uv;
+    uv_buf_t                buffer_wtls_uv;
+    uv_buf_t                buffer_any_uv;
     size_t                  buffer_size;
+    uv_write_cb             write_callback;
+    size_t                  write_written;
+    size_t                  write_size;
+    ch_buf*                 write_buffer;
     ch_chirp_t*             chirp;
     uv_shutdown_t           shutdown_req;
-    uv_buf_t                uv_buf;
     uv_write_t              write_req;
     uv_timer_t              shutdown_timeout;
     int8_t                  shutdown_tasks;
@@ -78,7 +107,9 @@ typedef struct ch_connection_s {
     BIO*                    bio_ssl;
     BIO*                    bio_app;
     int                     tls_handshake_state;
+    float                   load;
     ch_reader_t             reader;
+    ch_writer_t             writer;
     char                    color_field;
     struct ch_connection_s* left;
     struct ch_connection_s* right;
@@ -96,6 +127,38 @@ test_ch_cn_conn_dict(
         int* x_mem,
         int* y_mem
 );
+//buffer.h
+typedef struct ch_bf_handler_s {
+    ch_buf* header[CH_BF_PREALLOC_HEADER];
+    char*   actor[CH_BF_PREALLOC_ACTOR];
+    ch_buf* data[CH_BF_PREALLOC_DATA];
+    uint8_t id;
+    uint8_t used;
+} ch_bf_handler_t;
+
+typedef struct ch_buffer_pool_s {
+    uint8_t  max_buffers;
+    uint8_t  used_buffers;
+    uint32_t free_buffers;
+    ch_bf_handler_t* handlers;
+} ch_buffer_pool_t;
+
+//pool_test.h
+extern
+void
+test_ch_bf_init(ch_buffer_pool_t* pool, uint8_t max_buffers);
+
+extern
+void
+test_ch_bf_free(ch_buffer_pool_t* pool);
+
+extern
+ch_bf_handler_t*
+test_ch_bf_reserve(ch_buffer_pool_t* pool);
+
+extern
+void
+test_ch_bf_return(ch_buffer_pool_t* pool, ch_bf_handler_t* handler_buf);
 """)
 
 

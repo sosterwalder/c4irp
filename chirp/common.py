@@ -2,6 +2,7 @@
 
 import itertools
 import logging
+import os
 import subprocess
 
 import six
@@ -77,3 +78,21 @@ def complete_config(config, base):
         setattr(base, key, value)
 
     return base
+
+
+def get_crypto_files():
+    """Get default cert.pem and dh.pem.
+
+    :rtype: list
+    """
+    folder = os.path.abspath(__file__).split(
+        os.path.sep
+    )[:-1]
+    cert   = list(folder)
+    dh     = list(folder)
+    cert.append("cert.pem")
+    dh.append("dh.pem")
+    return (
+        os.path.sep.join(cert),
+        os.path.sep.join(dh),
+    )

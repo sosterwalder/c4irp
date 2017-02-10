@@ -12,25 +12,15 @@
 #include "../include/callbacks.h"
 #include "../include/common.h"
 
-ch_alloc_cb_t _ch_alloc_cb;
-ch_free_cb_t _ch_free_cb;
-ch_realloc_cb_t _ch_realloc_cb;
-
 // .. c:function::
-static
-ch_inline
 void*
-ch_alloc(size_t size)
+ch_alloc(size_t size);
 //
 //    Allocate fixed amount of memory.
 //
 //    :param size_t size: The amount of memory in bytes to allocate
 //
-// .. code-block:: cpp
-//
-{
-    return _ch_alloc_cb(size);
-}
+
 // .. c:function::
 static
 ch_inline
@@ -47,31 +37,49 @@ ch_bytes_to_hex(uint8_t* bytes, size_t bytes_size, char* str, size_t str_size)
 // .. code-block:: cpp
 //
 {
+    size_t i;
     A(bytes_size * 2 + 1 <= str_size, "Not enough space for string");
-    for(int i = 0; i < bytes_size; i++)
+    for(i = 0; i < bytes_size; i++)
     {
-            str += sprintf(str, "%02X", bytes[i]);
+            snprintf(str, 3, "%02X", bytes[i]);
+            str += 2;
     }
-    str = 0;
+    *str = 0;
 }
 
 // .. c:function::
 static
 ch_inline
+int
+ch_msb32(uint32_t x)
+//
+//    Get the most significant bit set
+//
+//    :param uint32_t x: The bit set
+//
+// .. code-block:: cpp
+//
+{
+    static const uint32_t bval[] =
+    {0,1,2,2,3,3,3,3,4,4,4,4,4,4,4,4};
+
+    uint32_t r = 0;
+    if (x & 0xFFFF0000) { r += 16/1; x >>= 16/1; }
+    if (x & 0x0000FF00) { r += 16/2; x >>= 16/2; }
+    if (x & 0x000000F0) { r += 16/4; x >>= 16/4; }
+    return r + bval[x];
+}
+
+// .. c:function::
 void
 ch_free(
         void* buf
-)
+);
 //
 //    Free a memory handle.
 //
 //    :param void* buf: The handle to free
 //
-// .. code-block:: cpp
-//
-{
-    _ch_free_cb(buf);
-}
 
 // .. c:function::
 static
@@ -89,13 +97,14 @@ ch_random_ints_as_bytes(uint8_t* bytes, size_t len)
 // .. code-block:: cpp
 //
 {
+    size_t i;
+    int tmp_rand;
     A(len % 4 == 0, "len must be multiple of four");
 #ifdef _WIN32
 #   if RAND_MAX < 16384 || INT_MAX < 16384 // 2**14
 #       error Seriously broken compiler or platform
 #   else // RAND_MAX < 16384 || INT_MAX < 16384
-        int tmp_rand;
-        for(size_t i = 0; i < len; i += 2) {
+        for(i = 0; i < len; i += 2) {
             tmp_rand = rand();
             memcpy(bytes + i, &tmp_rand, 2);
         }
@@ -104,17 +113,18 @@ ch_random_ints_as_bytes(uint8_t* bytes, size_t len)
 #   if RAND_MAX < 1073741824 || INT_MAX < 1073741824 // 2**30
 #       ifdef CH_ACCEPT_STRANGE_PLATFORM
             /* WTF, fallback platform */
-            for(size_t i = 0; i < len; i++) {
+            (void)(tmp_rand);
+            for(i = 0; i < len; i++) {
                 bytes[i] = ((unsigned int) rand()) % 256;
             }
 #       else // ACCEPT_STRANGE_PLATFORM
             // cppcheck-suppress preprocessorErrorDirective
-#           error Unexpected RAND_MAX / INT_MAX, define CH_ACCEPT_STRANGE_PLATFORM
+#           error Unexpected RAND_MAX / INT_MAX, define \
+                CH_ACCEPT_STRANGE_PLATFORM
 #       endif // ACCEPT_STRANGE_PLATFORM
 #   else // RAND_MAX < 1073741824 || INT_MAX < 1073741824
         /* Tested: this is 4 times faster*/
-        int tmp_rand;
-        for(size_t i = 0; i < len; i += 4) {
+        for(i = 0; i < len; i += 4) {
             tmp_rand = rand();
             memcpy(bytes + i, &tmp_rand, 4);
         }
@@ -123,24 +133,17 @@ ch_random_ints_as_bytes(uint8_t* bytes, size_t len)
 }
 //
 // .. c:function::
-static
-ch_inline
 void*
 ch_realloc(
         void*  buf,
         size_t size
-)
+);
 //
 //    Resize allocated memory.
 //
 //    :param void* buf: The handle to resize
 //    :param size_t size: The new size of the memory in bytes
 //
-// .. code-block:: cpp
-//
-{
-    return _ch_realloc_cb(buf, size);
-}
 
 // .. c:function::
 static

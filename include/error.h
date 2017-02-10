@@ -61,6 +61,7 @@ typedef enum {
     CH_TLS_ERROR      = 6,
     CH_UNINIT         = 7,
     CH_IN_PRORESS     = 8,
+    CH_TIMEOUT        = 9,
 } ch_error_t;
 
 #endif //ch_inc_error_h

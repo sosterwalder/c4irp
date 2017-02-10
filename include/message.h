@@ -31,18 +31,18 @@
 #define CH_WIRE_MESSAGE \
     uint8_t  identity[16]; \
     uint8_t  serial[16]; \
-    int8_t   message_type; \
-    int16_t  header_len; \
-    int16_t  actor_len; \
-    int32_t  data_len \
+    uint8_t  message_type; \
+    uint16_t header_len; \
+    uint16_t actor_len; \
+    uint32_t data_len \
 
 typedef struct ch_message_s {
     // Network data, has to be sent in network order
     CH_WIRE_MESSAGE;
     // These fields follow the message in this order (see _len above)
-    void*    header;
+    ch_buf*  header;
     char*    actor;
-    void*    data;
+    ch_buf*  data;
     // Local only data
     uint8_t  ip_protocol;
     uint8_t  address[16];
@@ -51,6 +51,16 @@ typedef struct ch_message_s {
     int8_t   free_actor;
     int8_t   free_data;
 } ch_message_t;
+
+// .. c:type:: ch_ms_message_t
+//
+//    Wire message (network endianness)
+//
+// .. code-block:: cpp
+
+typedef struct ch_ms_message_s {
+    CH_WIRE_MESSAGE;
+} ch_ms_message_t;
 
 // .. c:type:: ch_text_address_t
 //
@@ -84,7 +94,7 @@ typedef struct ch_text_address_s {
 //
 // * Please use MAX_HANDLERS preallocated buffers of size 32 for header
 // * Please use MAX_HANDLERS preallocated buffers of size 256 for actor
-// * Please use MAX_HANDLERS preallocated buffers of size 1024 for data
+// * Please use MAX_HANDLERS preallocated buffers of size 512 for data
 //
 // Either fields may exceed the limit, in which case you have to alloc and set
 // the free_* field.

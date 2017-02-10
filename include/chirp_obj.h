@@ -10,6 +10,7 @@
 #include "common.h"
 #include "callbacks.h"
 #include "wrappers.h"
+#include "message.h"
 
 // .. c:type:: ch_config_t
 //
@@ -37,6 +38,23 @@
 //    .. c:member:: uint8_t RETRIES
 //
 //       Count of retries till error is reported, by default 1.
+//
+//    .. c:member:: uint8_t MAX_HANDLERS
+//
+//       Count of handlers used. Allowed values between 1 and 32. Default: 16.
+//       If FLOW_CONTROL is on it must be >= 16.
+//
+//    .. c:member:: char FLOW_CONTROL
+//
+//       Flow control prevents overload of one node in chain for workers.
+//       Default: 1.
+//
+//    .. c:member:: char ACKNOWLEDGE
+//
+//       Acknowledge messages. Is needed for retry and flow-control. Disabling
+//       acknowledge can improve performance on long delay connections, but at
+//       the risk of overloading the remote and the local machine. You have to
+//       set RETRIES and FLOW_CONTROL to 0 or chirp won't accept the config.
 //
 //    .. c:member:: char CLOSE_ON_SIGINT
 //
@@ -69,6 +87,9 @@ typedef struct ch_config_s {
     uint16_t        PORT;
     uint8_t         BACKLOG;
     uint8_t         RETRIES;
+    uint8_t         MAX_HANDLERS;
+    char            ACKNOWLEDGE;
+    char            FLOW_CONTROL;
     char            CLOSE_ON_SIGINT;
     uint32_t        BUFFER_SIZE;
     uint8_t         BIND_V6[16];
@@ -209,6 +230,22 @@ ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp);
 //    :param ch_config_t* config: Chirp config
 //    :param ch_chirp_t** chirp: Out: Pointer to chirp object pointer. Ca be
 //                               NULL
+//
+// .. c:function::
+extern
+void
+ch_chirp_send(ch_chirp_t* chirp, ch_message_t* msg, ch_send_cb_t send_cb);
+//
+//    Send a message. Messages can be sent in parallel to different nodes.
+//    Messages to the same node will block, if you don't wait for the callback.
+//
+//    If you don't want to allocate messages on sending, we recommend to use a
+//    pool of messages.
+//
+//    :param ch_chirp_t* chirp: Chirp instance
+//    :param ch_message_t msg: The message to send. The memory of the message
+//                             must stay valid till the callback is called.
+//    :param ch_send_cb_t send_cb: Will be call
 //
 // .. c:function::
 extern

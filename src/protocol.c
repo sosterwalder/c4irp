@@ -16,8 +16,11 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     right,
     color_field,
     CH_RECEIPT_CMP
-);
+)
 
+
+// Declarations
+// ============
 
 // .. c:function::
 static
@@ -43,7 +46,7 @@ _ch_pr_do_handshake(ch_connection_t* conn);
 static
 ch_inline
 void
-_ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts);
+_ch_pr_free_receipts(ch_receipt_t* receipts);
 //
 //    Free all remaining items in a receipts set
 //
@@ -77,6 +80,9 @@ _ch_pr_read_data_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf);
 //
 //    TODO params
 //
+
+// Definitions
+// ===========
 
 // .. c:function::
 static
@@ -138,12 +144,12 @@ _ch_pr_do_handshake(ch_connection_t* conn)
         conn->flags &= ~CH_CN_TLS_HANDSHAKE;
         // Last handshake state, since we got that on the last read and have to
         // use it on this read.
-        if(conn->tls_handshake_state == 1) {
+        if(conn->tls_handshake_state) {
             L(
                 chirp,
                 "SSL handshake successful. ch_chirp_t:%p, ch_connection_t:%p",
-                chirp,
-                conn
+                (void*) chirp,
+                (void*) conn
             );
         } else {
 #           ifndef NDEBUG
@@ -152,8 +158,8 @@ _ch_pr_do_handshake(ch_connection_t* conn)
             E(
                 chirp,
                 "SSL handshake failed. ch_chirp_t:%p, ch_connection_t:%p",
-                chirp,
-                conn
+                (void*) chirp,
+                (void*) conn
             );
             ch_cn_shutdown(conn);
             return;
@@ -166,7 +172,7 @@ _ch_pr_do_handshake(ch_connection_t* conn)
 static
 ch_inline
 void
-_ch_pr_free_receipts(ch_chirp_t* chirp, ch_receipt_t* receipts)
+_ch_pr_free_receipts(ch_receipt_t* receipts)
 //    :noindex:
 //
 //    see: :c:func:`_ch_pr_free_receipts`
@@ -205,7 +211,7 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
             chirp,
             "New connection error %s. ch_chirp_t:%p",
             uv_strerror(status),
-            chirp
+            (void*) chirp
         ); // NOCOV TODO
         return; // NOCOV TODO
     }
@@ -217,7 +223,7 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
         E(
             chirp,
             "Could not initialize connection. ch_chirp_t:%p",
-            chirp
+            (void*) chirp
          );
         ch_free(conn);
         return;
@@ -226,47 +232,12 @@ _ch_pr_new_connection_cb(uv_stream_t* server, int status)
     uv_tcp_init(server->loop, client);
     client->data = conn;
     if (uv_accept(server, (uv_stream_t*) client) == 0) {
-        struct sockaddr_storage addr;
-        int addr_len;
         L(
             chirp,
             "Accepted connection. ch_chirp_t:%p, ch_connection_t:%p",
-            chirp,
-            conn
+            (void*) chirp,
+            (void*) conn
         );
-        if(uv_tcp_getpeername(
-                    client,
-                    (struct sockaddr*) &addr,
-                    &addr_len
-        ) != CH_SUCCESS) {
-            E(
-                chirp,
-                "Could not get remote address. ch_chirp_t:%p, "
-                "ch_connection_t:%p",
-                chirp,
-                conn
-            );
-            conn->shutdown_tasks = 1;
-            uv_close((uv_handle_t*) client, ch_cn_close_cb);
-            return;
-        };
-        if(addr.ss_family == AF_INET6) {
-            struct sockaddr_in6* saddr = (struct sockaddr_in6*) &addr;
-            conn->ip_protocol = CH_IPV6;
-            memcpy(
-                &conn->address,
-                &saddr->sin6_addr,
-                sizeof(saddr->sin6_addr)
-            );
-        } else {
-            struct sockaddr_in* saddr = (struct sockaddr_in*) &addr;
-            conn->ip_protocol = CH_IPV4;
-            memcpy(
-                &conn->address,
-                &saddr->sin_addr,
-                sizeof(saddr->sin_addr)
-            );
-        }
         if(conn->flags & CH_CN_ENCRYPTED) {
             SSL_set_accept_state(conn->ssl);
             conn->flags |= CH_CN_TLS_HANDSHAKE;
@@ -298,7 +269,7 @@ _ch_pr_read(ch_connection_t* conn)
 {
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
-    int tmp_err = 1;
+    int tmp_err;
     // Handshake done, normal operation
     tmp_err = SSL_read(
         conn->ssl,
@@ -310,8 +281,8 @@ _ch_pr_read(ch_connection_t* conn)
             chirp,
             "Read %d bytes. ch_chirp_t:%p, ch_connection_t:%p",
             tmp_err,
-            chirp,
-            conn
+            (void*) chirp,
+            (void*) conn
         );
         ch_rd_read(conn, conn->buffer_rtls, tmp_err);
     } else {
@@ -323,15 +294,15 @@ _ch_pr_read(ch_connection_t* conn)
                 chirp,
                 "SSL operation fatal error. ch_chirp_t:%p, "
                 "ch_connection_t:%p",
-                chirp,
-                conn
+                (void*) chirp,
+                (void*) conn
             );
         } else {
             L(
                 chirp,
                 "SSL operation failed. ch_chirp_t:%p, ch_connection_t:%p",
-                chirp,
-                conn
+                (void*) chirp,
+                (void*) conn
             );
         }
         ch_cn_shutdown(conn);
@@ -353,8 +324,6 @@ _ch_pr_read_data_cb(
 // .. code-block:: cpp
 //
 {
-    int tmp_err;
-    size_t bytes_decrypted = 0;
     ch_connection_t* conn = stream->data;
     ch_chirp_t* chirp = conn->chirp;
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
@@ -365,15 +334,30 @@ _ch_pr_read_data_cb(
         ch_cn_shutdown(conn);
         return;
     }
+    if(nread < 0) {
+        L(
+            chirp,
+            "Reader got error %d -> shutdown. ch_chirp_t:%p, "
+            "ch_connection_t:%p",
+            (int) nread,
+            (void*) chirp,
+            (void*) conn
+        );
+        ch_cn_shutdown(conn);
+        return;
+    }
     L(
         chirp,
         "%d available bytes. ch_chirp_t:%p, ch_connection_t:%p",
         (int) nread,
-        chirp,
-        conn
+        (void*) chirp,
+        (void*) conn
     );
     if(conn->flags & CH_CN_ENCRYPTED) {
+        size_t bytes_decrypted = 0;
+        size_t snread = (size_t) nread;
         do {
+            int tmp_err;
             tmp_err = BIO_write(
                 conn->bio_app,
                 buf->base + bytes_decrypted,
@@ -384,8 +368,8 @@ _ch_pr_read_data_cb(
                     chirp,
                     "SSL error writing to BIO, shutting down connection. "
                     "ch_connection_t:%p ch_chirp_t:%p",
-                    conn,
-                    chirp
+                    (void*) conn,
+                    (void*) chirp
                 );
                 ch_cn_shutdown(conn);
                 return;
@@ -395,7 +379,7 @@ _ch_pr_read_data_cb(
                 _ch_pr_do_handshake(conn);
             else
                 _ch_pr_read(conn);
-        } while(bytes_decrypted < nread);
+        } while(bytes_decrypted < snread);
     } else
         ch_rd_read(conn, buf->base, nread);
 }
@@ -441,7 +425,7 @@ ch_pr_start(ch_protocol_t* protocol)
             __FILE__,
             __LINE__,
             config->PORT,
-            chirp
+            (void*) chirp
         );
         return tmp_err;  // NOCOV UV_EADDRINUSE can happen in tcp_bind or
                          // listen on my systems it happends in listen
@@ -460,7 +444,7 @@ ch_pr_start(ch_protocol_t* protocol)
             __FILE__,
             __LINE__,
             config->PORT,
-            chirp
+            (void*) chirp
         );
         return CH_EADDRINUSE;
     }
@@ -488,7 +472,7 @@ ch_pr_start(ch_protocol_t* protocol)
             __FILE__,
             __LINE__,
             config->PORT,
-            chirp
+            (void*) chirp
         );
         return tmp_err; // NOCOV errors happend for IPV4
     }
@@ -506,30 +490,13 @@ ch_pr_start(ch_protocol_t* protocol)
             __FILE__,
             __LINE__,
             config->PORT,
-            chirp
+            (void*) chirp
         );
         return CH_EADDRINUSE; // NOCOV errors happend for IPV4
     }
     protocol->receipts = NULL;
     protocol->late_receipts = NULL;
     protocol->connections = NULL;
-    /*ch_receipt_t* t;
-    struct sglib_ch_receipt_t_iterator it;
-    for(int i = 0; i < 10; ++i) {
-        t = ch_chirp_alloc(chirp, sizeof(ch_receipt_t));
-        // TODO fill t->receipt
-        sglib_ch_receipt_t_add(&protocol->receipts, t);
-    }
-    for(
-            t = sglib_ch_receipt_t_it_init_inorder(
-                &it,
-                protocol->receipts
-            );
-            t != NULL;
-            t = sglib_ch_receipt_t_it_next(&it)
-    ) {
-        printf("%d ", t->receipt[0]);
-    } */
     return CH_SUCCESS;
 }
 
@@ -544,13 +511,13 @@ ch_pr_stop(ch_protocol_t* protocol)
 //
 {
     ch_chirp_t* chirp = protocol->chirp;
-    L(chirp, "Closing protocol. ch_chirp_t:%p", chirp);
+    L(chirp, "Closing protocol. ch_chirp_t:%p", (void*) chirp);
     _ch_pr_close_free_connections(chirp);
     uv_close((uv_handle_t*) &protocol->serverv4, ch_chirp_close_cb);
     uv_close((uv_handle_t*) &protocol->serverv6, ch_chirp_close_cb);
     chirp->_->closing_tasks += 2;
-    _ch_pr_free_receipts(chirp, protocol->receipts);
-    _ch_pr_free_receipts(chirp, protocol->late_receipts);
+    _ch_pr_free_receipts(protocol->receipts);
+    _ch_pr_free_receipts(protocol->late_receipts);
     return CH_SUCCESS;
 }
 //

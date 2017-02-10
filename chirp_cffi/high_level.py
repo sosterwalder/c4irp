@@ -62,6 +62,7 @@ typedef void* (*ch_alloc_cb_t)(size_t size);
 typedef void (*ch_free_cb_t)(void* buf);
 typedef void (*ch_log_cb_t)(char msg[], char error);
 typedef void* (*ch_realloc_cb_t)(void* buf, size_t new_size);
+typedef void (*ch_send_cb_t)(int status, float load);
 
 //message.h
 typedef struct {
@@ -69,19 +70,21 @@ typedef struct {
 } ch_text_address_t;
 
 typedef struct {
-    char     identity[16];
-    char     serial[16];
+    // Network data, has to be sent in network order
+    uint8_t  identity[16];
+    uint8_t  serial[16];
     int8_t   message_type;
     int16_t  header_len;
     int16_t  actor_len;
     int32_t  data_len;
-    char*    header;
+    // These fields follow the message in this order (see _len above)
+    void*    header;
     char*    actor;
-    char*    data;
+    void*    data;
+    // Local only data
     uint8_t  ip_protocol;
     uint8_t  address[16];
     int32_t  port;
-    int8_t   host_order;
     int8_t   free_header;
     int8_t   free_actor;
     int8_t   free_data;
@@ -113,17 +116,20 @@ typedef struct ch_identity_s {
     unsigned char data[16];
 } ch_identity_t;
 
-typedef struct {
+typedef struct ch_config_s {
     float           REUSE_TIME;
     float           TIMEOUT;
     uint16_t        PORT;
     uint8_t         BACKLOG;
     uint8_t         RETRIES;
+    uint8_t         MAX_HANDLERS;
+    char            ACKNOWLEDGE;
+    char            FLOW_CONTROL;
     char            CLOSE_ON_SIGINT;
     uint32_t        BUFFER_SIZE;
-    char            BIND_V6[16];
-    char            BIND_V4[4];
-    unsigned char   IDENTITY[16];
+    uint8_t         BIND_V6[16];
+    uint8_t         BIND_V4[4];
+    uint8_t         IDENTITY[16];
     char*           CERT_CHAIN_PEM;
     char*           DH_PARAMS_PEM;
 } ch_config_t;

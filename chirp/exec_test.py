@@ -1,13 +1,13 @@
 """Running test executables."""
 # Start ignoring PyLintBear*E1101*
 
-import os
 import signal
 import socket
 import ssl
+import sys
 import time
 
-from . import sh
+from . import common, sh
 
 chirp = sh.background_command("src/chirp_etest")
 
@@ -17,12 +17,7 @@ def connect_ssl():
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     context.verify_mode = ssl.CERT_REQUIRED
     context.check_hostname = False
-    folder = __file__.split(os.path.sep)[:-1]
-    folder.append("cert.pem")
-    cert = "%s%s" % (
-        os.path.sep,
-        os.path.join(*folder)
-    )
+    cert, _ = common.get_crypto_files()
     context.load_verify_locations(cert)
     context.load_cert_chain(cert)
     context.set_ciphers(
@@ -47,11 +42,18 @@ def test_ssl():
     finally:
         try:
             time.sleep(0.25)
-            p.send_signal(signal.SIGINT)
+            if sys.platform == "win32":
+                p.kill()
+            else:
+                p.send_signal(signal.SIGINT)
             stdout, stderr = p.communicate()
             print(stdout.decode("UTF-8"), stderr.decode("UTF-8"))
         finally:
-            p.kill()
+            try:  # Races always possible
+                p.kill()
+            except OSError:
+                pass
+
 
 if __name__ == "__main__":
     connect_ssl()

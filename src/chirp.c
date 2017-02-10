@@ -11,7 +11,13 @@
 
 #include <time.h>
 #include <signal.h>
-#include <unistd.h>
+#ifdef _WIN32
+#   define ch_access _access
+#   include <io.h>
+#else
+#   define ch_access access
+#   include <unistd.h>
+#endif
 
 SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     ch_chirp_t,
@@ -19,7 +25,7 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     _right,
     _color_field,
     SGLIB_NUMERIC_COMPARATOR
-);
+)
 
 // .. c:var:: ch_config_t ch_config_defaults
 //
@@ -33,6 +39,9 @@ static ch_config_t _ch_config_defaults = {
     .PORT            = 2998,
     .BACKLOG         = 100,
     .RETRIES         = 1,
+    .MAX_HANDLERS    = 16,
+    .FLOW_CONTROL    = 1,
+    .ACKNOWLEDGE     = 1,
     .CLOSE_ON_SIGINT = 1,
     .BUFFER_SIZE     = 0,
     .BIND_V6         = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -120,7 +129,7 @@ _ch_chirp_check_closing_cb(uv_prepare_t* handle)
         chirp,
         "Check closing semaphore (%d). ch_chirp_t:%p",
         ichirp->closing_tasks,
-        chirp
+        (void*) chirp
     );
     // In production we allow the semaphore to drop below zero but log it as an
     // error
@@ -133,7 +142,7 @@ _ch_chirp_check_closing_cb(uv_prepare_t* handle)
         E(
             chirp,
             "Check closing semaphore dropped blow 0. ch_chirp_t:%p",
-            chirp
+            (void*) chirp
         );
     }
 }
@@ -164,7 +173,7 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
         E(
             chirp,
             "Chirp closing callback called on closed. ch_chirp_t:%p",
-            chirp
+            (void*) chirp
         );
         return;
     }
@@ -173,20 +182,26 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
         E(
             chirp,
             "Chirp closing callback called on closed. ch_chirp_t:%p",
-            chirp
+            (void*) chirp
         );
         return;
     }
-    L(chirp, "Chirp closing callback called. ch_chirp_t:%p", chirp);
+    L(
+        chirp,
+        "Chirp closing callback called. ch_chirp_t:%p",
+        (void*) chirp
+    );
     assert(ch_pr_stop(&ichirp->protocol) == CH_SUCCESS);
     uv_close((uv_handle_t*) &ichirp->close, ch_chirp_close_cb);
     ichirp->closing_tasks += 1;
     assert(uv_prepare_init(ichirp->loop, &ichirp->close_check) == CH_SUCCESS);
     ichirp->close_check.data = chirp;
     // We use a semaphore to wait until all callbacks are done:
-    // 1. Every time a new callback is scheduled we do ichirp->closing_tasks += 1
+    // 1. Every time a new callback is scheduled we do
+    //    ichirp->closing_tasks += 1
     // 2. Every time a callback is called we do ichirp->closing_tasks -= 1
-    // 3. Every uv_loop iteration before it blocks we check ichirp->closing_tasks == 0
+    // 3. Every uv_loop iteration before it blocks we check
+    //    ichirp->closing_tasks == 0
     // -> if we reach 0 all callbacks are done and we continue freeing memory
     // etc.
     assert(uv_prepare_start(
@@ -210,8 +225,8 @@ ch_chirp_close_cb(uv_handle_t* handle)
         chirp,
         "Closing semaphore (%d). uv_handle_t:%p, ch_chirp_t:%p",
         chirp->_->closing_tasks,
-        handle,
-        chirp
+        (void*) handle,
+        (void*) chirp
     );
 }
 
@@ -229,14 +244,13 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 {
     char chirp_closed = 0;
     ch_chirp_int_t* ichirp;
-    L(chirp, "Closing chirp via callback. ch_chirp_t:%p", chirp);
     if(chirp == NULL || chirp->_init != CH_CHIRP_MAGIC) {
         fprintf(
             stderr,
             "%s:%d Fatal: chirp is not initialzed. ch_chirp_t:%p\n",
             __FILE__,
             __LINE__,
-            chirp
+            (void*) chirp
         );
         return CH_UNINIT; // NOCOV  TODO can be tested
     }
@@ -253,18 +267,27 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
             "%s:%d Fatal: chirp is already closed. ch_chirp_t:%p\n",
             __FILE__,
             __LINE__,
-            chirp
+            (void*) chirp
         );
         return CH_FATAL;
     }
     if(ichirp->flags & CH_CHIRP_CLOSING) {
-        E(chirp, "Close already in progress. ch_chirp_t:%p", chirp);
+        E(
+            chirp,
+            "Close already in progress. ch_chirp_t:%p",
+            (void*) chirp
+        );
         return CH_IN_PRORESS;
     }
     ichirp->flags |= CH_CHIRP_CLOSING;
     ichirp->close.data = chirp;
+    L(chirp, "Closing chirp via callback. ch_chirp_t:%p", (void*) chirp);
     if(uv_async_send(&ichirp->close) < 0) {
-        E(chirp, "Could not call close callback. ch_chirp_t:%p", chirp);
+        E(
+            chirp,
+            "Could not call close callback. ch_chirp_t:%p",
+            (void*) chirp
+        );
         return CH_UV_ERROR; // NOCOV only breaking things will trigger this
     }
     return CH_SUCCESS;
@@ -287,20 +310,20 @@ _ch_chirp_closing_down_cb(uv_handle_t* handle)
         L(
             chirp,
             "UV-Loop stopped by chirp. uv_loop_t:%p ch_chirp_t:%p",
-            ichirp->loop,
-            chirp
+            (void*) ichirp->loop,
+            (void*) chirp
         );
     }
     chirp->_ = NULL;
     ch_free(ichirp);
-    L(chirp, "Closed. ch_chirp_t:%p", chirp);
+    L(chirp, "Closed. ch_chirp_t:%p", (void*) chirp);
     if(sglib_ch_chirp_t_is_member(_ch_chirp_instances, chirp))
         sglib_ch_chirp_t_delete(&_ch_chirp_instances, chirp);
     else {
         E(
             chirp,
             "Closing unknown chirp instance. ch_chirp_t:%p",
-            chirp
+            (void*) chirp
         );
     }
     _ch_chirp_ref_count -= 1;
@@ -374,7 +397,7 @@ ch_chirp_init(
 
     // rand
     srand((unsigned int) time(NULL));
-    int i = 0;
+    unsigned int i = 0;
     while(
             i < (sizeof(tmp_conf->IDENTITY) - 1) &&
             tmp_conf->IDENTITY[i] == 0
@@ -389,7 +412,7 @@ ch_chirp_init(
         E(
             chirp,
             "Could not initialize close callback. ch_chirp_t:%p",
-            chirp
+            (void*) chirp
         );
         ch_free(ichirp);
         chirp->_init = 0;
@@ -403,7 +426,7 @@ ch_chirp_init(
             chirp,
             "Could not start protocol: %d. ch_chirp_t:%p",
             tmp_err,
-            chirp
+            (void*) chirp
         );
         ch_free(ichirp);
         chirp->_init = 0;
@@ -419,7 +442,7 @@ ch_chirp_init(
             chirp,
             "Could not start encryption: %d. ch_chirp_t:%p",
             tmp_err,
-            chirp
+            (void*) chirp
         );
         ch_free(ichirp);
         chirp->_init = 0;
@@ -437,8 +460,8 @@ ch_chirp_init(
         chirp,
         "Chirp initialized id: %s. ch_chirp_t:%p, uv_loop_t:%p",
         id_str,
-        chirp,
-        loop
+        (void*) chirp,
+        (void*) loop
     );
 #   endif
     if(!_ch_chirp_sig_init) {
@@ -446,11 +469,18 @@ ch_chirp_init(
             E(
                 chirp,
                 "Unable to set SIGINT handler. ch_chirp_t:%p",
-                chirp
+                (void*) chirp
             );
        }
        else
-           _ch_chirp_sig_init = 1;
+           _ch_chirp_sig_init = 1; // We need at least sigint
+       if(signal(SIGTERM, _ch_chirp_sig_handler) == SIG_ERR) {
+            E(
+                chirp,
+                "Unable to set SIGTERM handler. ch_chirp_t:%p",
+                (void*) chirp
+            );
+       }
     }
     _ch_chirp_ref_count += 1;
     sglib_ch_chirp_t_add(&_ch_chirp_instances, chirp);
@@ -481,7 +511,7 @@ ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp_out)
             (&chirp),
             "Could not init loop: %d. uv_loop_t:%p",
             tmp_err,
-            &loop
+            (void*) &loop
         );
         return tmp_err;  // NOCOV this can only fail with access error
     }
@@ -491,7 +521,7 @@ ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp_out)
             (&chirp),
             "Could not init chirp: %d ch_chirp_t:%p",
             tmp_err,
-            &chirp
+            (void*) &chirp
         );
         return tmp_err;  // NOCOV covered in ch_chirp_init tests
     }
@@ -499,8 +529,8 @@ ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp_out)
     L(
         (&chirp),
         "UV-Loop run by chirp. ch_chirp_t:%p, uv_loop_t:%p",
-        &chirp,
-        &loop
+        (void*) &chirp,
+        (void*) &loop
     );
     /* This works and is not TOO bad because the function blocks. */
     // cppcheck-suppress unmatchedSuppression
@@ -513,7 +543,7 @@ ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp_out)
             (&chirp),
             "uv_run returned with error: %d, uv_loop_t:%p",
             tmp_err,
-            &loop
+            (void*) &loop
         );
         return tmp_err; // NOCOV only breaking things will trigger this
     }
@@ -551,7 +581,7 @@ _ch_chirp_sig_handler(int signo)
 //
 {
     ch_chirp_t* t;
-    if(signo != SIGINT)
+    if(signo != SIGINT && signo != SIGTERM)
         return;
     struct sglib_ch_chirp_t_iterator it;
     for(
@@ -579,19 +609,19 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
 {
     A(chirp->_init == CH_CHIRP_MAGIC, "Not a ch_chirp_t*");
     ch_config_t* conf = &chirp->_->config;
-    V(
+    VE(
         chirp,
         conf->DH_PARAMS_PEM != NULL,
         "Config: DH_PARAMS_PEM must be set."
     );
-    V(
+    VE(
         chirp,
         conf->CERT_CHAIN_PEM != NULL,
         "Config: CERT_CHAIN_PEM must be set."
-    );    
+    );
     V(
         chirp,
-        access(conf->CERT_CHAIN_PEM, F_OK ) != -1,
+        ch_access(conf->CERT_CHAIN_PEM, F_OK ) != -1,
         "Config: cert %s does not exist.",
         conf->CERT_CHAIN_PEM
     );
@@ -638,6 +668,36 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
         conf->TIMEOUT,
         conf->REUSE_TIME
     );
+    if(conf->FLOW_CONTROL) {
+        VE(
+            chirp,
+            conf->MAX_HANDLERS >= 16,
+            "Config: if flow control is on max_handlers must be >= 16."
+        );
+    } else {
+        VE(
+            chirp,
+            conf->MAX_HANDLERS >= 1,
+            "Config: max_handlers must be >= 1."
+        );
+    }
+    if(conf->ACKNOWLEDGE == 0) {
+        VE(
+            chirp,
+            conf->RETRIES != 0,
+            "Config: if acknowledge is disabled retries has to be 0."
+        );
+        VE(
+            chirp,
+            conf->FLOW_CONTROL != 0,
+            "Config: if acknowledge is disabled flow-control has to be 0."
+        );
+    }
+    VE(
+        chirp,
+        conf->MAX_HANDLERS <= 32,
+        "Config: max_handlers must be <= 1."
+    );
     V(
         chirp,
         conf->BUFFER_SIZE >= CH_LIB_UV_MIN_BUFFER || conf->BUFFER_SIZE == 0,
@@ -654,7 +714,9 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp)
     );
     V(
         chirp,
-        conf->BUFFER_SIZE >= sizeof(ch_rd_handshake_t) || conf->BUFFER_SIZE == 0,
+        conf->BUFFER_SIZE >= sizeof(
+            ch_rd_handshake_t
+        ) || conf->BUFFER_SIZE == 0,
         "Config: buffer size must be > %d (%d)",
         (int) sizeof(ch_rd_handshake_t),
         conf->BUFFER_SIZE

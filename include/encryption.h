@@ -12,7 +12,7 @@
 // .. c:function::
 extern
 ch_error_t
-ch_en_openssl_init(const ch_config_t* config);
+ch_en_openssl_init(void);
 //
 //    Initialize openssl according to config.
 //

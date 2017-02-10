@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 set -e
-BUILDTYPE="$1"
+export BUILDTYPE="$1"
+export CHIRP_DOCKER="True"
 
 source /etc/profile
 pyenv local 3.5.2

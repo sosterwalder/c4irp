@@ -74,7 +74,7 @@ SGLIB_DEFINE_RBTREE_PROTOTYPES(
     right,
     color_field,
     CH_RECEIPT_CMP
-);
+)
 
 // .. c:function::
 static

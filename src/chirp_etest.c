@@ -20,6 +20,8 @@ main(
 // .. code-block:: cpp
 
 {
+    (void)(argc); // I hate incomplete main headers;
+    (void)(argv); // I hate incomplete main headers;
     ch_chirp_t chirp;
     uv_loop_t loop;
     ch_config_t config;
