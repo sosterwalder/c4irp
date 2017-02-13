@@ -40,7 +40,7 @@ class PoolMachine(RuleBasedStateMachine):
 
     @rule(rnd=st.random_module())
     @precondition(lambda self: self.count > 0)
-    def return_buf(self, rnd):  # Ignore all
+    def return_buf(self, rnd):  # Ignore PyLintBear (W0613)
         """Return a buffer."""
         random.shuffle(self.buffers)
         buf = self.buffers.pop()
