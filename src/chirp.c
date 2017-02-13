@@ -3,7 +3,7 @@
 // =====
 //
 // .. code-block:: cpp
-
+//
 #include "chirp.h"
 #include "util.h"
 
@@ -19,6 +19,11 @@
 #   include <unistd.h>
 #endif
 
+// Sglib Prototypes
+// ================
+
+// .. code-block:: cpp
+//
 SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     ch_chirp_t,
     _left,
@@ -26,6 +31,9 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     _color_field,
     SGLIB_NUMERIC_COMPARATOR
 )
+
+// Declarations
+// ============
 
 // .. c:var:: ch_config_t ch_config_defaults
 //
@@ -56,7 +64,7 @@ static ch_config_t _ch_config_defaults = {
 //    Chirp reference counter
 //
 // .. code-block:: cpp
-
+//
 static int _ch_chirp_ref_count = 0;
 
 // .. c:var:: int _ch_chirp_sig_init
@@ -64,7 +72,7 @@ static int _ch_chirp_ref_count = 0;
 //    Signal handler was initialized
 //
 // .. code-block:: cpp
-
+//
 static char _ch_chirp_sig_init = 0;
 
 // .. c:var:: ch_chirp_t** _ch_chirp_instances
@@ -76,27 +84,38 @@ static char _ch_chirp_sig_init = 0;
 static ch_chirp_t* _ch_chirp_instances = NULL;
 
 // .. c:function::
-static void
+static
+void
 _ch_chirp_check_closing_cb(uv_prepare_t* handle);
 //
 //    Close chirp when the closing semaphore reaches zero.
 //
-//    TODO params
+//    :param uv_prepare_t* handle: Prepare handle which will be stopped (and
+//                                 thus its callback)
 //
+
 // .. c:function::
-static void
+static
+void
 _ch_chirp_close_async_cb(uv_async_t* handle);
 //
 //    Internal callback to close chirp. Makes ch_chirp_close_ts thread-safe
 //
+//    :param uv_async_t* handle: Async handle which is used to closed chirp
+//
+
 // .. c:function::
-static void
+static
+void
 _ch_chirp_closing_down_cb(uv_handle_t* handle);
 //
-//    Closing chirp after the check callback has been closed.
+//    Close chirp after the check callback has been closed and stops the libuv
+//    loop.
 //
-//    TODO params
+//    :param uv_handle_t* handle: Base libuv handle which contains chirp (as
+//                                data)
 //
+
 // .. c:function::
 static
 void
@@ -104,6 +123,7 @@ _ch_chirp_sig_handler(int);
 //
 //    Closes all chirp instances on sig int.
 //
+
 // .. c:function::
 static
 ch_error_t
@@ -111,9 +131,18 @@ _ch_chirp_verify_cfg(const ch_chirp_t* chirp);
 //
 //   Verifies the configuration.
 //
+//   :param   ch_chirp_t* chrip: Instance of a chirp object
+//
+//   :return: A chirp error. see: :c:type:`ch_error_t`
+//   :rtype:  ch_error_t
+//
+
+// Definitions
+// ===========
 
 // .. c:function::
-static void
+static
+void
 _ch_chirp_check_closing_cb(uv_prepare_t* handle)
 //    :noindex:
 //
@@ -146,6 +175,7 @@ _ch_chirp_check_closing_cb(uv_prepare_t* handle)
         );
     }
 }
+
 // .. c:function::
 void
 ch_chirp_config_init(ch_config_t* config)
@@ -158,8 +188,10 @@ ch_chirp_config_init(ch_config_t* config)
 {
     *config = _ch_config_defaults;
 }
+
 // .. c:function::
-static void
+static
+void
 _ch_chirp_close_async_cb(uv_async_t* handle)
 //    :noindex:
 //
@@ -209,6 +241,7 @@ _ch_chirp_close_async_cb(uv_async_t* handle)
         _ch_chirp_check_closing_cb
     ) == CH_SUCCESS);
 }
+
 // .. c:function::
 void
 ch_chirp_close_cb(uv_handle_t* handle)
@@ -237,7 +270,7 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 //
 //    see: :c:func:`ch_chirp_close_ts`
 //
-//    This function is thread-safe
+//    This function is thread-safe.
 //
 // .. code-block:: cpp
 //
@@ -294,7 +327,8 @@ ch_chirp_close_ts(ch_chirp_t* chirp)
 }
 
 // .. c:function::
-static void
+static
+void
 _ch_chirp_closing_down_cb(uv_handle_t* handle)
 //    :noindex:
 //
@@ -596,6 +630,7 @@ _ch_chirp_sig_handler(int signo)
             ch_chirp_close_ts(t);
     }
 }
+
 // .. c:function::
 static
 ch_error_t

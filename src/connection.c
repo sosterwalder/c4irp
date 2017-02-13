@@ -12,7 +12,7 @@
 
 // Sglib Prototypes
 // ================
-//
+
 // .. code-block:: cpp
 //
 SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
@@ -23,6 +23,8 @@ SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     CH_CONNECTION_CMP
 )
 
+// .. code-block:: cpp
+//
 SGLIB_DEFINE_RBTREE_FUNCTIONS( // NOCOV
     ch_connection_set_t,
     left,

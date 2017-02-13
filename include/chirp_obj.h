@@ -132,7 +132,6 @@ typedef struct ch_chirp_s {
 //    Struct containing the chirp identity.
 //
 // .. code-block:: cpp
-
 typedef struct ch_identity_s {
     unsigned char data[16];
 } ch_identity_t;
@@ -145,7 +144,7 @@ ch_chirp_config_init(ch_config_t* config);
 //    Initialize chirp config with defaults
 //
 //    :param ch_config_t config: Chirp config
-//
+
 // .. c:function::
 extern
 ch_error_t
@@ -158,6 +157,10 @@ ch_chirp_close_ts(ch_chirp_t* chirp);
 //
 //    :param ch_chirp_t chirp: Chirp object
 //
+//    :return: A chirp error. see: :c:type:`ch_error_t`
+//    :rtype: ch_error_t
+//
+
 // .. c:function::
 extern
 ch_identity_t
@@ -165,8 +168,12 @@ ch_chirp_get_identity(ch_chirp_t* chirp);
 //
 //    Get the identity of this chirp instance.
 //
-//    :param ch_chirp_t chirp: Chirp object
+//    :param   ch_chirp_t chirp: Chirp object
 //
+//    :return: A chirp identity. see: :c:type:`ch_identity_t`
+//    :rtype:  ch_identity_t
+//
+
 // .. c:function::
 extern
 uv_loop_t*
@@ -176,6 +183,9 @@ ch_chirp_get_loop(ch_chirp_t* chirp);
 //
 //    :param ch_chirp_t chirp: Chirp object
 //
+//    TODO: Document return value
+//
+
 // .. c:function::
 extern
 ch_error_t
@@ -194,6 +204,9 @@ ch_chirp_init(
 //    :param uv_loop_t* loop: Reference to a libuv loop
 //    :param ch_log_cb_t log_cb: Callback to logging facility, can be NULL
 //
+//    TODO: Document return value
+//
+
 // .. c:function::
 static
 ch_inline
@@ -210,6 +223,7 @@ ch_chirp_register_log_cb(ch_chirp_t* chirp, ch_log_cb_t log_cb)
 {
     chirp->_log = log_cb;
 }
+
 // .. c:function::
 extern
 ch_error_t
@@ -224,7 +238,7 @@ ch_chirp_run(const ch_config_t* config, ch_chirp_t** chirp);
 //      * callbacks
 //
 //     The method blocks, but chirp paramenter will be set. Can be used to run
-//     chirp in a user defined thread. Use ch_chirp_close_ts to close it chirp
+//     chirp in a user defined thread. Use ch_chirp_close_ts to close chirp
 //     in any other thread.
 //
 //    :param ch_config_t* config: Chirp config
